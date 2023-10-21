@@ -1,0 +1,33 @@
+[project]
+name = "stjames"
+version = "0.0.1"
+description = "standardized JSON atom/molecule encoding scheme"
+readme = "README.md"
+requires-python = ">=3.8"
+authors = [
+    { name = "Corin Wagen", email = "corin@rowansci.com" },
+]
+
+dependencies = [
+    "pydantic>=2.4",
+]
+
+[build-system]
+# maybe will want to move away from setuptools eventually
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project.urls]
+"Homepage" = "https://github.com/rowansci/stjames"
+"Bug Tracker" = "https://github.com/rowansci/stjames/issues"
+
+[tool.setuptools.packages.find]
+where = ["."]  # list of folders that contain the packages (["."] by default)
+include = ["stjames"]  # package names should match these glob patterns (["*"] by default)
+exclude = []  # exclude packages matching these glob patterns (empty by default)
+namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
+
+[tool.ruff]
+line-length = 160
+select = ["E", "F"]
+ignore = ["E741"]
