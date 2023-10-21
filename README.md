@@ -17,9 +17,6 @@ To install, ensure you have Python 3.7 or newer. Then run:
 pip install stjames
 ```
 
-## License
-
-See ``LICENSE``
-
+For bug reports, please use the Issues tab (above).
 
 *Corin Wagen, 2023*
