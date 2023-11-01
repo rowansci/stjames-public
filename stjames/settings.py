@@ -25,6 +25,16 @@ class Settings(Base):
     opt_settings: Optional[OptimizationSettings] = None
     thermochem_settings: Optional[ThermochemistrySettings] = ThermochemistrySettings()
 
+    @pydantic.computed_field
+    @property
+    def level_of_theory(self) -> str:
+        if self.method in [Method.HF3C, Method.B973C]:
+            return self.method.value
+        elif (len(self.corrections)) == 0 or (self.method in [Method.B97D3]):
+            return f"{self.method.value}/{self.basis_set.name.lower()}"
+        else:
+            return f"{self.method.value}-{'-'.join([c.value for c in self.corrections])}/{self.basis_set.name.lower()}"
+
     def model_post_init(self, __context: Any) -> None:
         _assign_settings_by_mode(self)
 
