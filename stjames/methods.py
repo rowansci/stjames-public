@@ -21,4 +21,3 @@ class Method(LowercaseStrEnum):
     PBE0 = "pbe0"
     B3LYP = "b3lyp"
     B3PW91 = "b3pw91"
-    PBEH3C = "pbeh-3c"

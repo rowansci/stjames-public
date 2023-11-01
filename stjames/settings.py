@@ -37,8 +37,8 @@ class Settings(Base):
     @pydantic.field_validator("basis_set", mode="before")
     @classmethod
     def inflate_basis_set(cls, v: Any) -> BasisSet:
-        """Turn a string into a ``BasisSettings`` object."""
-        if isinstance(v, BasisSet):
+        """ Turn a string into a ``BasisSet`` object. (This is a little crude.) """
+        if isinstance(v, (BasisSet, dict)):
             return v
         elif isinstance(v, str):
             return BasisSet(name=v)
