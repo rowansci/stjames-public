@@ -51,7 +51,5 @@ class OptimizationSettings(Base):
     def check_rms_max_grad(self) -> Self:
         rms_grad = self.rms_gradient_threshold
         max_grad = self.max_gradient_threshold
-        assert (
-            abs(max_grad / rms_grad - 1.50) < 1e-3
-        ), "DLFIND hard-codes this relationship between RMS and max gradient!"
+        assert abs(max_grad / rms_grad - 1.50) < 1e-3, "DLFIND hard-codes this relationship between RMS and max gradient!"
         return self

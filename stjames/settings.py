@@ -37,7 +37,7 @@ class Settings(Base):
     @pydantic.field_validator("basis_set", mode="before")
     @classmethod
     def inflate_basis_set(cls, v: Any) -> BasisSet:
-        """ Turn a string into a ``BasisSet`` object. (This is a little crude.) """
+        """Turn a string into a ``BasisSet`` object. (This is a little crude.)"""
         if isinstance(v, (BasisSet, dict)):
             return v
         elif isinstance(v, str):
@@ -53,12 +53,7 @@ def _assign_settings_by_mode(settings: Settings) -> None:
     mode = settings.mode
 
     if mode == Mode.AUTO:
-        if (
-            (Task.OPTIMIZE in settings.tasks)
-            or (Task.GRADIENT in settings.tasks)
-            or (Task.FREQUENCIES) in settings.tasks
-            or (Task.HESSIAN) in settings.tasks
-        ):
+        if (Task.OPTIMIZE in settings.tasks) or (Task.GRADIENT in settings.tasks) or (Task.FREQUENCIES) in settings.tasks or (Task.HESSIAN) in settings.tasks:
             mode = Mode.CAREFUL
         else:
             mode = Mode.RAPID
