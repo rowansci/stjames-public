@@ -19,3 +19,6 @@ class Mode(LowercaseStrEnum):
 
     # for debugging purposes
     DEBUG = "debug"
+
+    # set parameters manually, prevent overwriting
+    MANUAL = "manual"

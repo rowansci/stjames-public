@@ -27,8 +27,8 @@ class Molecule(Base):
     elapsed: Optional[float] = None
 
     gradient: Optional[list[list[float]]] = None
-    density_matrix: Optional[list[list[float]]] = None
-    hessian: Optional[list[list[list[list[float]]]]] = None
+#    density_matrix: Optional[list[list[float]]] = None
+#    hessian: Optional[list[list[list[list[float]]]]] = None
 
     atomic_charges: Optional[list[float]] = None
     atomic_spin_densities: Optional[list[float]] = None
