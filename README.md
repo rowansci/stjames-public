@@ -11,12 +11,16 @@ This is not intended to be run as a standalone library: it's basically just a bi
 
 ## Installation
 
-To install, ensure you have Python 3.7 or newer. Then run:
+To install, ensure you have Python 3.8 or newer. Then run:
 
 ```
 pip install stjames
 ```
 
 For bug reports, please use the Issues tab (above).
+
+## New Releases
+
+To release a new version, update the version number in ``pyproject.toml`` (using semantic versioning) and then issue a release with a matching version number. Github Actions will take care of the rest!
 
 *Corin Wagen, 2023*
