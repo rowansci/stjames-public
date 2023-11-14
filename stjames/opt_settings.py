@@ -1,5 +1,4 @@
 import pydantic
-from typing import Self
 
 from .base import Base, LowercaseStrEnum
 
@@ -17,6 +16,7 @@ class Constraint(Base):
 
     constraint_type: ConstraintType
     atoms: list[int]
+
 
 class OptimizationSettings(Base):
     max_steps: pydantic.PositiveInt = 100
