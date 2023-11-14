@@ -4,7 +4,7 @@ from typing import Any
 from .modes import Mode
 from .methods import Method
 from .tasks import Task
-from .base import Base
+from .base import Base, UniqueList
 from .corrections import Correction
 from .scf_settings import SCFSettings
 from .basis_set import BasisSet
@@ -15,8 +15,8 @@ from .thermochem_settings import ThermochemistrySettings
 class Settings(Base):
     method: Method = Method.HARTREE_FOCK
     basis_set: BasisSet = BasisSet(name="STO-3G")
-    tasks: list[Task] = [Task.ENERGY, Task.CHARGE, Task.DIPOLE]
-    corrections: list[Correction] = []
+    tasks: UniqueList[Task] = [Task.ENERGY, Task.CHARGE, Task.DIPOLE]
+    corrections: UniqueList[Correction] = []
 
     mode: Mode = Mode.AUTO
 
