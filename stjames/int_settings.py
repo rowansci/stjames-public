@@ -19,5 +19,5 @@ class IntSettings(Base):
 
     # these will get overwritten by ``mode`` anyway, for the most part
     eri_threshold: pydantic.PositiveFloat = 1e-9
-    csam_multiplier: pydantic.PositiveInt = pydantic.Field(default=1, ge=1)
+    csam_multiplier: pydantic.PositiveFloat = pydantic.Field(default=1, ge=1)
     pair_overlap_threshold: pydantic.PositiveFloat = 1e-10
