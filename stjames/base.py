@@ -24,6 +24,7 @@ class LowercaseStrEnum(str, Enum):
                 return member
         return None
 
+
 # cf. https://github.com/pydantic/pydantic-core/pull/820#issuecomment-1670475909
 # there are python details here I don't really grasp
 T = TypeVar("T", bound=Hashable)

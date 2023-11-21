@@ -26,9 +26,9 @@ class Molecule(Base):
     scf_completed: Optional[bool] = None
     elapsed: Optional[float] = None
 
-    homo_lumo_gap: Optional[float] # in eV
+    homo_lumo_gap: Optional[float]  # in eV
 
-    gradient: Optional[list[list[float]]] = None # Hartree/Bohr
+    gradient: Optional[list[list[float]]] = None  # Hartree/Bohr
 
     mulliken_charges: Optional[list[float]] = None
     mulliken_spin_densities: Optional[list[float]] = None
