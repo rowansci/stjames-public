@@ -26,12 +26,12 @@ class Molecule(Base):
     scf_completed: Optional[bool] = None
     elapsed: Optional[float] = None
 
-    gradient: Optional[list[list[float]]] = None
-    #    density_matrix: Optional[list[list[float]]] = None
-    #    hessian: Optional[list[list[list[list[float]]]]] = None
+    homo_lumo_gap: Optional[float] # in eV
 
-    atomic_charges: Optional[list[float]] = None
-    atomic_spin_densities: Optional[list[float]] = None
+    gradient: Optional[list[list[float]]] = None # Hartree/Bohr
+
+    mulliken_charges: Optional[list[float]] = None
+    mulliken_spin_densities: Optional[list[float]] = None
     dipole: Optional[list[float]] = None
 
     vibrational_modes: Optional[list[VibrationalMode]] = None

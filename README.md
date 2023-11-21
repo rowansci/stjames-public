@@ -1,5 +1,8 @@
 # stjames
 
+[![pypi](https://img.shields.io/pypi/v/stjames.svg)](https://pypi.python.org/pypi/stjames)
+[![Ruff](https://img.shields.io/endpoint?url=https://raw.githubusercontent.com/charliermarsh/ruff/main/assets/badge/v1.json)](https://github.com/charliermarsh/ruff)
+
 *STructured JSON Atom/Molecule Encoding Scheme*
 
 <img src='img/james_icon.jpg' width=350>
