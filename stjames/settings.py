@@ -103,29 +103,29 @@ def _assign_settings_by_mode(settings: Settings) -> None:
     if mode == Mode.RECKLESS:
         scf_settings.energy_threshold = 1e-5
         scf_settings.rms_error_threshold = 1e-7
-        scf_settings.max_error_threshold = 1e-4
+        scf_settings.max_error_threshold = 1e-5
         scf_settings.rebuild_frequency = 100
         scf_settings.int_settings.eri_threshold = 1e-8
         scf_settings.int_settings.csam_multiplier = 3.0
-        scf_settings.int_settings.pair_overlap_threshold = 1e-9
-        scf_settings.grid_settings.angular_num_points = 302
-        scf_settings.grid_settings.radial_num_points = 75
+        scf_settings.int_settings.pair_overlap_threshold = 1e-8
+        scf_settings.grid_settings.angular_num_points = 194
+        scf_settings.grid_settings.radial_num_points = 50
         scf_settings.grid_settings.radial_precision = 1e-10
     elif mode == Mode.RAPID:
         scf_settings.energy_threshold = 1e-6
         scf_settings.rms_error_threshold = 1e-8
-        scf_settings.max_error_threshold = 1e-5
+        scf_settings.max_error_threshold = 1e-6
         scf_settings.rebuild_frequency = 20
         scf_settings.int_settings.eri_threshold = 1e-9
         scf_settings.int_settings.csam_multiplier = 1.0
-        scf_settings.int_settings.pair_overlap_threshold = 1e-10
-        scf_settings.grid_settings.angular_num_points = 590
-        scf_settings.grid_settings.radial_num_points = 99
+        scf_settings.int_settings.pair_overlap_threshold = 1e-9
+        scf_settings.grid_settings.angular_num_points = 302
+        scf_settings.grid_settings.radial_num_points = 75
         scf_settings.grid_settings.radial_precision = 1e-11
     elif mode == Mode.CAREFUL:
         scf_settings.energy_threshold = 1e-7
         scf_settings.rms_error_threshold = 1e-9
-        scf_settings.max_error_threshold = 1e-6
+        scf_settings.max_error_threshold = 1e-7
         scf_settings.rebuild_frequency = 10
         scf_settings.int_settings.eri_threshold = 1e-10
         scf_settings.int_settings.csam_multiplier = 1.0
