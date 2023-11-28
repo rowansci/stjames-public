@@ -26,5 +26,7 @@ class Calculation(Base):
     elapsed: Optional[float] = None
     logfile: Optional[str] = None
 
+    engine: Optional[str] = "kestrel"
+
     # not to be changed by end users, diff. versions will have diff. defaults
     json_format: str = StJamesVersion.V0
