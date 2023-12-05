@@ -24,4 +24,4 @@ class GridSettings(Base):
 
     # pruning?
     prune: bool = True
-    min_angular_points: pydantic.PositiveInt = 194
+    min_angular_points: pydantic.PositiveInt = 50

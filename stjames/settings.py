@@ -69,7 +69,7 @@ def _assign_settings_by_mode(settings: Settings) -> None:
     mode = settings.mode
 
     if mode == Mode.AUTO:
-        if (Task.OPTIMIZE in settings.tasks) or (Task.GRADIENT in settings.tasks) or (Task.FREQUENCIES) in settings.tasks or (Task.HESSIAN) in settings.tasks:
+        if (Task.OPTIMIZE in settings.tasks) or (Task.GRADIENT in settings.tasks) or (Task.FREQUENCIES in settings.tasks) or (Task.HESSIAN in settings.tasks):
             mode = Mode.CAREFUL
         else:
             mode = Mode.RAPID
@@ -108,7 +108,7 @@ def _assign_settings_by_mode(settings: Settings) -> None:
         scf_settings.int_settings.eri_threshold = 1e-8
         scf_settings.int_settings.csam_multiplier = 3.0
         scf_settings.int_settings.pair_overlap_threshold = 1e-8
-        scf_settings.grid_settings.angular_num_points = 194
+        scf_settings.grid_settings.angular_num_points = 302
         scf_settings.grid_settings.radial_num_points = 50
         scf_settings.grid_settings.radial_precision = 1e-10
     elif mode == Mode.RAPID:
@@ -119,7 +119,7 @@ def _assign_settings_by_mode(settings: Settings) -> None:
         scf_settings.int_settings.eri_threshold = 1e-9
         scf_settings.int_settings.csam_multiplier = 1.0
         scf_settings.int_settings.pair_overlap_threshold = 1e-9
-        scf_settings.grid_settings.angular_num_points = 302
+        scf_settings.grid_settings.angular_num_points = 590
         scf_settings.grid_settings.radial_num_points = 75
         scf_settings.grid_settings.radial_precision = 1e-11
     elif mode == Mode.CAREFUL:

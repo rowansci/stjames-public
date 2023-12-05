@@ -4,6 +4,7 @@ import pydantic
 from .base import Base, LowercaseStrEnum
 from .int_settings import IntSettings
 from .grid_settings import GridSettings
+from .diis_settings import DIISSettings
 
 
 class SCFInitMethod(LowercaseStrEnum):
@@ -20,6 +21,7 @@ class SCFSettings(Base):
 
     int_settings: IntSettings = IntSettings()
     grid_settings: GridSettings = GridSettings()
+    diis_settings: DIISSettings = DIISSettings()
 
     #### damping
     do_damping: bool = True
@@ -47,7 +49,6 @@ class SCFSettings(Base):
     do_diis: bool = True
     start_diis_max_error: pydantic.PositiveFloat = 0.5
     start_diis_iter: pydantic.PositiveInt = 3
-    diis_subspace_size: pydantic.PositiveInt = 12
 
     # if ``read`` initialization is selected
     initial_density_matrix_guess: Optional[list[list[float]]] = None
