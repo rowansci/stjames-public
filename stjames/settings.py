@@ -57,7 +57,11 @@ class Settings(Base):
         if isinstance(v, (BasisSet, dict)):
             return v
         elif isinstance(v, str):
-            return BasisSet(name=v)
+            if len(str):
+                return BasisSet(name=v)
+            else:
+                # "" is basically None, let's be real here...
+                return BasisSet(name="STO-3G")
         elif v is None:
             return BasisSet(name="STO-3G")
         else:
@@ -150,9 +154,7 @@ def _assign_settings_by_mode(settings: Settings) -> None:
         scf_settings.max_error_threshold = 1e-9
         scf_settings.rebuild_frequency = 1
         scf_settings.int_settings.eri_threshold = 1e-14
-        scf_settings.int_settings.csam_multiplier = (
-            1e10  # in other words, disable CSAM
-        )
+        scf_settings.int_settings.csam_multiplier = 1e10  # in other words, disable CSAM
         scf_settings.int_settings.pair_overlap_threshold = 1e-14
         scf_settings.grid_settings.angular_num_points = 974
         scf_settings.grid_settings.radial_num_points = 250

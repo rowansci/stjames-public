@@ -47,8 +47,12 @@ class SCFSettings(Base):
 
     #### DIIS
     do_diis: bool = True
+    # error below which we'll start DIIS
     start_diis_max_error: pydantic.PositiveFloat = 0.5
+    # first iteration we'll consider starting DIIS
     start_diis_iter: pydantic.PositiveInt = 3
+    # iteration past which we'll start DIIS even if error is high
+    start_diis_anyway: pydantic.PositiveInt = 7
 
     # if ``read`` initialization is selected
     initial_density_matrix_guess: Optional[list[list[float]]] = None

@@ -1,5 +1,5 @@
 import pydantic
-from typing import Optional
+from typing import Optional, Self
 
 from .base import Base
 
@@ -26,7 +26,7 @@ class Molecule(Base):
     scf_completed: Optional[bool] = None
     elapsed: Optional[float] = None
 
-    homo_lumo_gap: Optional[float]=None  # in eV
+    homo_lumo_gap: Optional[float] = None  # in eV
 
     gradient: Optional[list[list[float]]] = None  # Hartree/Bohr
 
@@ -76,3 +76,15 @@ class Molecule(Base):
             return None
         else:
             return self.energy + self.thermal_free_energy_corr
+
+    @pydantic.model_validator(mode="after")
+    def check_electron_sanity(self) -> Self:
+        num_electrons = sum(self.atomic_numbers) - self.charge
+        num_unpaired_electrons = self.multiplicity - 1
+        if (num_electrons - num_unpaired_electrons) % 2 != 0:
+            raise ValueError(
+                f"The combination of {num_electrons} electrons, charge {self.charge}, and multiplicity {self.multiplicity} is impossible. "
+                "Double-check the charge and multiplicity values given and verify that it's correct."
+            )
+
+        return self
