@@ -57,7 +57,7 @@ class Settings(Base):
         if isinstance(v, (BasisSet, dict)):
             return v
         elif isinstance(v, str):
-            if len(str):
+            if len(v):
                 return BasisSet(name=v)
             else:
                 # "" is basically None, let's be real here...
