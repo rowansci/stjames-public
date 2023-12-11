@@ -15,6 +15,12 @@ class SCFInitMethod(LowercaseStrEnum):
     READ = "read"
 
 
+class OrthonormalizationMethod(LowercaseStrEnum):
+    SYMMETRIC = "symmetric"
+    CANONICAL = "canonical"
+    # cholesky, in future?
+
+
 class SCFSettings(Base):
     max_iters: int = 100
     init_method: SCFInitMethod = SCFInitMethod.SAD
@@ -22,6 +28,9 @@ class SCFSettings(Base):
     int_settings: IntSettings = IntSettings()
     grid_settings: GridSettings = GridSettings()
     diis_settings: DIISSettings = DIISSettings()
+
+    #### orthonormalization
+    orthonormalization: OrthonormalizationMethod = OrthonormalizationMethod.CANONICAL
 
     #### damping
     do_damping: bool = True
