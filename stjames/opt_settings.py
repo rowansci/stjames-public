@@ -15,7 +15,7 @@ class Constraint(Base):
     """Represents a single constraint."""
 
     constraint_type: ConstraintType
-    atoms: list[int]
+    atoms: list[int]  # 1-indexed
 
 
 class OptimizationSettings(Base):
