@@ -12,15 +12,15 @@ class RadialGridType(LowercaseStrEnum):
 
 class GridSettings(Base):
     radial_grid_type: RadialGridType = RadialGridType.LMG
-    angular_num_points: pydantic.PositiveInt = 590
+    angular_num_points: pydantic.PositiveInt = 302
 
     weight_cutoff: pydantic.PositiveFloat = 1e-14
 
     # for LMG
-    radial_precision: pydantic.PositiveFloat = 1e-12
+    radial_precision: pydantic.PositiveFloat = 1e-11
 
     # for other schemes, like KK
-    radial_num_points: pydantic.PositiveInt = 99
+    radial_num_points: pydantic.PositiveInt = 75
 
     # pruning?
     prune: bool = True

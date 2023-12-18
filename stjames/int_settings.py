@@ -10,8 +10,11 @@ class ERIStrategy(LowercaseStrEnum):
     # Raffinetti-style supermatrix
     SUPERMATRIX = "supermatrix"
 
-    # let the software choose based on the molecule
+    # let the software choose between direct and supermatrix based on size
     AUTO = "auto"
+
+    # resolution of the identity for J and K
+    RIJK = "rijk"
 
 
 class IntSettings(Base):
@@ -21,3 +24,8 @@ class IntSettings(Base):
     eri_threshold: pydantic.PositiveFloat = 1e-9
     csam_multiplier: pydantic.PositiveFloat = pydantic.Field(default=1, ge=1)
     pair_overlap_threshold: pydantic.PositiveFloat = 1e-10
+
+    @property
+    def resolution_of_the_identity(self) -> bool:
+        """ Abstracting in case we add RIJCOSX, etc later """
+        return self.strategy == ERIStrategy.RIJK

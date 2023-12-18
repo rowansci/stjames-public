@@ -113,15 +113,15 @@ def _assign_settings_by_mode(settings: Settings) -> None:
         scf_settings.int_settings.csam_multiplier = 3.0
         scf_settings.int_settings.pair_overlap_threshold = 1e-8
     elif mode == Mode.RAPID:
-        scf_settings.energy_threshold = 1e-6
+        scf_settings.energy_threshold = 5e-5
         scf_settings.rms_error_threshold = 1e-8
         scf_settings.max_error_threshold = 1e-6
         scf_settings.rebuild_frequency = 20
-        scf_settings.int_settings.eri_threshold = 1e-9
-        scf_settings.int_settings.csam_multiplier = 1.0
+        scf_settings.int_settings.eri_threshold = 1e-8
+        scf_settings.int_settings.csam_multiplier = 5.0
         scf_settings.int_settings.pair_overlap_threshold = 1e-9
     elif mode == Mode.CAREFUL:
-        scf_settings.energy_threshold = 1e-7
+        scf_settings.energy_threshold = 1e-6
         scf_settings.rms_error_threshold = 1e-9
         scf_settings.max_error_threshold = 1e-7
         scf_settings.rebuild_frequency = 10

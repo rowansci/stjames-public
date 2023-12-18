@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 import pydantic
 
 from .base import Base, LowercaseStrEnum
@@ -35,18 +35,21 @@ class SCFSettings(Base):
     #### damping
     do_damping: bool = True
     # when should we stop damping?
-    end_damping_error: pydantic.PositiveFloat = 0.5
+    end_damping_error: pydantic.PositiveFloat = 0.1
     # what damping factor should we use?
-    damping_factor: float = pydantic.Field(ge=0, le=1, default=0.5)
+    damping_factor: float = pydantic.Field(ge=0, le=1, default=0.7)
 
     #### level shifting
     do_level_shift: bool = True
     # how much? (Eh)
-    level_shift_magnitude: pydantic.PositiveFloat = 0.1
+    level_shift_magnitude: pydantic.PositiveFloat = 0.25
     # when should we stop?
     end_level_shift_error: pydantic.PositiveFloat = 0.1
 
-    #### reset incremental fock build
+    #### incremental
+    # do incremental fock build?
+    do_incremental: bool = True
+    # reset incremental fock build
     rebuild_frequency: pydantic.PositiveInt = 20
 
     #### when are we converged?
@@ -57,7 +60,7 @@ class SCFSettings(Base):
     #### DIIS
     do_diis: bool = True
     # error below which we'll start DIIS
-    start_diis_max_error: pydantic.PositiveFloat = 0.5
+    start_diis_max_error: pydantic.PositiveFloat = 0.2
     # first iteration we'll consider starting DIIS
     start_diis_iter: pydantic.PositiveInt = 3
     # iteration past which we'll start DIIS even if error is high
@@ -65,3 +68,8 @@ class SCFSettings(Base):
 
     # if ``read`` initialization is selected
     initial_density_matrix_guess: Optional[list[list[float]]] = None
+
+    def model_post_init(self, __context: Any) -> None:
+        # disable incremental Fock for RI
+        if self.int_settings.resolution_of_the_identity:
+            self.do_incremental = False
