@@ -10,7 +10,7 @@ class ERIStrategy(LowercaseStrEnum):
     # Raffinetti-style supermatrix
     SUPERMATRIX = "supermatrix"
 
-    # let the software choose between direct and supermatrix based on siz3
+    # let the software choose between direct and supermatrix based on size
     AUTO = "auto"
 
     # resolution of the identity for J and K
@@ -18,7 +18,7 @@ class ERIStrategy(LowercaseStrEnum):
 
 
 class IntSettings(Base):
-    strategy: ERIStrategy = ERIStrategy.RIJK
+    strategy: ERIStrategy = ERIStrategy.AUTO
 
     # these will get overwritten by ``mode`` anyway, for the most part
     eri_threshold: pydantic.PositiveFloat = 1e-9
