@@ -1,4 +1,4 @@
-from typing import Optional
+from typing import Optional, Any
 import pydantic
 
 from .base import Base, LowercaseStrEnum
@@ -46,7 +46,10 @@ class SCFSettings(Base):
     # when should we stop?
     end_level_shift_error: pydantic.PositiveFloat = 0.1
 
-    #### reset incremental fock build
+    #### incremental
+    # do incremental fock build?
+    do_incremental: bool = True
+    # reset incremental fock build
     rebuild_frequency: pydantic.PositiveInt = 20
 
     #### when are we converged?
@@ -65,3 +68,8 @@ class SCFSettings(Base):
 
     # if ``read`` initialization is selected
     initial_density_matrix_guess: Optional[list[list[float]]] = None
+
+    def model_post_init(self, __context: Any) -> None:
+        # disable incremental Fock for RI
+        if self.int_settings.resolution_of_the_identity:
+            self.do_incremental = False
