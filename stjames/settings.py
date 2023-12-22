@@ -117,8 +117,8 @@ def _assign_settings_by_mode(settings: Settings) -> None:
         scf_settings.rms_error_threshold = 1e-8
         scf_settings.max_error_threshold = 1e-6
         scf_settings.rebuild_frequency = 20
-        scf_settings.int_settings.eri_threshold = 1e-8
-        scf_settings.int_settings.csam_multiplier = 5.0
+        scf_settings.int_settings.eri_threshold = 1e-9
+        scf_settings.int_settings.csam_multiplier = 1.0
         scf_settings.int_settings.pair_overlap_threshold = 1e-9
     elif mode == Mode.CAREFUL:
         scf_settings.energy_threshold = 1e-6
@@ -149,17 +149,20 @@ def _assign_settings_by_mode(settings: Settings) -> None:
 
     opt_settings = settings.opt_settings
 
+    # constrained optimizations warrant loosening the settings a bit
+    has_constraints = (len(opt_settings.constraints) > 0)
+
     # cf. DLFIND manual, and https://www.cup.uni-muenchen.de/ch/compchem/geom/basic.html
     # and the discussion at https://geometric.readthedocs.io/en/latest/how-it-works.html
     if mode == Mode.RECKLESS:
         opt_settings.energy_threshold = 1e-5
         opt_settings.max_gradient_threshold = 4.5e-3
         opt_settings.rms_gradient_threshold = 3e-3
-    elif mode == Mode.RAPID:
-        opt_settings.energy_threshold = 1e-6
+    elif (mode == Mode.RAPID) or (mode == Mode.CAREFUL and has_constraints):
+        opt_settings.energy_threshold = 5e-5
         opt_settings.max_gradient_threshold = 2.5e-3
         opt_settings.rms_gradient_threshold = 1.7e-3
-    elif mode == Mode.CAREFUL:
+    elif mode == Mode.CAREFUL or (mode == mode.METICULOUS and has_constraints):
         opt_settings.energy_threshold = 1e-6
         opt_settings.max_gradient_threshold = 4.5e-4
         opt_settings.rms_gradient_threshold = 3e-4

@@ -84,7 +84,7 @@ class Molecule(Base):
         if (num_electrons - num_unpaired_electrons) % 2 != 0:
             raise ValueError(
                 f"The combination of {num_electrons} electrons, charge {self.charge}, and multiplicity {self.multiplicity} is impossible. "
-                "Double-check the charge and multiplicity values given and verify that it's correct."
+                "Double-check the charge and multiplicity values given and verify that they are correct."
             )
 
         return self
