@@ -21,3 +21,6 @@ class Method(LowercaseStrEnum):
     PBE0 = "pbe0"
     B3LYP = "b3lyp"
     B3PW91 = "b3pw91"
+
+    # ML methods
+    AIMNET2_WB97MD3 = "aimnet2_wb97md3"
