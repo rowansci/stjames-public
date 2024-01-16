@@ -1,5 +1,5 @@
 import pydantic
-from typing import Any
+from typing import Any, Optional
 
 from .modes import Mode
 from .methods import Method
