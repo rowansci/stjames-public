@@ -27,5 +27,5 @@ class IntSettings(Base):
 
     @property
     def resolution_of_the_identity(self) -> bool:
-        """ Abstracting in case we add RIJCOSX, etc later """
+        """Abstracting in case we add RIJCOSX, etc later"""
         return self.strategy == ERIStrategy.RIJK

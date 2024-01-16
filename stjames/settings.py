@@ -28,7 +28,7 @@ class Settings(Base):
     @pydantic.computed_field
     @property
     def level_of_theory(self) -> str:
-        if self.method in [Method.HF3C, Method.B973C]:
+        if self.method in [Method.HF3C, Method.B973C, Method.AIMNET2_WB97MD3]:
             return self.method.value
         elif (len(self.corrections)) == 0 or (self.method in [Method.B97D3]):
             return f"{self.method.value}/{self.basis_set.name.lower()}"
@@ -150,7 +150,7 @@ def _assign_settings_by_mode(settings: Settings) -> None:
     opt_settings = settings.opt_settings
 
     # constrained optimizations warrant loosening the settings a bit
-    has_constraints = (len(opt_settings.constraints) > 0)
+    has_constraints = len(opt_settings.constraints) > 0
 
     # cf. DLFIND manual, and https://www.cup.uni-muenchen.de/ch/compchem/geom/basic.html
     # and the discussion at https://geometric.readthedocs.io/en/latest/how-it-works.html
