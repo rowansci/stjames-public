@@ -76,7 +76,11 @@ def _assign_settings_by_mode(settings: Settings) -> None:
 
     if mode == Mode.AUTO:
         if (Task.OPTIMIZE in settings.tasks) or (Task.GRADIENT in settings.tasks) or (Task.FREQUENCIES in settings.tasks) or (Task.HESSIAN in settings.tasks):
-            mode = Mode.CAREFUL
+            # noisy gradient! struggles to converge
+            if settings.method == Method.AIMNET2_WB97MD3:
+                mode = Mode.RAPID
+            else:
+                mode = Mode.CAREFUL
         else:
             mode = Mode.RAPID
     elif mode == Mode.MANUAL:
