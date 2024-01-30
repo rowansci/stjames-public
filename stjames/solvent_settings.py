@@ -1,17 +1,42 @@
-from typing import Optional, Any
 import pydantic
 
 from .base import Base, LowercaseStrEnum
 
-class ImplicitSolventModel(LowercaseStrEnum):
+
+class Solvent(LowercaseStrEnum):
+    WATER = "water"
+    NITROMETHANE = "nitromethane"
+    NITROBENZENE = "nitrobenzene"
+    TOLUENE = "toluene"
+    BENZENE = "benzene"
+    CHLOROBENZENE = "chlorobenzene"
+    CARBONTETRACHLORIDE = "carbontetrachloride"
+    DICHLOROETHANE = "dichloroethane"
+    DICHLOROMETHANE = "dichloromethane"
+    CHLOROFORM = "chloroform"
+    DIETHYLETHER = "diethylether"
+    DIISOPROPYLETHER = "diisopropylether"
+    DIMETHYLSULFOXIDE = "dimethylsulfoxide"
+    TETRAHYDROFURAN = "tetrahydrofuran"
+    CYCLOHEXANE = "cyclohexane"
+    OCTANE = "octane"
+    ACETICACID = "aceticacid"
+    HEXANE = "hexane"
+    ETHYLACETATE = "ethylacetate"
+    ACETONE = "acetone"
+    ACETONITRILE = "acetonitrile"
+    METHANOL = "methanol"
+    ETHANOL = "ethanol"
+    ISOPROPANOL = "isopropanol"
+    DIMETHYLACETAMIDE = "dimethylacetamide"
+    DIMETHYLFORMAMIDE = "dimethylformamide"
+
+class SolventModel(LowercaseStrEnum):
     CPCM = "cpcm"
-    NONE = "none"
+    ALPB = "alpb"
+    COSMO = "cosmo"
 
 
 class SolventSettings(Base):
-    model: ImplicitSolventModel = ImplicitSolventModel.NONE
-    epsilon: float = 78.36
-
-    grid_points_per_atom: pydantic.PositiveInt = 170
-    vdw_scale: pydantic.PositiveFloat = 1.2
-    weight_cutoff: pydantic.PositiveFloat = 1e-8
+    solvent: Solvent
+    model: SolventModel

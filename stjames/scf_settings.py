@@ -29,7 +29,6 @@ class SCFSettings(Base):
     int_settings: IntSettings = IntSettings()
     grid_settings: GridSettings = GridSettings()
     diis_settings: DIISSettings = DIISSettings()
-    solvent_settings: SolventSettings = SolventSettings()
 
     #### orthonormalization
     orthonormalization: OrthonormalizationMethod = OrthonormalizationMethod.CANONICAL

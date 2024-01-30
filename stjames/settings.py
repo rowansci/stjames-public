@@ -1,5 +1,5 @@
 import pydantic
-from typing import Any
+from typing import Any, Optional
 
 from .modes import Mode
 from .methods import Method
@@ -10,7 +10,7 @@ from .scf_settings import SCFSettings
 from .basis_set import BasisSet
 from .opt_settings import OptimizationSettings
 from .thermochem_settings import ThermochemistrySettings
-
+from .solvent_settings import SolventSettings
 
 class Settings(Base):
     method: Method = Method.HARTREE_FOCK
@@ -19,6 +19,8 @@ class Settings(Base):
     corrections: UniqueList[Correction] = []
 
     mode: Mode = Mode.AUTO
+
+    solvent_settings: Optional[SolventSettings] = None
 
     # scf/opt settings will be set automatically based on mode, but can be overridden manually
     scf_settings: SCFSettings = SCFSettings()

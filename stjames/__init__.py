@@ -10,6 +10,7 @@ from .diis_settings import *
 from .solvent_settings import *
 from .thermochem_settings import *
 from .grid_settings import *
+from .solvent_settings import *
 from .settings import *
 
 from .methods import *
