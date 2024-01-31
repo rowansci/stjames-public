@@ -19,7 +19,7 @@ class Constraint(Base):
 
 
 class OptimizationSettings(Base):
-    max_steps: pydantic.PositiveInt = 100
+    max_steps: pydantic.PositiveInt = 250
     transition_state: bool = False
 
     # when are we converged?

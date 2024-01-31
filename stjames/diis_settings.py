@@ -15,7 +15,7 @@ class DIISStrategy(LowercaseStrEnum):
 
 
 class DIISSettings(Base):
-    strategy: DIISStrategy = DIISStrategy.DIIS
+    strategy: DIISStrategy = DIISStrategy.ADIIS_DIIS
     subspace_size: pydantic.PositiveInt = 12
 
     # if it's a hybrid strategy, where do we transition?
