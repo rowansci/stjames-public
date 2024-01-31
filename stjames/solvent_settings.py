@@ -1,5 +1,3 @@
-import pydantic
-
 from .base import Base, LowercaseStrEnum
 
 
@@ -30,6 +28,7 @@ class Solvent(LowercaseStrEnum):
     ISOPROPANOL = "isopropanol"
     DIMETHYLACETAMIDE = "dimethylacetamide"
     DIMETHYLFORMAMIDE = "dimethylformamide"
+
 
 class SolventModel(LowercaseStrEnum):
     CPCM = "cpcm"

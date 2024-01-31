@@ -1,7 +1,7 @@
-from typing import Optional, Any
 import pydantic
 
 from .base import Base, LowercaseStrEnum
+
 
 class ImplicitSolventModel(LowercaseStrEnum):
     CPCM = "cpcm"

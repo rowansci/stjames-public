@@ -5,7 +5,6 @@ from .base import Base, LowercaseStrEnum
 from .int_settings import IntSettings
 from .grid_settings import GridSettings
 from .diis_settings import DIISSettings
-from .solvent_settings import SolventSettings
 
 
 class SCFInitMethod(LowercaseStrEnum):

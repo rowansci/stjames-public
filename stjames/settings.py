@@ -12,9 +12,10 @@ from .opt_settings import OptimizationSettings
 from .thermochem_settings import ThermochemistrySettings
 from .solvent_settings import SolventSettings
 
+
 class Settings(Base):
     method: Method = Method.HARTREE_FOCK
-    basis_set: BasisSet = BasisSet(name="STO-3G")
+    basis_set: Optional[BasisSet] = None
     tasks: UniqueList[Task] = [Task.ENERGY, Task.CHARGE, Task.DIPOLE]
     corrections: UniqueList[Correction] = []
 
@@ -30,10 +31,10 @@ class Settings(Base):
     @pydantic.computed_field
     @property
     def level_of_theory(self) -> str:
-        if self.method in [Method.HF3C, Method.B973C]:
+        if self.method in [Method.HF3C, Method.B973C] or self.basis_set is None:
             return self.method.value
-        elif (len(self.corrections)) == 0 or (self.method in [Method.B97D3]):
-            return f"{self.method.value}/{self.basis_set.name.lower()}"
+        #        elif (len(self.corrections)) == 0 or (self.method in [Method.B97D3]):
+        #            return f"{self.method.value}/{self.basis_set.name.lower()}"
         else:
             return f"{self.method.value}-{'-'.join([c.value for c in self.corrections])}/{self.basis_set.name.lower()}"
 
@@ -54,7 +55,7 @@ class Settings(Base):
 
     @pydantic.field_validator("basis_set", mode="before")
     @classmethod
-    def inflate_basis_set(cls, v: Any) -> BasisSet:
+    def inflate_basis_set(cls, v: Any) -> BasisSet | None:
         """Turn a string into a ``BasisSet`` object. (This is a little crude.)"""
         if isinstance(v, (BasisSet, dict)):
             return v
@@ -63,9 +64,9 @@ class Settings(Base):
                 return BasisSet(name=v)
             else:
                 # "" is basically None, let's be real here...
-                return BasisSet(name="STO-3G")
+                return None
         elif v is None:
-            return BasisSet(name="STO-3G")
+            return None
         else:
             raise ValueError(f"invalid value ``{v}`` for ``basis_set``")
 

@@ -3,6 +3,8 @@
 STO-3G
 STO-6G
 
+MIDIX
+
 3-21G
 6-31G
 6-31G(d)
