@@ -10,15 +10,18 @@ from .scf_settings import SCFSettings
 from .basis_set import BasisSet
 from .opt_settings import OptimizationSettings
 from .thermochem_settings import ThermochemistrySettings
+from .solvent_settings import SolventSettings
 
 
 class Settings(Base):
     method: Method = Method.HARTREE_FOCK
-    basis_set: Optional[BasisSet] = BasisSet(name="STO-3G")
+    basis_set: Optional[BasisSet] = None
     tasks: UniqueList[Task] = [Task.ENERGY, Task.CHARGE, Task.DIPOLE]
     corrections: UniqueList[Correction] = []
 
     mode: Mode = Mode.AUTO
+
+    solvent_settings: Optional[SolventSettings] = None
 
     # scf/opt settings will be set automatically based on mode, but can be overridden manually
     scf_settings: SCFSettings = SCFSettings()
@@ -30,8 +33,8 @@ class Settings(Base):
     def level_of_theory(self) -> str:
         if self.method in [Method.HF3C, Method.B973C, Method.AIMNET2_WB97MD3] or self.basis_set is None:
             return self.method.value
-        elif (len(self.corrections)) == 0 or (self.method in [Method.B97D3]):
-            return f"{self.method.value}/{self.basis_set.name.lower()}"
+        #        elif (len(self.corrections)) == 0 or (self.method in [Method.B97D3]):
+        #            return f"{self.method.value}/{self.basis_set.name.lower()}"
         else:
             return f"{self.method.value}-{'-'.join([c.value for c in self.corrections])}/{self.basis_set.name.lower()}"
 
@@ -63,7 +66,7 @@ class Settings(Base):
                 return BasisSet(name=v)
             else:
                 # "" is basically None, let's be real here...
-                return BasisSet(name="STO-3G")
+                return None
         elif v is None:
             return None
         else:

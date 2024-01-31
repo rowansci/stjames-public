@@ -5,7 +5,6 @@ from .base import Base, LowercaseStrEnum
 from .int_settings import IntSettings
 from .grid_settings import GridSettings
 from .diis_settings import DIISSettings
-from .solvent_settings import SolventSettings
 
 
 class SCFInitMethod(LowercaseStrEnum):
@@ -29,7 +28,6 @@ class SCFSettings(Base):
     int_settings: IntSettings = IntSettings()
     grid_settings: GridSettings = GridSettings()
     diis_settings: DIISSettings = DIISSettings()
-    solvent_settings: SolventSettings = SolventSettings()
 
     #### orthonormalization
     orthonormalization: OrthonormalizationMethod = OrthonormalizationMethod.CANONICAL
