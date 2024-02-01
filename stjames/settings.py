@@ -72,6 +72,12 @@ class Settings(Base):
         else:
             raise ValueError(f"invalid value ``{v}`` for ``basis_set``")
 
+    @pydantic.field_validator("corrections", mode="before")
+    @classmethod
+    def remove_empty_string(cls, v: list) -> list:
+        """ Remove empty string values. """
+        return [c for c in v if c]
+
 
 def _assign_settings_by_mode(settings: Settings) -> None:
     """Modifies ``scf_settings`` and ``opt_settings`` based on preset ``mode``."""
