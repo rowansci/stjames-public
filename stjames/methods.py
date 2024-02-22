@@ -41,6 +41,7 @@ class Method(LowercaseStrEnum):
 
     # ML methods
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
+    AIMNET2_B973C = "aimnet2_b973c"
 
     # xTB methods
     GFN1_XTB = "gfn1_xtb"

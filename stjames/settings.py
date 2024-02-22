@@ -31,12 +31,17 @@ class Settings(Base):
     @pydantic.computed_field
     @property
     def level_of_theory(self) -> str:
-        if self.method in [Method.HF3C, Method.B973C, Method.AIMNET2_WB97MD3] or self.basis_set is None:
-            return self.method.value
-        #        elif (len(self.corrections)) == 0 or (self.method in [Method.B97D3]):
-        #            return f"{self.method.value}/{self.basis_set.name.lower()}"
+        # prepackaged methods
+        if self.method in [Method.HF3C, Method.B973C, Method.AIMNET2_WB97MD3, Method.AIMNET2_B973C, Method.GFN2_XTB, Method.GFN1_XTB] or self.basis_set is None:
+            method = self.method.value
         else:
-            return f"{self.method.value}-{'-'.join([c.value for c in self.corrections])}/{self.basis_set.name.lower()}"
+            corrections = list(filter(lambda x: x not in (None, ""), self.corrections))
+            method = f"{self.method.value}-{'-'.join([c.value for c in corrections])}/{self.basis_set.name.lower()}"
+
+        if self.solvent_settings is not None:
+            method += f"/{self.solvent_settings.model.value}({self.solvent_settings.solvent.value})"
+
+        return method
 
     def model_post_init(self, __context: Any) -> None:
         _assign_settings_by_mode(self)
@@ -75,7 +80,7 @@ class Settings(Base):
     @pydantic.field_validator("corrections", mode="before")
     @classmethod
     def remove_empty_string(cls, v: list) -> list:
-        """ Remove empty string values. """
+        """Remove empty string values."""
         return [c for c in v if c]
 
 
