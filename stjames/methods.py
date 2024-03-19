@@ -36,6 +36,7 @@ class Method(LowercaseStrEnum):
     # range-separated
     CAMB3LYP = "camb3lyp"
     WB97XD = "wb97x_d"
+    WB97XD3 = "wb97x_d3"
     WB97XV = "wb97x_v"
     WB97MV = "wb97m_v"
 
