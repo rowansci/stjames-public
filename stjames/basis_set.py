@@ -1,5 +1,9 @@
 import pydantic
-from typing import Optional, Self
+
+try:
+    from typing import Optional, Self
+except ImportError:
+    from typing_extensions import Optional, Self
 
 from .base import Base
 
