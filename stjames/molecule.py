@@ -54,28 +54,28 @@ class Molecule(Base):
         return [a.atomic_number for a in self.atoms]
 
     @property
-    def sum_energy_zpe(self) -> float | None:
+    def sum_energy_zpe(self) -> Optional[float]:
         if (self.energy is None) or (self.zero_point_energy is None):
             return None
         else:
             return self.energy + self.zero_point_energy
 
     @property
-    def sum_energy_thermal_corr(self) -> float | None:
+    def sum_energy_thermal_corr(self) -> Optional[float]:
         if (self.energy is None) or (self.thermal_energy_corr is None):
             return None
         else:
             return self.energy + self.thermal_energy_corr
 
     @property
-    def sum_energy_enthalpy(self) -> float | None:
+    def sum_energy_enthalpy(self) -> Optional[float]:
         if (self.energy is None) or (self.thermal_enthalpy_corr is None):
             return None
         else:
             return self.energy + self.thermal_enthalpy_corr
 
     @property
-    def sum_energy_free_energy(self) -> float | None:
+    def sum_energy_free_energy(self) -> Optional[float]:
         if (self.energy is None) or (self.thermal_free_energy_corr is None):
             return None
         else:

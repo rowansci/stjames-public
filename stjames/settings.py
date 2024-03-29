@@ -60,7 +60,7 @@ class Settings(Base):
 
     @pydantic.field_validator("basis_set", mode="before")
     @classmethod
-    def parse_basis_set(cls, v: Any) -> BasisSet | None:
+    def parse_basis_set(cls, v: Any) -> Optional[BasisSet]:
         """Turn a string into a ``BasisSet`` object. (This is a little crude.)"""
         if isinstance(v, BasisSet):
             return None if v.name is None else v
