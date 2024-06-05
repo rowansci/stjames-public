@@ -1,7 +1,8 @@
-import pydantic
 from enum import Enum
+from typing import Annotated, Any, Hashable, TypeVar
+
 import numpy as np
-from typing import Any, Annotated, TypeVar, Hashable
+import pydantic
 
 
 class Base(pydantic.BaseModel):

@@ -1,16 +1,17 @@
-import pydantic
 from typing import Any, Optional
 
-from .modes import Mode
-from .methods import Method
-from .tasks import Task
+import pydantic
+
 from .base import Base, UniqueList
-from .corrections import Correction
-from .scf_settings import SCFSettings
 from .basis_set import BasisSet
+from .corrections import Correction
+from .methods import Method
+from .modes import Mode
 from .opt_settings import OptimizationSettings
-from .thermochem_settings import ThermochemistrySettings
+from .scf_settings import SCFSettings
 from .solvent_settings import SolventSettings
+from .tasks import Task
+from .thermochem_settings import ThermochemistrySettings
 
 
 class Settings(Base):
