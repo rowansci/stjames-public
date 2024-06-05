@@ -34,5 +34,7 @@ line-length = 160
 select = [
     "E",  # pycodestyle errors
     "F",  # pyflakes
+    "I",  # isort
+    "W",  # pycodestyle warnings
 ]
 ignore = ["E741"]

@@ -1,7 +1,7 @@
 from typing import Optional
 
-from .molecule import Molecule
 from .base import Base, LowercaseStrEnum
+from .molecule import Molecule
 from .settings import Settings
 from .status import Status
 
