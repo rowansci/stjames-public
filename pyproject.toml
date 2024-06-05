@@ -29,5 +29,12 @@ namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
 [tool.ruff]
 line-length = 160
-select = ["E", "F"]
+
+[tool.ruff.lint]
+select = [
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "I",  # isort
+    "W",  # pycodestyle warnings
+]
 ignore = ["E741"]

@@ -1,10 +1,11 @@
-from typing import Optional, Any
+from typing import Any, Optional
+
 import pydantic
 
 from .base import Base, LowercaseStrEnum
-from .int_settings import IntSettings
-from .grid_settings import GridSettings
 from .diis_settings import DIISSettings
+from .grid_settings import GridSettings
+from .int_settings import IntSettings
 
 
 class SCFInitMethod(LowercaseStrEnum):
