@@ -2,6 +2,7 @@
 
 from .calculation import *
 from .molecule import *
+from .workflows import *
 
 from .scf_settings import *
 from .int_settings import *
