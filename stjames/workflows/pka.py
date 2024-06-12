@@ -1,4 +1,14 @@
-from .workflow import Workflow
+from typing import Optional
+
+from ..base import Base
+from .workflow import DBCalculation, Workflow
+
+
+class pKaMicrostate(Base):
+    atom_index: int
+    structures: list[DBCalculation] = []
+    delta_G: float
+    pKa: float
 
 
 class pKaWorkflow(Workflow):
@@ -9,3 +19,9 @@ class pKaWorkflow(Workflow):
     protonate_atoms: list[int] = []
 
     reasonableness_buffer: float = 5
+
+    structures: list[DBCalculation] = []
+    conjugate_acids: list[pKaMicrostate] = []
+    conjugate_bases: list[pKaMicrostate] = []
+    strongest_acid: Optional[float] = None
+    strongest_base: Optional[float] = None

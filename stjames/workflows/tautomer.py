@@ -2,7 +2,7 @@ from typing import Optional
 
 from ..base import Base
 from .conformer import ConformerSettings
-from .workflow import Workflow
+from .workflow import DBCalculation, Workflow
 
 
 class Tautomer(Base):
@@ -11,7 +11,7 @@ class Tautomer(Base):
     predicted_relative_energy: Optional[float] = None
 
     # uuids, optionally
-    structures: list[Optional[str]] = []
+    structures: list[DBCalculation] = []
 
 
 class TautomerWorkflow(Workflow):

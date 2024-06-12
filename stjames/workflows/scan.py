@@ -34,4 +34,5 @@ class ScanWorkflow(Workflow):
     calc_settings: Settings
     engine: str
 
-    scan_points: list[ScanPoint] = []
+    # uuids of scan points
+    scan_points: list[str] = []
