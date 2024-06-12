@@ -7,7 +7,7 @@ class FukuiIndexWorkflow(Workflow):
     # uuid of optimization
     optimization: Optional[str] = None
 
-    global_electrophilicity_index: float
-    fukui_positive: list[float]
-    fukui_negative: list[float]
-    fukui_zero: list[float]
+    global_electrophilicity_index: Optional[float] = None
+    fukui_positive: Optional[list[float]] = None
+    fukui_negative: Optional[list[float]] = None
+    fukui_zero: Optional[list[float]] = None
