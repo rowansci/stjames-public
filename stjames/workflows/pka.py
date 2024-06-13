@@ -1,5 +1,6 @@
 from typing import Optional
 
+from ..mode import Mode
 from ..base import Base
 from .workflow import DBCalculation, Workflow
 
@@ -12,6 +13,8 @@ class pKaMicrostate(Base):
 
 
 class pKaWorkflow(Workflow):
+    mode: Mode = Mode.CAREFUL
+
     pka_range: tuple[float, float] = (2, 12)
     deprotonate_elements: list[int] = [7, 8, 16]
     deprotonate_atoms: list[int] = []

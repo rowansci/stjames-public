@@ -1,5 +1,4 @@
 from ..base import Base
-from ..mode import Mode
 from ..molecule import Molecule
 
 
@@ -7,7 +6,6 @@ class Workflow(Base):
     """All workflows should have these properties."""
 
     initial_molecule: Molecule
-    mode: Mode
 
 
 class DBCalculation(Base):

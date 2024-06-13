@@ -32,7 +32,7 @@ class ScanSettings(Base):
 class ScanWorkflow(Workflow):
     scan_settings: ScanSettings
     calc_settings: Settings
-    engine: str
+    calc_engine: str
 
     # uuids of scan points
     scan_points: list[str] = []

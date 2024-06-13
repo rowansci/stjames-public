@@ -1,6 +1,7 @@
 from typing import Optional
 
 from ..base import Base
+from ..mode import Mode
 from .conformer import ConformerSettings
 from .workflow import DBCalculation, Workflow
 
@@ -15,5 +16,5 @@ class Tautomer(Base):
 
 
 class TautomerWorkflow(Workflow):
-    settings: ConformerSettings
+    mode: Mode = Mode.CAREFUL
     tautomers: list[Tautomer] = []

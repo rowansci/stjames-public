@@ -18,19 +18,12 @@ class ConformerSettings(Base):
 
 
 class RdkitConformerSettings(ConformerSettings):
-    csearch_program: str = "rdkit"
-
     num_initial_confs: int = 100
     max_mmff_energy: float = 10
     max_mmff_iterations: int = 500
-    num_confs_considered: float = 10
-    num_confs_taken: float = 3
-    rmsd_cutoff: float = 0.1
 
 
 class CrestConformerSettings(ConformerSettings):
-    csearch_program: str = "crest"
-
     flags: str = "--quick --ewin 10"
     gfn: int | str = "ff"
 
@@ -44,6 +37,7 @@ class Conformer(Base):
 
 
 class ConformerWorkflow(Workflow):
+    mode: Mode = Mode.RAPID
     settings: ConformerSettings = ConformerSettings()
     conformers: list[Conformer] = []
 
@@ -69,7 +63,7 @@ def csearch_settings_by_mode(mode: Mode) -> ConformerSettings:
             num_confs_taken=50,
         )
 
-    elif mode == Mode.RAPID:
+    elif mode == Mode.RAPID or Mode.AUTO:
         return RdkitConformerSettings(
             num_initial_confs=300,
             max_mmff_energy=15,
