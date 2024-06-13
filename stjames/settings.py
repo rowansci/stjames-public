@@ -13,6 +13,22 @@ from .solvent_settings import SolventSettings
 from .tasks import Task
 from .thermochem_settings import ThermochemistrySettings
 
+PREPACKAGED_METHODS = [
+    Method.HF3C,
+    Method.B973C,
+    Method.AIMNET2_WB97MD3,
+    Method.AIMNET2_B973C,
+    Method.GFN2_XTB,
+    Method.GFN1_XTB
+]
+
+METHODS_WITH_CORRECTION = [
+    Method.B97D3,
+    Method.WB97XD,
+    Method.WB97XD3,
+    Method.WB97XV,
+    Method.WB97MV,
+]
 
 class Settings(Base):
     method: Method = Method.HARTREE_FOCK
@@ -32,9 +48,10 @@ class Settings(Base):
     @pydantic.computed_field
     @property
     def level_of_theory(self) -> str:
-        # prepackaged methods
-        if self.method in [Method.HF3C, Method.B973C, Method.AIMNET2_WB97MD3, Method.AIMNET2_B973C, Method.GFN2_XTB, Method.GFN1_XTB] or self.basis_set is None:
+        if self.method in PREPACKAGED_METHODS or self.basis_set is None:
             method = self.method.value
+        elif self.method in METHODS_WITH_CORRECTION:
+            method = f"{self.method.value}/{self.basis_set.name.lower()}"
         else:
             corrections = list(filter(lambda x: x not in (None, ""), self.corrections))
             method = f"{self.method.value}-{'-'.join([c.value for c in corrections])}/{self.basis_set.name.lower()}"
