@@ -11,12 +11,12 @@ from .diis_settings import *
 from .solvent_settings import *
 from .thermochem_settings import *
 from .grid_settings import *
-from .solvent_settings import *
 from .settings import *
 
-from .methods import *
+from .method import *
 from .basis_set import *
-from .tasks import *
-from .corrections import *
-from .modes import *
+from .task import *
+from .correction import *
+from .solvent import *
+from .mode import *
 from .status import *

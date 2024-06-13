@@ -4,23 +4,16 @@ import pydantic
 
 from .base import Base, UniqueList
 from .basis_set import BasisSet
-from .corrections import Correction
-from .methods import Method
-from .modes import Mode
+from .correction import Correction
+from .method import Method
+from .mode import Mode
 from .opt_settings import OptimizationSettings
 from .scf_settings import SCFSettings
-from .solvent_settings import SolventSettings
-from .tasks import Task
+from .solvent import SolventSettings
+from .task import Task
 from .thermochem_settings import ThermochemistrySettings
 
-PREPACKAGED_METHODS = [
-    Method.HF3C,
-    Method.B973C,
-    Method.AIMNET2_WB97MD3,
-    Method.AIMNET2_B973C,
-    Method.GFN2_XTB,
-    Method.GFN1_XTB
-]
+PREPACKAGED_METHODS = [Method.HF3C, Method.B973C, Method.AIMNET2_WB97MD3, Method.AIMNET2_B973C, Method.GFN2_XTB, Method.GFN1_XTB]
 
 METHODS_WITH_CORRECTION = [
     Method.B97D3,
@@ -29,6 +22,7 @@ METHODS_WITH_CORRECTION = [
     Method.WB97XV,
     Method.WB97MV,
 ]
+
 
 class Settings(Base):
     method: Method = Method.HARTREE_FOCK
