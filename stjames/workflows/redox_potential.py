@@ -1,4 +1,4 @@
-from typing import Optional, Any
+from typing import Any, Optional
 
 from ..mode import Mode
 from ..solvent import Solvent
@@ -24,7 +24,7 @@ class RedoxPotentialWorkflow(Workflow):
     oxidation_potential: Optional[float] = None
 
     def model_post_init(self, __context: Any) -> None:
-        """ Keep back-compatible with old schema. """
+        """Keep back-compatible with old schema."""
         if self.redox_type == "oxidation":
             self.oxidation = True
             self.reduction = False

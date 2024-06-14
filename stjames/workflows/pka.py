@@ -1,7 +1,7 @@
 from typing import Optional
 
-from ..mode import Mode
 from ..base import Base
+from ..mode import Mode
 from .workflow import DBCalculation, Workflow
 
 
