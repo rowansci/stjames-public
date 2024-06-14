@@ -8,8 +8,8 @@ from .workflow import DBCalculation, Workflow
 class pKaMicrostate(Base):
     atom_index: int
     structures: list[DBCalculation] = []
-    delta_G: float
-    pKa: float
+    deltaG: float
+    pka: float
 
 
 class pKaWorkflow(Workflow):
