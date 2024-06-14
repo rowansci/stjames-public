@@ -1,4 +1,5 @@
 import pydantic
+from pydantic import PositiveFloat, PositiveInt
 
 try:
     from typing import Optional, Self
@@ -10,8 +11,8 @@ from .base import Base
 
 class BasisSetOverride(Base):
     name: str
-    atomic_numbers: Optional[list[pydantic.PositiveInt]] = None
-    atoms: Optional[list[pydantic.PositiveInt]] = None  # 1-indexed
+    atomic_numbers: Optional[list[PositiveInt]] = None
+    atoms: Optional[list[PositiveInt]] = None  # 1-indexed
 
     @pydantic.model_validator(mode="after")
     def check_override(self) -> Self:
@@ -29,4 +30,4 @@ class BasisSet(Base):
     # value below which a basis function can be ignored
     # (for improving DFT grid calcs, as per Stratmann/Scuseria/Frisch CPL 1996)
     # this shouldn't really need to be modified...
-    cutoff_threshold: pydantic.PositiveFloat = 1e-10
+    cutoff_threshold: PositiveFloat = 1e-10

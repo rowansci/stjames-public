@@ -1,4 +1,4 @@
-from typing import Any, Optional
+from typing import Any, Optional, TypeVar
 
 import pydantic
 
@@ -13,7 +13,14 @@ from .solvent import SolventSettings
 from .task import Task
 from .thermochem_settings import ThermochemistrySettings
 
-PREPACKAGED_METHODS = [Method.HF3C, Method.B973C, Method.AIMNET2_WB97MD3, Method.AIMNET2_B973C, Method.GFN2_XTB, Method.GFN1_XTB]
+PREPACKAGED_METHODS = [
+    Method.HF3C,
+    Method.B973C,
+    Method.AIMNET2_WB97MD3,
+    Method.AIMNET2_B973C,
+    Method.GFN2_XTB,
+    Method.GFN1_XTB,
+]
 
 METHODS_WITH_CORRECTION = [
     Method.B97D3,
@@ -22,6 +29,8 @@ METHODS_WITH_CORRECTION = [
     Method.WB97XV,
     Method.WB97MV,
 ]
+
+T = TypeVar("T")
 
 
 class Settings(Base):
@@ -39,8 +48,8 @@ class Settings(Base):
     opt_settings: OptimizationSettings = OptimizationSettings()
     thermochem_settings: ThermochemistrySettings = ThermochemistrySettings()
 
-    @pydantic.computed_field
     @property
+    @pydantic.computed_field
     def level_of_theory(self) -> str:
         if self.method in PREPACKAGED_METHODS or self.basis_set is None:
             method = self.method.value
@@ -72,18 +81,17 @@ class Settings(Base):
 
     @pydantic.field_validator("basis_set", mode="before")
     @classmethod
-    def parse_basis_set(cls, v: Any) -> Optional[BasisSet]:
+    def parse_basis_set(cls, v: Any) -> BasisSet | dict | None:
         """Turn a string into a ``BasisSet`` object. (This is a little crude.)"""
         if isinstance(v, BasisSet):
             return None if v.name is None else v
         elif isinstance(v, dict):
-            return None if v["name"] is None else v
+            return None if v.get("name") is None else v
         elif isinstance(v, str):
             if len(v):
                 return BasisSet(name=v)
-            else:
-                # "" is basically None, let's be real here...
-                return None
+            # "" is basically None, let's be real here...
+            return None
         elif v is None:
             return None
         else:
@@ -91,7 +99,7 @@ class Settings(Base):
 
     @pydantic.field_validator("corrections", mode="before")
     @classmethod
-    def remove_empty_string(cls, v: list) -> list:
+    def remove_empty_string(cls, v: list[T]) -> list[T]:
         """Remove empty string values."""
         return [c for c in v if c]
 
