@@ -11,7 +11,9 @@ class RedoxPotentialWorkflow(Workflow):
     reduction: bool = True
     oxidation: bool = True
 
+    # legacy values - remove in future release!
     redox_type: Optional[str] = None
+    redox_potential: Optional[float] = None
 
     # uuids
     neutral_molecule: Optional[str] = None
@@ -26,6 +28,8 @@ class RedoxPotentialWorkflow(Workflow):
         if self.redox_type == "oxidation":
             self.oxidation = True
             self.reduction = False
+            self.oxidation_potential = self.redox_potential
         elif self.redox_type == "reduction":
             self.oxidation = False
             self.reduction = True
+            self.reduction_potential = self.redox_potential
