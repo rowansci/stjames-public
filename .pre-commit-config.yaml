@@ -1,0 +1,26 @@
+repos:
+- repo: https://github.com/pre-commit/pre-commit-hooks
+  rev: v4.6.0  # this is optional, use `pre-commit autoupdate` to get the latest rev!
+  hooks:
+    - id: end-of-file-fixer
+    - id: trailing-whitespace
+
+- repo: https://github.com/astral-sh/ruff-pre-commit
+  # Ruff version.
+  rev: v0.4.9
+  hooks:
+    # Run the linter.
+    - id: ruff
+      args: [ --fix ]
+    # Run the formatter.
+    - id: ruff-format
+
+- repo: https://github.com/pre-commit/mirrors-mypy
+  rev: v1.10.0
+  hooks:
+    - id: mypy
+      stages: [commit, push]
+      args: ['--config-file', 'pyproject.toml']
+      additional_dependencies:
+        - pydantic
+        - numpy

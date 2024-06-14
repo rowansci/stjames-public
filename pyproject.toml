@@ -10,6 +10,7 @@ authors = [
 
 dependencies = [
     "pydantic>=2.4",
+    "numpy",
 ]
 
 [build-system]
@@ -38,3 +39,6 @@ select = [
     "W",  # pycodestyle warnings
 ]
 ignore = ["E741"]
+
+[tool.mypy]
+plugins = ["pydantic.mypy"]

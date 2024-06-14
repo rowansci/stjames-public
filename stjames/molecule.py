@@ -1,4 +1,5 @@
 import pydantic
+from pydantic import NonNegativeInt, PositiveInt
 
 try:
     from typing import Optional, Self
@@ -16,17 +17,17 @@ class VibrationalMode(Base):
 
 
 class Atom(Base):
-    atomic_number: pydantic.NonNegativeInt
+    atomic_number: NonNegativeInt
     position: list[float]
 
 
 class Molecule(Base):
     charge: int
-    multiplicity: pydantic.PositiveInt
+    multiplicity: PositiveInt
     atoms: list[Atom]
 
     energy: Optional[float] = None
-    scf_iterations: Optional[pydantic.NonNegativeInt] = None
+    scf_iterations: Optional[NonNegativeInt] = None
     scf_completed: Optional[bool] = None
     elapsed: Optional[float] = None
 
@@ -46,40 +47,36 @@ class Molecule(Base):
     thermal_free_energy_corr: Optional[float] = None
 
     @property
-    def coordinates(self):
+    def coordinates(self) -> list[list[float]]:
         return [a.position for a in self.atoms]
 
     @property
-    def atomic_numbers(self):
+    def atomic_numbers(self) -> list[NonNegativeInt]:
         return [a.atomic_number for a in self.atoms]
 
     @property
     def sum_energy_zpe(self) -> Optional[float]:
         if (self.energy is None) or (self.zero_point_energy is None):
             return None
-        else:
-            return self.energy + self.zero_point_energy
+        return self.energy + self.zero_point_energy
 
     @property
     def sum_energy_thermal_corr(self) -> Optional[float]:
         if (self.energy is None) or (self.thermal_energy_corr is None):
             return None
-        else:
-            return self.energy + self.thermal_energy_corr
+        return self.energy + self.thermal_energy_corr
 
     @property
     def sum_energy_enthalpy(self) -> Optional[float]:
         if (self.energy is None) or (self.thermal_enthalpy_corr is None):
             return None
-        else:
-            return self.energy + self.thermal_enthalpy_corr
+        return self.energy + self.thermal_enthalpy_corr
 
     @property
     def sum_energy_free_energy(self) -> Optional[float]:
         if (self.energy is None) or (self.thermal_free_energy_corr is None):
             return None
-        else:
-            return self.energy + self.thermal_free_energy_corr
+        return self.energy + self.thermal_free_energy_corr
 
     @pydantic.model_validator(mode="after")
     def check_electron_sanity(self) -> Self:
