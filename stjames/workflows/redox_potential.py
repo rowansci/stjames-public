@@ -28,8 +28,10 @@ class RedoxPotentialWorkflow(Workflow):
         if self.redox_type == "oxidation":
             self.oxidation = True
             self.reduction = False
-            self.oxidation_potential = self.redox_potential
+            if self.oxidation_potential is None:
+                self.oxidation_potential = self.redox_potential
         elif self.redox_type == "reduction":
             self.oxidation = False
             self.reduction = True
-            self.reduction_potential = self.redox_potential
+            if self.reduction_potential is None:
+                self.reduction_potential = self.redox_potential
