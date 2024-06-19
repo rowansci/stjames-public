@@ -49,7 +49,7 @@ def csearch_settings_by_mode(mode: Mode) -> ConformerSettings:
     if mode == Mode.METICULOUS:
         return CrestConformerSettings(
             gfn=2,
-            flags="--ewin 15",
+            flags="--ewin 15 --noreftopo",
             max_energy=10,
             num_confs_considered=500,
             num_confs_taken=150,
@@ -58,7 +58,7 @@ def csearch_settings_by_mode(mode: Mode) -> ConformerSettings:
     elif mode == Mode.CAREFUL:
         return CrestConformerSettings(
             gfn="ff",
-            flags="--quick --ewin 10",
+            flags="--quick --ewin 10 --noreftopo",
             num_confs_considered=150,
             num_confs_taken=50,
         )
