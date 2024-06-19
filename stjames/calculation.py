@@ -1,6 +1,7 @@
 from typing import Optional
 
 from .base import Base, LowercaseStrEnum
+from .message import Message
 from .molecule import Molecule
 from .settings import Settings
 from .status import Status
@@ -25,6 +26,7 @@ class Calculation(Base):
     name: Optional[str] = None
     elapsed: Optional[float] = None
     logfile: Optional[str] = None
+    messages: list[Message] = []
 
     engine: Optional[str] = "peregrine"
 
