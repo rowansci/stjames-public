@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from ..base import Base
+from ..constraint import Constraint
 from ..method import Method
 from ..mode import Mode
 from ..solvent import Solvent
@@ -15,6 +16,8 @@ class ConformerSettings(Base):
     final_method: Method = Method.AIMNET2_WB97MD3
     solvent: Optional[Solvent] = Solvent.WATER
     max_energy: float = 5
+
+    constraints: list[Constraint] = []
 
 
 class RdkitConformerSettings(ConformerSettings):
