@@ -1,5 +1,3 @@
-# ruff: noqa: F403
-
 from .conformer import *
 from .descriptors import *
 from .fukui import *

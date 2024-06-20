@@ -1,4 +1,4 @@
-# ruff: noqa
+# ruff: noqa: I001
 
 from .calculation import *
 from .molecule import *
