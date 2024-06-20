@@ -1,4 +1,5 @@
 from ..base import Base
+from ..message import Message
 from ..molecule import Molecule
 
 
@@ -6,6 +7,7 @@ class Workflow(Base):
     """All workflows should have these properties."""
 
     initial_molecule: Molecule
+    messages: list[Message] = []
 
 
 class DBCalculation(Base):
