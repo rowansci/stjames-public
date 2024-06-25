@@ -45,12 +45,18 @@ class ConformerWorkflow(Workflow):
     conformers: list[Conformer] = []
 
     def model_post_init(self, __context: Any) -> None:
-        self.settings = csearch_settings_by_mode(self.mode)
+        self.settings = csearch_settings_by_mode(self.mode, self.settings)
 
 
-def csearch_settings_by_mode(mode: Mode) -> ConformerSettings:
+def csearch_settings_by_mode(mode: Mode, old_settings: Optional[ConformerSettings]) -> ConformerSettings:
+    if mode == Mode.MANUAL:
+        assert old_settings is not None
+        return old_settings
+
+    settings: ConformerSettings
+
     if mode == Mode.METICULOUS:
-        return CrestConformerSettings(
+        settings = CrestConformerSettings(
             gfn=2,
             flags="--ewin 15 --noreftopo",
             max_energy=10,
@@ -59,7 +65,7 @@ def csearch_settings_by_mode(mode: Mode) -> ConformerSettings:
         )
 
     elif mode == Mode.CAREFUL:
-        return CrestConformerSettings(
+        settings = CrestConformerSettings(
             gfn="ff",
             flags="--quick --ewin 10 --noreftopo",
             num_confs_considered=150,
@@ -67,7 +73,7 @@ def csearch_settings_by_mode(mode: Mode) -> ConformerSettings:
         )
 
     elif mode == Mode.RAPID or Mode.AUTO:
-        return RdkitConformerSettings(
+        settings = RdkitConformerSettings(
             num_initial_confs=300,
             max_mmff_energy=15,
             num_confs_considered=100,
@@ -75,7 +81,7 @@ def csearch_settings_by_mode(mode: Mode) -> ConformerSettings:
         )
 
     elif mode == Mode.RECKLESS:
-        return RdkitConformerSettings(
+        settings = RdkitConformerSettings(
             num_initial_confs=200,
             max_mmff_energy=10,
             num_confs_considered=50,
@@ -85,3 +91,10 @@ def csearch_settings_by_mode(mode: Mode) -> ConformerSettings:
 
     else:
         raise ValueError(f"invalid mode ``{mode.value}`` for conformer settings")
+
+    if old_settings is not None:
+        settings.final_method = old_settings.final_method
+        settings.solvent = old_settings.solvent
+        settings.constraints = old_settings.constraints
+
+    return settings
