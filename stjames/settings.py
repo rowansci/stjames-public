@@ -48,15 +48,17 @@ class Settings(Base):
     opt_settings: OptimizationSettings = OptimizationSettings()
     thermochem_settings: ThermochemistrySettings = ThermochemistrySettings()
 
+    # mypy has this dead wrong (https://docs.pydantic.dev/2.0/usage/computed_fields/)
+    @pydantic.computed_field  # type: ignore[misc]
     @property
-    @pydantic.computed_field
     def level_of_theory(self) -> str:
+        corrections = list(filter(lambda x: x not in (None, ""), self.corrections))
+
         if self.method in PREPACKAGED_METHODS or self.basis_set is None:
             method = self.method.value
-        elif self.method in METHODS_WITH_CORRECTION:
+        elif self.method in METHODS_WITH_CORRECTION or len(corrections) == 0:
             method = f"{self.method.value}/{self.basis_set.name.lower()}"
         else:
-            corrections = list(filter(lambda x: x not in (None, ""), self.corrections))
             method = f"{self.method.value}-{'-'.join([c.value for c in corrections])}/{self.basis_set.name.lower()}"
 
         if self.solvent_settings is not None:
