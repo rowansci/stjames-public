@@ -16,18 +16,19 @@ from .thermochem_settings import ThermochemistrySettings
 PREPACKAGED_METHODS = [
     Method.HF3C,
     Method.B973C,
+    Method.R2SCAN3C,
     Method.AIMNET2_WB97MD3,
-    Method.AIMNET2_B973C,
     Method.GFN2_XTB,
     Method.GFN1_XTB,
+    Method.GFN_FF,
 ]
 
 METHODS_WITH_CORRECTION = [
-    Method.B97D3,
-    Method.WB97XD,
     Method.WB97XD3,
     Method.WB97XV,
     Method.WB97MV,
+    Method.WB97MD3BJ,
+    Method.DSDBLYPD3BJ,
 ]
 
 T = TypeVar("T")
