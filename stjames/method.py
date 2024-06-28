@@ -25,7 +25,7 @@ class Method(LowercaseStrEnum):
     WB97MD3BJ = "wb97m_d3bj"
     WB97X3C = "wb97x_3c"
 
-    DSDBLYPD3BJ = "dsd_b3lyp_d3bj"
+    DSDBLYPD3BJ = "dsd_blyp_d3bj"
 
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
 
