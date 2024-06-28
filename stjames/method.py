@@ -2,48 +2,34 @@ from .base import LowercaseStrEnum
 
 
 class Method(LowercaseStrEnum):
-    #### Hartree–Fock:
     HARTREE_FOCK = "hf"
-    HF3C = "hf-3c"
+    HF3C = "hf_3c"
 
-    #### DFT:
-    # LDA
-    LSDA = "lsda"
-
-    # local GGA
     PBE = "pbe"
-    BLYP = "blyp"
-    BP86 = "bp86"
-    B97D3 = "b97-d3"
-    B973C = "b97-3c"
-
-    # mGGA
+    B973C = "b97_3c"
     R2SCAN = "r2scan"
+    R2SCAN3C = "r2scan3c"
     TPSS = "tpss"
     M06L = "m06l"
 
-    # hybrid GGA
     PBE0 = "pbe0"
     B3LYP = "b3lyp"
-    B3PW91 = "b3pw91"
-    B97MV = "b97m_v"
-
-    # hybrid mGGA
-    TPSS0 = "tpss0"
+    TPSSH = "tpssh"
     M06 = "m06"
     M062X = "m062x"
 
-    # range-separated
     CAMB3LYP = "camb3lyp"
-    WB97XD = "wb97x_d"
     WB97XD3 = "wb97x_d3"
     WB97XV = "wb97x_v"
     WB97MV = "wb97m_v"
+    WB97MD3BJ = "wb97m_d3bj"
+    WB97X3C = "wb97x_3c"
 
-    # ML methods
+    DSDBLYPD3BJ = "dsd_b3lyp_d3bj"
+
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
-    AIMNET2_B973C = "aimnet2_b973c"
 
-    # xTB methods
+    # GFN0_XTB = "gfn1_xtb"
     GFN1_XTB = "gfn1_xtb"
     GFN2_XTB = "gfn2_xtb"
+    GFN_FF = "gfn_ff"

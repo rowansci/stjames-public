@@ -16,18 +16,19 @@ from .thermochem_settings import ThermochemistrySettings
 PREPACKAGED_METHODS = [
     Method.HF3C,
     Method.B973C,
+    Method.R2SCAN3C,
     Method.AIMNET2_WB97MD3,
-    Method.AIMNET2_B973C,
     Method.GFN2_XTB,
     Method.GFN1_XTB,
+    Method.GFN_FF,
 ]
 
 METHODS_WITH_CORRECTION = [
-    Method.B97D3,
-    Method.WB97XD,
     Method.WB97XD3,
     Method.WB97XV,
     Method.WB97MV,
+    Method.WB97MD3BJ,
+    Method.DSDBLYPD3BJ,
 ]
 
 T = TypeVar("T")
@@ -48,15 +49,17 @@ class Settings(Base):
     opt_settings: OptimizationSettings = OptimizationSettings()
     thermochem_settings: ThermochemistrySettings = ThermochemistrySettings()
 
+    # mypy has this dead wrong (https://docs.pydantic.dev/2.0/usage/computed_fields/)
+    @pydantic.computed_field  # type: ignore[misc]
     @property
-    @pydantic.computed_field
     def level_of_theory(self) -> str:
+        corrections = list(filter(lambda x: x not in (None, ""), self.corrections))
+
         if self.method in PREPACKAGED_METHODS or self.basis_set is None:
             method = self.method.value
-        elif self.method in METHODS_WITH_CORRECTION:
+        elif self.method in METHODS_WITH_CORRECTION or len(corrections) == 0:
             method = f"{self.method.value}/{self.basis_set.name.lower()}"
         else:
-            corrections = list(filter(lambda x: x not in (None, ""), self.corrections))
             method = f"{self.method.value}-{'-'.join([c.value for c in corrections])}/{self.basis_set.name.lower()}"
 
         if self.solvent_settings is not None:
