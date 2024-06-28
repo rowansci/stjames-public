@@ -24,7 +24,7 @@ class LowercaseStrEnum(str, Enum):
     def _missing_(cls, value: str) -> str | None:  # type: ignore
         # Type note: technically breaking Liskov, value: object in Enum
         for member in cls:
-            if member.lower().replace("-", "") == value.lower().replace("-", ""):
+            if member.lower().replace("-", "").replace("_", "") == value.lower().replace("-", "").replace("_", ""):
                 return member
         return None
 
