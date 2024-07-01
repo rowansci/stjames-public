@@ -48,7 +48,7 @@ class ConformerWorkflow(Workflow):
         self.settings = csearch_settings_by_mode(self.mode, self.settings)
 
 
-def csearch_settings_by_mode(mode: Mode, old_settings: Optional[ConformerSettings]) -> ConformerSettings:
+def csearch_settings_by_mode(mode: Mode, old_settings: Optional[ConformerSettings] = None) -> ConformerSettings:
     if mode == Mode.MANUAL:
         assert old_settings is not None
         return old_settings
