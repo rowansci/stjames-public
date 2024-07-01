@@ -8,7 +8,7 @@ class Method(LowercaseStrEnum):
     PBE = "pbe"
     B973C = "b97_3c"
     R2SCAN = "r2scan"
-    R2SCAN3C = "r2scan3c"
+    R2SCAN3C = "r2scan_3c"
     TPSS = "tpss"
     M06L = "m06l"
 
@@ -25,7 +25,7 @@ class Method(LowercaseStrEnum):
     WB97MD3BJ = "wb97m_d3bj"
     WB97X3C = "wb97x_3c"
 
-    DSDBLYPD3BJ = "dsd_b3lyp_d3bj"
+    DSDBLYPD3BJ = "dsd_blyp_d3bj"
 
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
 
@@ -33,3 +33,6 @@ class Method(LowercaseStrEnum):
     GFN1_XTB = "gfn1_xtb"
     GFN2_XTB = "gfn2_xtb"
     GFN_FF = "gfn_ff"
+
+    # this was going to be removed, but Jonathon wrote such a nice basis set test... it's off the front end.
+    BP86 = "bp86"

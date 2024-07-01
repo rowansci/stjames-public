@@ -31,6 +31,7 @@ class Solvent(LowercaseStrEnum):
 
 
 class SolventModel(LowercaseStrEnum):
+    PCM = "pcm"
     CPCM = "cpcm"
     ALPB = "alpb"
     COSMO = "cosmo"
