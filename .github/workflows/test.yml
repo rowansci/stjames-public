@@ -1,0 +1,29 @@
+name: Run Tests
+
+on:
+  pull_request: {}
+  push:
+    branches: master
+
+jobs:
+  test:
+    strategy:
+      matrix:
+        python-version: ['3.12']
+        os: [ubuntu-latest]
+
+    name: Python ${{ matrix.os }} ${{ matrix.python-version }}
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - run: pip install .
+      - run: pip install -r dev-requirements.txt
+
+      - run: ruff format . --check
+      - run: ruff check .
+      - run: mypy stjames
