@@ -20,6 +20,7 @@ PREPACKAGED_METHODS = [
     Method.AIMNET2_WB97MD3,
     Method.GFN2_XTB,
     Method.GFN1_XTB,
+    Method.GFN0_XTB,
     Method.GFN_FF,
 ]
 

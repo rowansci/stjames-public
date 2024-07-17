@@ -18,7 +18,7 @@ class Base(pydantic.BaseModel):
 
 
 class LowercaseStrEnum(str, Enum):
-    """Enum where hyphens and case are ignored."""
+    """Enum where hyphens, underscores, and case are ignored."""
 
     @classmethod
     def _missing_(cls, value: str) -> str | None:  # type: ignore
