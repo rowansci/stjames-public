@@ -46,6 +46,9 @@ class Molecule(Base):
     thermal_enthalpy_corr: Optional[float] = None
     thermal_free_energy_corr: Optional[float] = None
 
+    def __len__(self) -> int:
+        return len(self.atoms)
+
     @property
     def coordinates(self) -> list[list[float]]:
         return [a.position for a in self.atoms]
