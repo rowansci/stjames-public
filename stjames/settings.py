@@ -20,6 +20,7 @@ PREPACKAGED_METHODS = [
     Method.AIMNET2_WB97MD3,
     Method.GFN2_XTB,
     Method.GFN1_XTB,
+    Method.GFN0_XTB,
     Method.GFN_FF,
 ]
 
@@ -104,7 +105,7 @@ class Settings(Base):
     @classmethod
     def remove_empty_string(cls, v: list[T]) -> list[T]:
         """Remove empty string values."""
-        return [c for c in v if c]
+        return [c for c in v if c] if v is not None else v
 
 
 def _assign_settings_by_mode(settings: Settings) -> None:

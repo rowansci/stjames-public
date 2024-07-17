@@ -10,7 +10,7 @@ from .base import Base
 
 
 class VibrationalMode(Base):
-    frequency: float
+    frequency: float  # in cm-1
     reduced_mass: float
     force_constant: float
     displacements: list[list[float]]
@@ -18,7 +18,7 @@ class VibrationalMode(Base):
 
 class Atom(Base):
     atomic_number: NonNegativeInt
-    position: list[float]
+    position: list[float]  # in Å
 
 
 class Molecule(Base):
@@ -26,10 +26,10 @@ class Molecule(Base):
     multiplicity: PositiveInt
     atoms: list[Atom]
 
-    energy: Optional[float] = None
+    energy: Optional[float] = None  # in Hartree
     scf_iterations: Optional[NonNegativeInt] = None
     scf_completed: Optional[bool] = None
-    elapsed: Optional[float] = None
+    elapsed: Optional[float] = None  # in seconds
 
     homo_lumo_gap: Optional[float] = None  # in eV
 
@@ -37,7 +37,7 @@ class Molecule(Base):
 
     mulliken_charges: Optional[list[float]] = None
     mulliken_spin_densities: Optional[list[float]] = None
-    dipole: Optional[list[float]] = None
+    dipole: Optional[list[float]] = None  # in Debye
 
     vibrational_modes: Optional[list[VibrationalMode]] = None
 
@@ -45,6 +45,9 @@ class Molecule(Base):
     thermal_energy_corr: Optional[float] = None
     thermal_enthalpy_corr: Optional[float] = None
     thermal_free_energy_corr: Optional[float] = None
+
+    def __len__(self) -> int:
+        return len(self.atoms)
 
     @property
     def coordinates(self) -> list[list[float]]:

@@ -29,7 +29,7 @@ class Method(LowercaseStrEnum):
 
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
 
-    # GFN0_XTB = "gfn1_xtb"
+    GFN0_XTB = "gfn0_xtb"
     GFN1_XTB = "gfn1_xtb"
     GFN2_XTB = "gfn2_xtb"
     GFN_FF = "gfn_ff"
