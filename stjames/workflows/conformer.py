@@ -13,6 +13,7 @@ class ConformerSettings(Base):
     num_confs_taken: int = 50
     rmsd_cutoff: float = 0.1
 
+    transition_state: bool = False
     final_method: Method = Method.AIMNET2_WB97MD3
     solvent: Optional[Solvent] = Solvent.WATER
     max_energy: float = 5
