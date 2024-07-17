@@ -104,7 +104,7 @@ class Settings(Base):
     @classmethod
     def remove_empty_string(cls, v: list[T]) -> list[T]:
         """Remove empty string values."""
-        return [c for c in v if c]
+        return [c for c in v if c] if v is not None else v
 
 
 def _assign_settings_by_mode(settings: Settings) -> None:
