@@ -13,7 +13,7 @@ from .solvent import SolventSettings
 from .task import Task
 from .thermochem_settings import ThermochemistrySettings
 
-T = TypeVar("T")
+_T = TypeVar("_T")
 
 
 class Settings(Base):
@@ -89,7 +89,7 @@ class Settings(Base):
 
     @pydantic.field_validator("corrections", mode="before")
     @classmethod
-    def remove_empty_string(cls, v: list[T]) -> list[T]:
+    def remove_empty_string(cls, v: list[_T]) -> list[_T]:
         """Remove empty string values."""
         return [c for c in v if c] if v is not None else v
 
