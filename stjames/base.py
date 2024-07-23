@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Annotated, Hashable, TypeVar
+from typing import Annotated, Any, Hashable, TypeVar
 
 import numpy as np
 import pydantic
@@ -10,11 +10,11 @@ T = TypeVar("T")
 class Base(pydantic.BaseModel):
     @pydantic.field_validator("*", mode="before")
     @classmethod
-    def coerce_numpy(cls, val: T) -> T | list:
+    def coerce_numpy(cls, val: T) -> T | list[Any]:
         if isinstance(val, np.ndarray):
-            return val.tolist()
-        else:
-            return val
+            return val.tolist()  # type: ignore [no-any-return]
+
+        return val
 
 
 class LowercaseStrEnum(str, Enum):

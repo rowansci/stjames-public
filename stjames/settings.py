@@ -5,32 +5,13 @@ import pydantic
 from .base import Base, UniqueList
 from .basis_set import BasisSet
 from .correction import Correction
-from .method import Method
+from .method import METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, Method
 from .mode import Mode
 from .opt_settings import OptimizationSettings
 from .scf_settings import SCFSettings
 from .solvent import SolventSettings
 from .task import Task
 from .thermochem_settings import ThermochemistrySettings
-
-PREPACKAGED_METHODS = [
-    Method.HF3C,
-    Method.B973C,
-    Method.R2SCAN3C,
-    Method.AIMNET2_WB97MD3,
-    Method.GFN2_XTB,
-    Method.GFN1_XTB,
-    Method.GFN0_XTB,
-    Method.GFN_FF,
-]
-
-METHODS_WITH_CORRECTION = [
-    Method.WB97XD3,
-    Method.WB97XV,
-    Method.WB97MV,
-    Method.WB97MD3BJ,
-    Method.DSDBLYPD3BJ,
-]
 
 T = TypeVar("T")
 
@@ -51,7 +32,8 @@ class Settings(Base):
     thermochem_settings: ThermochemistrySettings = ThermochemistrySettings()
 
     # mypy has this dead wrong (https://docs.pydantic.dev/2.0/usage/computed_fields/)
-    @pydantic.computed_field  # type: ignore[misc]
+    # Python 3.12 narrows the reason for the ignore to prop-decorator
+    @pydantic.computed_field  # type: ignore[misc, prop-decorator, unused-ignore]
     @property
     def level_of_theory(self) -> str:
         corrections = list(filter(lambda x: x not in (None, ""), self.corrections))
@@ -81,11 +63,15 @@ class Settings(Base):
         if self.method == Method.HF3C:
             self.basis_set = BasisSet(name="minix")
         elif self.method == Method.B973C:
-            self.basis_set = BasisSet(name="mTZVP")
+            self.basis_set = BasisSet(name="def2-mTZVP")
+        elif self.method == Method.R2SCAN3C:
+            self.basis_set = BasisSet(name="def2-mTZVPP")
+        elif self.method == Method.WB97X3C:
+            self.basis_set = BasisSet(name="vDZP")
 
     @pydantic.field_validator("basis_set", mode="before")
     @classmethod
-    def parse_basis_set(cls, v: Any) -> BasisSet | dict | None:
+    def parse_basis_set(cls, v: Any) -> BasisSet | dict[str, Any] | None:
         """Turn a string into a ``BasisSet`` object. (This is a little crude.)"""
         if isinstance(v, BasisSet):
             return None if v.name is None else v
@@ -202,11 +188,11 @@ def _assign_settings_by_mode(settings: Settings) -> None:
         opt_settings.energy_threshold = 1e-5
         opt_settings.max_gradient_threshold = 4.5e-3
         opt_settings.rms_gradient_threshold = 3e-3
-    elif (mode == Mode.RAPID) or (mode == Mode.CAREFUL and has_constraints):
+    elif mode == Mode.RAPID or (mode == Mode.CAREFUL and has_constraints):
         opt_settings.energy_threshold = 5e-5
         opt_settings.max_gradient_threshold = 2.5e-3
         opt_settings.rms_gradient_threshold = 1.7e-3
-    elif mode == Mode.CAREFUL or (mode == mode.METICULOUS and has_constraints):
+    elif mode == Mode.CAREFUL or (mode == Mode.METICULOUS and has_constraints):
         opt_settings.energy_threshold = 1e-6
         opt_settings.max_gradient_threshold = 4.5e-4
         opt_settings.rms_gradient_threshold = 3e-4
