@@ -1,10 +1,7 @@
+from typing import Optional, Self
+
 import pydantic
 from pydantic import NonNegativeInt, PositiveInt
-
-try:
-    from typing import Optional, Self
-except ImportError:
-    from typing_extensions import Optional, Self
 
 from .base import Base
 

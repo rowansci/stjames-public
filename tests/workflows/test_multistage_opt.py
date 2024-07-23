@@ -149,7 +149,6 @@ def test_careful(He: Molecule) -> None:
         "mode": Mode.RAPID,
         "solvent_settings": None,
     }
-
     for key, value in settings0.items():
         assert getattr(mso_opt0, key) == value
 
@@ -195,7 +194,6 @@ def test_meticulous(He: Molecule) -> None:
         "mode": Mode.AUTO,
         "solvent_settings": None,
     }
-
     for key, value in settings0.items():
         assert getattr(mso_opt0, key) == value
 
@@ -255,7 +253,6 @@ def test_manual(He: Molecule) -> None:
         "mode": Mode.AUTO,
         "solvent_settings": None,
     }
-
     for key, value in settings0.items():
         assert getattr(mso_opt0, key) == value
 
