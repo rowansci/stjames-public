@@ -3,7 +3,7 @@ name = "stjames"
 version = "0.0.40"
 description = "standardized JSON atom/molecule encoding scheme"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 authors = [
     { name = "Corin Wagen", email = "corin@rowansci.com" },
 ]

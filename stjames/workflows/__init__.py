@@ -5,4 +5,5 @@ from .multistage_opt import *
 from .pka import *
 from .redox_potential import *
 from .scan import *
+from .spin_states import *
 from .tautomer import *
