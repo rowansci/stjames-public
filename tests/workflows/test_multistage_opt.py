@@ -3,7 +3,7 @@ from typing import Any
 from pytest import fixture, mark, raises
 
 from stjames import Atom, Method, Mode, Molecule, Settings, SolventSettings, Task
-from stjames.workflows import MultiStageOpt
+from stjames.workflows import MultiStageOptInput
 
 
 @fixture
@@ -21,9 +21,9 @@ def He() -> Molecule:
     ],
 )
 def test_multistage_opt_basic(mode: Mode, level_of_theory: str, He: Molecule) -> None:
-    mso = MultiStageOpt(initial_molecule=He, mode=mode, solvent="water")
+    mso = MultiStageOptInput(initial_molecule=He, mode=mode, solvent="water")
 
-    assert str(mso) == f"<MultiStageOpt {mode}>"
+    assert str(mso) == f"<MultiStageOptInput {mode.name}>"
     assert mso.level_of_theory == level_of_theory
     assert mso.optimization_settings
     assert mso.singlepoint_settings
@@ -36,24 +36,30 @@ def test_multistage_opt_basic(mode: Mode, level_of_theory: str, He: Molecule) ->
     assert not mso.transition_state
 
 
+def test_auto(He: Molecule) -> None:
+    mso = MultiStageOptInput(initial_molecule=He, mode=Mode.AUTO)
+    assert mso.mode == Mode.RAPID
+
+    mso = MultiStageOptInput(initial_molecule=He, mode=Mode.AUTO)
+    assert mso.mode == Mode.RAPID
+
+
 def test_raises(He: Molecule) -> None:
     with raises(ValueError):
-        MultiStageOpt(initial_molecule=He)
+        # mypy is correct, but needs to be silenced to test pydantic error
+        MultiStageOptInput(initial_molecule=He)  # type: ignore [call-arg]
 
     with raises(ValueError):
         # mypy is correct, but needs to be silenced to test pydantic error
-        MultiStageOpt(mode="reckless", solvent="acetonitrile")  # type: ignore [call-arg]
+        MultiStageOptInput(mode=Mode.RAPID)  # type: ignore [call-arg]
 
     singlepoint_settings = Settings(method=Method.B973C)
     with raises(ValueError):
-        MultiStageOpt(initial_molecule=He, mode=Mode.RAPID, singlepoint_settings=singlepoint_settings)
-
-    with raises(NotImplementedError):
-        MultiStageOpt(initial_molecule=He, mode="junk", solvent="acetonitrile")
+        MultiStageOptInput(initial_molecule=He, mode=Mode.RAPID, singlepoint_settings=singlepoint_settings)
 
 
 def test_reckless(He: Molecule) -> None:
-    mso = MultiStageOpt(initial_molecule=He, mode="reckless", solvent="acetonitrile")
+    mso = MultiStageOptInput(initial_molecule=He, mode="reckless", solvent="acetonitrile")
 
     assert mso.optimization_settings
     assert len(mso.optimization_settings) == 1
@@ -84,7 +90,7 @@ def test_reckless(He: Molecule) -> None:
 
 @mark.smoke
 def test_rapid(He: Molecule) -> None:
-    mso = MultiStageOpt(initial_molecule=He, mode="rapid", xtb_preopt=True, solvent="hexane")
+    mso = MultiStageOptInput(initial_molecule=He, mode="rapid", xtb_preopt=True, solvent="hexane")
 
     assert mso.optimization_settings
     assert len(mso.optimization_settings) == 2
@@ -125,7 +131,7 @@ def test_rapid(He: Molecule) -> None:
 
 
 def test_careful(He: Molecule) -> None:
-    mso = MultiStageOpt(initial_molecule=He, mode="careful", solvent="acetone", transition_state=True)
+    mso = MultiStageOptInput(initial_molecule=He, mode="careful", solvent="acetone", transition_state=True)
 
     assert mso.optimization_settings
     assert len(mso.optimization_settings) == 2
@@ -170,9 +176,9 @@ def test_careful(He: Molecule) -> None:
 
 
 def test_meticulous(He: Molecule) -> None:
-    mso = MultiStageOpt(initial_molecule=He, mode="meticulous", xtb_preopt=False)
+    mso = MultiStageOptInput(initial_molecule=He, mode="meticulous", xtb_preopt=False)
 
-    assert str(mso) == f"<MultiStageOpt {Mode.METICULOUS}>"
+    assert str(mso) == "<MultiStageOptInput METICULOUS>"
     assert mso.optimization_settings
     assert len(mso.optimization_settings) == 2
     assert mso.singlepoint_settings
@@ -218,18 +224,18 @@ def test_meticulous(He: Molecule) -> None:
 
 def test_manual(He: Molecule) -> None:
     """
-    Builds a manual MultiStageOpt
+    Builds a manual MultiStageOptInput
     """
     optimization_settings = [
         Settings(method=Method.GFN0_XTB, tasks=[Task.OPTIMIZE]),
         Settings(method=Method.B3LYP, basis_set="def2-SVP", tasks=[Task.OPTIMIZE]),
     ]
     singlepoint_settings = Settings(method=Method.PBE, basis_set="def2-TZVP", solvent_settings=SolventSettings(solvent="octane", model="cpcm"))
-    mso = MultiStageOpt(initial_molecule=He, optimization_settings=optimization_settings, singlepoint_settings=singlepoint_settings)
+    mso = MultiStageOptInput(initial_molecule=He, mode=Mode.MANUAL, optimization_settings=optimization_settings, singlepoint_settings=singlepoint_settings)
 
     level_of_theory = "pbe/def2-tzvp/cpcm(octane)//b3lyp/def2-svp//gfn0_xtb"
 
-    assert str(mso) == f"<MultiStageOpt {level_of_theory}>"
+    assert str(mso) == f"<MultiStageOptInput {level_of_theory}>"
     assert mso.level_of_theory == level_of_theory
     assert mso.optimization_settings
     assert len(mso.optimization_settings) == 2

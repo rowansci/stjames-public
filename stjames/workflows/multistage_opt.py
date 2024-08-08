@@ -1,18 +1,20 @@
-from typing import Any, Sequence, TypeVar
+from typing import Self, Sequence
 
 from pydantic import model_validator
 
+from ..calculation import Calculation
 from ..constraint import Constraint
 from ..method import XTB_METHODS, Method
 from ..mode import Mode
+from ..molecule import Molecule
 from ..opt_settings import OptimizationSettings
 from ..settings import Settings
 from ..solvent import Solvent, SolventSettings
 from ..task import Task
-from .workflow import Workflow
+from .workflow import WorkflowInput, WorkflowResults
 
 
-class MultiStageOpt(Workflow):
+class MultiStageOptInput(WorkflowInput):
     """
     Workflow for multi-stage optimizations.
 
@@ -29,8 +31,8 @@ class MultiStageOpt(Workflow):
 
     Inherited
     :param initial_molecule: Molecule of interest
+    :param mode: Mode for workflow
 
-    :param mode: Mode for calculations
     :param optimization_settings: list of opt settings to apply successively
     :param singlepoint_settings: final single point settings
     :param solvent: solvent to use
@@ -38,14 +40,13 @@ class MultiStageOpt(Workflow):
     :param constraints: constraints for optimization
     :param transition_state: whether this is a transition state
 
-    >>> from stjames.molecule import Molecule, Atom
+    >>> from stjames.molecule import Atom
     >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
-    >>> mso = MultiStageOpt(initial_molecule=He, mode=Mode.RAPID, solvent="water")
+    >>> mso = MultiStageOptInput(initial_molecule=He, mode=Mode.RAPID, solvent="water")
     >>> mso.level_of_theory
     'r2scan_3c/cpcm(water)//gfn2_xtb'
     """
 
-    mode: Mode | None = None
     optimization_settings: Sequence[Settings] = tuple()
     singlepoint_settings: Settings | None = None
     solvent: Solvent | None = None
@@ -53,122 +54,142 @@ class MultiStageOpt(Workflow):
     constraints: Sequence[Constraint] = tuple()
     transition_state: bool = False
 
-    def __str__(self) -> str:
-        if self.mode != Mode.MANUAL:
-            return f"<MultiStageOpt {self.mode}>"
+    def __repr__(self) -> str:
+        """
+        String representation of the workflow.
 
-        return f"<MultiStageOpt {self.level_of_theory}>"
+        >>> from stjames.molecule import Atom
+        >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
+        >>> print(MultiStageOptInput(initial_molecule=He, mode=Mode.RAPID, solvent="water"))
+        <MultiStageOptInput RAPID>
+        """
+        if self.mode != Mode.MANUAL:
+            return f"<MultiStageOptInput {self.mode.name}>"
+
+        return f"<MultiStageOptInput {self.level_of_theory}>"
 
     @property
     def level_of_theory(self) -> str:
-        methods = []
-        if self.singlepoint_settings:
-            methods.append(self.singlepoint_settings)
+        """
+        Returns the level of theory for the workflow.
+
+        >>> from stjames.molecule import Atom
+        >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
+        >>> mso = MultiStageOptInput(initial_molecule=He, mode=Mode.RAPID, solvent="water")
+        >>> mso.level_of_theory
+        'r2scan_3c/cpcm(water)//gfn2_xtb'
+        """
+        methods = [self.singlepoint_settings] if self.singlepoint_settings else []
         methods += reversed(self.optimization_settings)
 
         return "//".join(m.level_of_theory for m in methods)
 
-    @model_validator(mode="before")
-    def check_only_mode_or_settings(cls, values: dict[str, Any]) -> dict[str, Any]:
-        opt = values.get("optimization_settings")
-        sp = values.get("singlepoint_settings")
-        opt_or_sp_set = opt is not None or sp is not None
+    @model_validator(mode="after")
+    def set_mode_and_settings(self) -> Self:
+        """
+        Check mode and settings are properly specified, and assign settings based on mode.
+        """
+        opt_or_sp = bool(self.optimization_settings) or bool(self.singlepoint_settings)
 
-        match mode := values.get("mode"):
-            case None:
-                values["mode"] = Mode.MANUAL
-                if not opt_or_sp_set:
-                    raise ValueError("Must specify at least one of optimization_settings, singlepoint_settings, or mode")
-            case Mode.MANUAL:
-                if not opt_or_sp_set:
-                    raise ValueError("Must specify at least one of optimization_settings or singlepoint_settings with MANUAL mode")
-            case Mode.DEBUG:
-                raise NotImplementedError(f"Unsupported mode: {mode}")
-            case _:
-                if opt_or_sp_set:
-                    raise ValueError(f"Cannot specify optimization_settings or singlepoint_settings with {mode=}")
-                values = _assign_settings_by_mode(values)
+        if self.mode == Mode.AUTO:
+            self.mode = Mode.RAPID
 
-        return values
+        match (self.mode, opt_or_sp):
+            case (Mode.DEBUG, _):
+                raise NotImplementedError("Unsupported mode: DEBUG")
+
+            case (Mode.MANUAL, False):
+                raise ValueError("Must specify at least one of optimization_settings or singlepoint_settings with MANUAL mode")
+            case (Mode.MANUAL, True):
+                pass
+
+            case (mode, True):
+                raise ValueError(f"Cannot specify optimization_settings or singlepoint_settings with {mode=}")
+
+            case (mode, False):
+                self._assign_settings_by_mode(mode)
+
+        return self
+
+    def _assign_settings_by_mode(self, mode: Mode = Mode.RAPID) -> None:
+        """
+        Construct the settings based on the mode.
+
+        :param mode: Mode to use
+        """
+        opt_settings = OptimizationSettings()
+
+        # No solvent in pre-opt
+        OPT = [Task.OPTIMIZE if not self.transition_state else Task.OPTIMIZE_TS]
+        gfn0_pre_opt = [Settings(method=Method.GFN0_XTB, tasks=OPT, mode=Mode.RAPID, opt_settings=opt_settings)]
+        gfn2_pre_opt = [Settings(method=Method.GFN2_XTB, tasks=OPT, mode=Mode.RAPID, opt_settings=opt_settings)]
+
+        def opt(method: Method, basis_set: str | None = None, solvent: Solvent | None = None, freq: bool = False) -> Settings:
+            """Generates optimization settings."""
+            model = "gbsa" if method in XTB_METHODS else "cpcm"
+
+            return Settings(
+                method=method,
+                basis_set=basis_set,
+                tasks=OPT + [Task.FREQUENCIES] * freq,
+                solvent_settings=SolventSettings(solvent=solvent, model=model) if solvent else None,
+                opt_settings=opt_settings,
+            )
+
+        def sp(method: Method, basis_set: str | None = None, solvent: Solvent | None = None) -> Settings:
+            """Generate singlepoint settings."""
+            model = "cpcmx" if method in XTB_METHODS else "cpcm"
+
+            return Settings(
+                method=method,
+                basis_set=basis_set,
+                solvent_settings=SolventSettings(solvent=solvent, model=model) if solvent else None,
+                opt_settings=opt_settings,
+            )
+
+        match mode:
+            case Mode.RECKLESS:
+                # no-pre-opt
+                self.optimization_settings = [opt(Method.GFN_FF)]
+                self.singlepoint_settings = sp(Method.GFN2_XTB, solvent=self.solvent)
+
+            case Mode.RAPID:
+                self.optimization_settings = [
+                    *gfn0_pre_opt * bool(self.xtb_preopt),
+                    opt(Method.GFN2_XTB, freq=True),
+                ]
+                self.singlepoint_settings = sp(Method.R2SCAN3C, solvent=self.solvent)
+
+            case Mode.CAREFUL:
+                self.optimization_settings = [
+                    *gfn2_pre_opt * (self.xtb_preopt is None),
+                    opt(Method.B973C, solvent=self.solvent, freq=True),
+                ]
+                self.singlepoint_settings = sp(Method.WB97X3C, solvent=self.solvent)
+
+            case Mode.METICULOUS:
+                self.optimization_settings = [
+                    *gfn2_pre_opt * (self.xtb_preopt is None),
+                    opt(Method.B973C, solvent=self.solvent),
+                    opt(Method.WB97X3C, solvent=self.solvent, freq=True),
+                ]
+                self.singlepoint_settings = sp(Method.WB97MD3BJ, "def2-TZVPPD", solvent=self.solvent)
+
+            case mode:
+                raise NotImplementedError(f"Cannot assign settings for {mode=}")
 
 
-_T = TypeVar("_T", bound=dict[str, Any])
-
-
-def _assign_settings_by_mode(values: _T) -> _T:
+class MultiStageOptResults(WorkflowResults):
     """
-    Construct the settings based on the mode.
+    Results for multi-stage optimizations.
 
-    Defaults to RAPID mode.
+    :param calculations: sequence of calculations leading to the final molecule
     """
-    assert values["mode"]
-    if values["mode"] == Mode.MANUAL:
-        return values
 
-    opt_settings = OptimizationSettings()  # constraints=values.get("constraints"))
+    # The stages of the optimization(s) and singlepoint
+    calculations: list[Calculation]
 
-    # No solvent in pre-opt
-    xtb_preopt = values.get("xtb_preopt")
-    OPT = [Task.OPTIMIZE if not values.get("transition_state") else Task.OPTIMIZE_TS]
-    gfn0_pre_opt = [Settings(method=Method.GFN0_XTB, tasks=OPT, mode=Mode.RAPID, opt_settings=opt_settings)]
-    gfn2_pre_opt = [Settings(method=Method.GFN2_XTB, tasks=OPT, mode=Mode.RAPID, opt_settings=opt_settings)]
-
-    def opt(method: Method, basis_set: str | None = None, solvent: Solvent | None = None, freq: bool = False) -> Settings:
-        """Generates optimization settings."""
-        model = "gbsa" if method in XTB_METHODS else "cpcm"
-
-        return Settings(
-            method=method,
-            basis_set=basis_set,
-            tasks=OPT + [Task.FREQUENCIES] * freq,
-            solvent_settings=SolventSettings(solvent=solvent, model=model) if solvent else None,
-            opt_settings=opt_settings,
-        )
-
-    def sp(method: Method, basis_set: str | None = None, solvent: Solvent | None = None) -> Settings:
-        """Generate singlepoint settings."""
-        model = "cpcmx" if method in XTB_METHODS else "cpcm"
-
-        return Settings(
-            method=method,
-            basis_set=basis_set,
-            solvent_settings=SolventSettings(solvent=solvent, model=model) if solvent else None,
-            opt_settings=opt_settings,
-        )
-
-    solvent = values.get("solvent")
-    match mode := values["mode"]:
-        case Mode.RECKLESS:
-            # no-pre-opt
-            optimization_settings = [opt(Method.GFN_FF)]
-            singlepoint_settings = sp(Method.GFN2_XTB, solvent=solvent)
-
-        case Mode.RAPID:
-            optimization_settings = [
-                *gfn0_pre_opt * bool(xtb_preopt),
-                opt(Method.GFN2_XTB, freq=True),
-            ]
-            singlepoint_settings = sp(Method.R2SCAN3C, solvent=solvent)
-
-        case Mode.CAREFUL:
-            optimization_settings = [
-                *gfn2_pre_opt * (xtb_preopt is None),
-                opt(Method.B973C, solvent=solvent, freq=True),
-            ]
-            singlepoint_settings = sp(Method.WB97X3C, solvent=solvent)
-
-        case Mode.METICULOUS:
-            optimization_settings = [
-                *gfn2_pre_opt * (xtb_preopt is None),
-                opt(Method.B973C, solvent=solvent),
-                opt(Method.WB97X3C, solvent=solvent, freq=True),
-            ]
-            singlepoint_settings = sp(Method.WB97MD3BJ, "def2-TZVPPD", solvent=solvent)
-
-        case _:
-            raise NotImplementedError(f"Unsupported {mode=}")
-
-    values["optimization_settings"] = optimization_settings
-    values["singlepoint_settings"] = singlepoint_settings
-
-    return values
+    @property
+    def molecule(self) -> Molecule:
+        """The last molecule is always the one we want."""
+        return self.calculations[-1].molecules[-1]
