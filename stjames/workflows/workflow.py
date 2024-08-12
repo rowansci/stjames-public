@@ -1,9 +1,13 @@
+from typing import TypeAlias
+
 from pydantic import BaseModel, ConfigDict
 
 from ..base import Base
 from ..message import Message
 from ..mode import Mode
 from ..molecule import Molecule
+
+UUID: TypeAlias = str
 
 
 class Workflow(Base):
@@ -16,7 +20,7 @@ class Workflow(Base):
 class DBCalculation(Base):
     """Encodes a calculation that's in the database. This isn't terribly useful by itself."""
 
-    uuid: str
+    uuid: UUID
 
 
 class WorkflowInput(BaseModel):
