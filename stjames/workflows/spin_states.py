@@ -1,29 +1,57 @@
 from typing import Self, Sequence
 
-from pydantic import BaseModel, PositiveInt, field_validator, model_validator
+from pydantic import BaseModel, Field, PositiveInt, field_validator, model_validator
 
-from ..calculation import Calculation
 from ..constraint import Constraint
 from ..mode import Mode
-from ..molecule import Molecule
 from ..solvent import Solvent
-from .multistage_opt import MultiStageOptInput
-from .workflow import WorkflowInput, WorkflowResults
+from .multistage_opt import MultiStageOptWorkflow
+from .workflow import UUID, Workflow
 
 # the id of a mutable object may change, thus using object()
 _sentinel_mso = object()
 
 
-class SpinStatesInput(WorkflowInput):
+class SpinState(BaseModel):
+    """
+    The result of a SpinState calculation.
+
+    :param multiplicity: multiplicity of the SpinState
+    :param relative_energy: energy of the optimized Molecule
+    :param calculations: the UUIDs of the Calculations that produced this SpinState
+
+    >>> from stjames.molecule import Atom, Molecule
+    >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
+    >>> SpinState(multiplicity=3, relative_energy=0, calculation=['8a031a27-30d2-4ac7-8ade-efae9e9fc94a'])
+    <SpinState 3 0.0>
+    """
+
+    multiplicity: PositiveInt
+    relative_energy: float
+    calculation: list[UUID]
+
+    def __str__(self) -> str:
+        return repr(self)
+
+    def __repr__(self) -> str:
+        return f"<SpinState {self.multiplicity} {self.relative_energy:.1f}>"
+
+
+class SpinStatesWorkflow(Workflow):
     """
     Workflow for computing spin states of molecules.
 
-    Uses the modes from MultiStageOptInput.
+    Uses the modes from MultiStageOptWorkflow.
+
+    Influenced by:
+    [Performance of Quantum Chemistry Methods for Benchmark Set of Spin–State
+    Energetics Derived from Experimental Data of 17 Transition Metal Complexes
+    (SSE17)](https://chemrxiv.org/engage/chemrxiv/article-details/66a8b15cc9c6a5c07a792487)
 
     Inherited
     :param initial_molecule: Molecule of interest
-    :param mode: Mode for workflow
 
+    :param mode: Mode for workflow
     :param states: multiplicities of the spin state targetted
     :param mode: Mode to use
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
@@ -32,26 +60,37 @@ class SpinStatesInput(WorkflowInput):
     :param constraints: constraints to add
     :param transition_state: whether this is a transition state
 
-    >>> from stjames.molecule import Atom
+    :param spin_states: resulting spin states data
+
+    >>> from stjames.molecule import Atom, Molecule
     >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
-    >>> ss = SpinStatesInput(initial_molecule=He, states=[1, 3, 5], mode=Mode.RAPID, solvent="water")
+    >>> ss = SpinStatesWorkflow(initial_molecule=He, states=[1, 3, 5], mode=Mode.RAPID, solvent="water")
     >>> str(ss)
-    '<SpinStatesInput [1, 3, 5] RAPID>'
+    '<SpinStatesWorkflow [1, 3, 5] RAPID>'
     """
 
+    mode: Mode
     states: list[PositiveInt]
     # Need to use a sentinel object to make both mypy and pydantic happy
-    multistage_opt_settings: MultiStageOptInput = _sentinel_mso  # type: ignore [assignment]
+    multistage_opt_settings: MultiStageOptWorkflow = _sentinel_mso  # type: ignore [assignment]
     solvent: Solvent | None = None
     xtb_preopt: bool | None = None
     constraints: Sequence[Constraint] = tuple()
     transition_state: bool = False
 
+    spin_states: list[SpinState] = Field(default_factory=list)
+
+    def __str__(self) -> str:
+        return repr(self)
+
     def __repr__(self) -> str:
         if self.mode != Mode.MANUAL:
-            return f"<SpinStatesInput {self.states} {self.mode.name}>"
+            return f"<SpinStatesWorkflow {self.states} {self.mode.name}>"
 
-        return f"<SpinStatesInput {self.states} {self.level_of_theory}>"
+        return f"<SpinStatesWorkflow {self.states} {self.level_of_theory}>"
+
+    def __len__(self) -> int:
+        return len(self.states)
 
     @property
     def level_of_theory(self) -> str:
@@ -87,7 +126,7 @@ class SpinStatesInput(WorkflowInput):
                 raise ValueError(f"Cannot specify multistage_opt_settings with {mode=}, {mso=}")
 
             case (mode, _):
-                self.multistage_opt_settings = MultiStageOptInput(
+                self.multistage_opt_settings = MultiStageOptWorkflow(
                     initial_molecule=self.initial_molecule,
                     mode=self.mode,
                     solvent=self.solvent,
@@ -98,87 +137,8 @@ class SpinStatesInput(WorkflowInput):
 
         return self
 
-
-class SpinState(BaseModel):
-    """
-    The result of a SpinState calculation.
-
-    :param multiplicity: multiplicity of the SpinState
-    :param relative_energy: energy of the optimized Molecule
-    :param calculation: the Calculation that produced this SpinState
-
-    >>> from stjames.molecule import Atom
-    >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
-    >>> calc = Calculation(molecules=[He])
-    >>> SpinState(multiplicity=3, relative_energy=0, calculation=calc)
-    <SpinState 3 0.0>
-    """
-
-    multiplicity: PositiveInt
-    relative_energy: float
-    calculation: Calculation
-
-    def __str__(self) -> str:
-        return repr(self)
-
-    def __repr__(self) -> str:
-        return f"<SpinState {self.multiplicity} {self.relative_energy:.1f}>"
-
-    @property
-    def molecule(self) -> Molecule:
-        """The last molecule is always the one we want."""
-        return self.calculation.molecules[-1]
-
-
-class SpinStatesResults(WorkflowResults):
-    """
-    Results of a SpinStates workflow.
-
-    :param spin_states: list of SpinStates
-
-    >>> from stjames.molecule import Atom
-    >>> mols = [
-    ...     Molecule(charge=0, multiplicity=i, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
-    ...     for i in [1, 3, 5]
-    ... ]
-    >>> calcs = [Calculation(molecules=[mol]) for mol in mols]
-    >>> relative_energies = [0, 1, 3]
-    >>> spin_states = [
-    ...     SpinState(molecule=mol, multiplicity=mol.multiplicity, relative_energy=re, calculation=calc)
-    ...     for mol, calc, re in zip(mols, calcs, relative_energies)
-    ... ]
-    >>> ssr = SpinStatesResults(spin_states=spin_states)
-    >>> ssr
-    <SpinStatesResults [1, 3, 5]>
-    >>> ssr.multiplicities
-    [1, 3, 5]
-    >>> ssr.relative_energies
-    [0.0, 1.0, 3.0]
-    >>> print(ssr)
-    SpinStatesResults
-      1:  0.00
-      3:  1.00
-      5:  3.00
-    """
-
-    spin_states: list[SpinState]
-
-    def __repr__(self) -> str:
-        return f"<SpinStatesResults {self.multiplicities}>"
-
-    def __str__(self) -> str:
+    def str_results(self) -> str:
         return "SpinStatesResults\n" + "\n".join(f"  {ss.multiplicity}: {ss.relative_energy:>5.2f}" for ss in self.spin_states)
-
-    def __len__(self) -> int:
-        return len(self.spin_states)
-
-    @property
-    def molecules(self) -> list[Molecule]:
-        return [ss.molecule for ss in self.spin_states]
-
-    @property
-    def multiplicities(self) -> list[PositiveInt]:
-        return [ss.multiplicity for ss in self.spin_states]
 
     @property
     def relative_energies(self) -> list[float]:
@@ -199,8 +159,5 @@ class SpinStatesResults(WorkflowResults):
 
         if any(re < 0 for re in relative_energies):
             raise ValueError(f"All relative energies must be >= 0, got: {relative_energies}")
-
-        if any(len(spin_states[0].molecule) != len(ss.molecule) for ss in spin_states[1:]):
-            raise ValueError("Inconsistent molecules found")
 
         return spin_states
