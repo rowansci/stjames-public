@@ -17,24 +17,24 @@ class SpinState(BaseModel):
     The result of a SpinState calculation.
 
     :param multiplicity: multiplicity of the SpinState
-    :param relative_energy: energy of the optimized Molecule
+    :param energy: energy of the optimized Molecule
     :param calculations: the UUIDs of the Calculations that produced this SpinState
 
     >>> from stjames.molecule import Atom, Molecule
     >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
-    >>> SpinState(multiplicity=3, relative_energy=0, calculation=['8a031a27-30d2-4ac7-8ade-efae9e9fc94a'])
-    <SpinState 3 0.0>
+    >>> SpinState(multiplicity=3, energy=-13.4291, calculation=['8a031a27-30d2-4ac7-8ade-efae9e9fc94a'])
+    <SpinState 3 -13.429>
     """
 
     multiplicity: PositiveInt
-    relative_energy: float
+    energy: float
     calculation: list[UUID]
 
     def __str__(self) -> str:
         return repr(self)
 
     def __repr__(self) -> str:
-        return f"<SpinState {self.multiplicity} {self.relative_energy:.1f}>"
+        return f"<SpinState {self.multiplicity} {self.energy:.3f}>"
 
 
 class SpinStatesWorkflow(Workflow):
@@ -138,26 +138,22 @@ class SpinStatesWorkflow(Workflow):
         return self
 
     def str_results(self) -> str:
-        return "SpinStatesResults\n" + "\n".join(f"  {ss.multiplicity}: {ss.relative_energy:>5.2f}" for ss in self.spin_states)
+        return "SpinStatesResults\n" + "\n".join(f"  {ss.multiplicity}: {ss.energy:>5.2f}" for ss in self.spin_states)
 
     @property
-    def relative_energies(self) -> list[float]:
-        return [ss.relative_energy for ss in self.spin_states]
+    def energies(self) -> list[float]:
+        return [ss.energy for ss in self.spin_states]
 
     @field_validator("spin_states")
     @classmethod
     def validate_spin_states(cls, spin_states: list[SpinState]) -> list[SpinState]:
         """Ensure that all spin states have consistent results."""
         mults = [ss.multiplicity for ss in spin_states]
-        relative_energies = [ss.relative_energy for ss in spin_states]
 
         if len(mults) != len(set(mults)):
             raise ValueError(f"Duplicate multiplicities found: {mults}")
 
         if any((mults[0] - mult) % 2 for mult in mults[1:]):
             raise ValueError(f"Inconsistent multiplicities found: {mults}")
-
-        if any(re < 0 for re in relative_energies):
-            raise ValueError(f"All relative energies must be >= 0, got: {relative_energies}")
 
         return spin_states
