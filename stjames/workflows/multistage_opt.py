@@ -122,7 +122,7 @@ class MultiStageOptWorkflow(Workflow):
 
         :param mode: Mode to use
         """
-        opt_settings = OptimizationSettings()
+        opt_settings = OptimizationSettings(constraints=self.constraints, transition_state=self.transition_state)
 
         # No solvent in pre-opt
         OPT = [Task.OPTIMIZE if not self.transition_state else Task.OPTIMIZE_TS]
@@ -149,7 +149,6 @@ class MultiStageOptWorkflow(Workflow):
                 method=method,
                 basis_set=basis_set,
                 solvent_settings=SolventSettings(solvent=solvent, model=model) if solvent else None,
-                opt_settings=opt_settings,
             )
 
         match mode:
