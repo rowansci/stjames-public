@@ -34,16 +34,16 @@ def test_spin_states_basic(mode: Mode, level_of_theory: str, Mn: Molecule) -> No
     assert spin_states.level_of_theory == level_of_theory
     assert spin_states.states == [2, 4, 6]
 
-    mso = spin_states.multistage_opt_settings
-    assert mso
-    assert mso.optimization_settings
-    assert mso.singlepoint_settings
-    assert mso.singlepoint_settings.method
-    assert mso.singlepoint_settings.solvent_settings is None
-    assert mso.solvent is None
-    assert not mso.constraints
-    assert mso.xtb_preopt is (mode in {Mode.CAREFUL, Mode.METICULOUS})
-    assert not mso.transition_state
+    msow = spin_states.multistage_opt_workflow
+    assert msow
+    assert msow.optimization_settings
+    assert msow.singlepoint_settings
+    assert msow.singlepoint_settings.method
+    assert msow.singlepoint_settings.solvent_settings is None
+    assert msow.solvent is None
+    assert not msow.constraints
+    assert msow.xtb_preopt is (mode in {Mode.CAREFUL, Mode.METICULOUS})
+    assert not msow.transition_state
 
 
 def test_raises(Mn: Molecule) -> None:
@@ -92,28 +92,28 @@ def test_reckless(Mn: Molecule) -> None:
 
     assert spin_states.states == [2, 4, 6]
 
-    mso = spin_states.multistage_opt_settings
-    assert mso
-    assert mso.optimization_settings
-    assert len(mso.optimization_settings) == 1
-    assert mso.singlepoint_settings
-    assert mso.singlepoint_settings.method == Method.GFN2_XTB
-    assert mso.singlepoint_settings.solvent_settings
-    assert mso.singlepoint_settings.solvent_settings.solvent == "acetonitrile"
-    assert mso.solvent == "acetonitrile"
-    assert not mso.constraints
-    assert not mso.xtb_preopt
-    assert not mso.transition_state
+    msow = spin_states.multistage_opt_workflow
+    assert msow
+    assert msow.optimization_settings
+    assert len(msow.optimization_settings) == 1
+    assert msow.singlepoint_settings
+    assert msow.singlepoint_settings.method == Method.GFN2_XTB
+    assert msow.singlepoint_settings.solvent_settings
+    assert msow.singlepoint_settings.solvent_settings.solvent == "acetonitrile"
+    assert msow.solvent == "acetonitrile"
+    assert not msow.constraints
+    assert not msow.xtb_preopt
+    assert not msow.transition_state
 
-    mso_opt0 = mso.optimization_settings[0]
+    msow_opt0 = msow.optimization_settings[0]
 
-    assert getattr(mso_opt0, "method") == Method.GFN_FF
-    assert getattr(mso_opt0, "basis_set") is None
-    assert getattr(mso_opt0, "tasks") == [Task.OPTIMIZE]
-    assert getattr(mso_opt0, "corrections") == []
-    assert getattr(mso_opt0, "mode") == Mode.AUTO
-    assert getattr(mso_opt0, "solvent_settings", "Not None") is None
-    assert not mso_opt0.opt_settings.transition_state
+    assert getattr(msow_opt0, "method") == Method.GFN_FF
+    assert getattr(msow_opt0, "basis_set") is None
+    assert getattr(msow_opt0, "tasks") == [Task.OPTIMIZE]
+    assert getattr(msow_opt0, "corrections") == []
+    assert getattr(msow_opt0, "mode") == Mode.AUTO
+    assert getattr(msow_opt0, "solvent_settings", "Not None") is None
+    assert not msow_opt0.opt_settings.transition_state
 
 
 @mark.smoke
@@ -128,36 +128,36 @@ def test_rapid(Mn: Molecule) -> None:
 
     assert spin_states.states == [2, 4, 6]
 
-    mso = spin_states.multistage_opt_settings
-    assert mso
-    assert mso.optimization_settings
-    assert len(mso.optimization_settings) == 2
-    assert mso.singlepoint_settings
-    assert mso.singlepoint_settings.method == Method.R2SCAN3C
-    assert mso.singlepoint_settings.solvent_settings
-    assert mso.singlepoint_settings.solvent_settings.solvent == "hexane"
-    assert mso.solvent == "hexane"
-    assert not mso.constraints
-    assert mso.xtb_preopt
-    assert not mso.transition_state
+    msow = spin_states.multistage_opt_workflow
+    assert msow
+    assert msow.optimization_settings
+    assert len(msow.optimization_settings) == 2
+    assert msow.singlepoint_settings
+    assert msow.singlepoint_settings.method == Method.R2SCAN3C
+    assert msow.singlepoint_settings.solvent_settings
+    assert msow.singlepoint_settings.solvent_settings.solvent == "hexane"
+    assert msow.solvent == "hexane"
+    assert not msow.constraints
+    assert msow.xtb_preopt
+    assert not msow.transition_state
 
-    mso_opt0, mso_opt1 = mso.optimization_settings
+    msow_opt0, msow_opt1 = msow.optimization_settings
 
-    assert mso_opt0.method == Method.GFN0_XTB
-    assert mso_opt0.basis_set is None
-    assert mso_opt0.tasks == [Task.OPTIMIZE]
-    assert mso_opt0.corrections == []
-    assert mso_opt0.mode == Mode.RAPID
-    assert mso_opt0.solvent_settings is None
-    assert not mso_opt0.opt_settings.transition_state
+    assert msow_opt0.method == Method.GFN0_XTB
+    assert msow_opt0.basis_set is None
+    assert msow_opt0.tasks == [Task.OPTIMIZE]
+    assert msow_opt0.corrections == []
+    assert msow_opt0.mode == Mode.RAPID
+    assert msow_opt0.solvent_settings is None
+    assert not msow_opt0.opt_settings.transition_state
 
-    assert mso_opt1.method == Method.GFN2_XTB
-    assert mso_opt1.basis_set is None
-    assert mso_opt1.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
-    assert mso_opt1.corrections == []
-    assert mso_opt1.mode == Mode.AUTO
-    assert mso_opt1.solvent_settings is None
-    assert not mso_opt1.opt_settings.transition_state
+    assert msow_opt1.method == Method.GFN2_XTB
+    assert msow_opt1.basis_set is None
+    assert msow_opt1.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
+    assert msow_opt1.corrections == []
+    assert msow_opt1.mode == Mode.AUTO
+    assert msow_opt1.solvent_settings is None
+    assert not msow_opt1.opt_settings.transition_state
 
 
 def test_careful(Fe: Molecule) -> None:
@@ -170,37 +170,37 @@ def test_careful(Fe: Molecule) -> None:
 
     assert spin_states.states == [1, 3, 5]
 
-    mso = spin_states.multistage_opt_settings
-    assert mso
-    assert mso.optimization_settings
-    assert len(mso.optimization_settings) == 2
-    assert mso.singlepoint_settings
-    assert mso.singlepoint_settings.method == Method.WB97X3C
-    assert not mso.singlepoint_settings.solvent_settings
-    assert not mso.solvent
-    assert not mso.constraints
-    assert mso.xtb_preopt
-    assert mso.transition_state
+    msow = spin_states.multistage_opt_workflow
+    assert msow
+    assert msow.optimization_settings
+    assert len(msow.optimization_settings) == 2
+    assert msow.singlepoint_settings
+    assert msow.singlepoint_settings.method == Method.WB97X3C
+    assert not msow.singlepoint_settings.solvent_settings
+    assert not msow.solvent
+    assert not msow.constraints
+    assert msow.xtb_preopt
+    assert msow.transition_state
 
-    mso_opt0, mso_opt1 = mso.optimization_settings
+    msow_opt0, msow_opt1 = msow.optimization_settings
 
-    assert mso_opt0.method == Method.GFN2_XTB
-    assert mso_opt0.basis_set is None
+    assert msow_opt0.method == Method.GFN2_XTB
+    assert msow_opt0.basis_set is None
     # Task.OPTIMIZE_TS is converted to Task.OPTIMIZE and settings.transition_state = True
-    assert mso_opt0.tasks == [Task.OPTIMIZE]
-    assert mso_opt0.corrections == []
-    assert mso_opt0.mode == Mode.RAPID
-    assert mso_opt0.solvent_settings is None
-    assert mso_opt0.opt_settings.transition_state
+    assert msow_opt0.tasks == [Task.OPTIMIZE]
+    assert msow_opt0.corrections == []
+    assert msow_opt0.mode == Mode.RAPID
+    assert msow_opt0.solvent_settings is None
+    assert msow_opt0.opt_settings.transition_state
 
-    assert mso_opt1.method == Method.B973C
-    assert mso_opt1.tasks == [Task.FREQUENCIES, Task.OPTIMIZE]
-    assert mso_opt1.corrections == []
-    assert mso_opt1.mode == Mode.AUTO
-    assert mso_opt1.solvent_settings is None
-    assert mso_opt1.basis_set
-    assert mso_opt1.basis_set.name == "def2-mTZVP"
-    assert mso_opt1.opt_settings.transition_state
+    assert msow_opt1.method == Method.B973C
+    assert msow_opt1.tasks == [Task.FREQUENCIES, Task.OPTIMIZE]
+    assert msow_opt1.corrections == []
+    assert msow_opt1.mode == Mode.AUTO
+    assert msow_opt1.solvent_settings is None
+    assert msow_opt1.basis_set
+    assert msow_opt1.basis_set.name == "def2-mTZVP"
+    assert msow_opt1.opt_settings.transition_state
 
 
 def test_meticulous(Mn: Molecule) -> None:
@@ -212,46 +212,46 @@ def test_meticulous(Mn: Molecule) -> None:
 
     assert spin_states.states == [2, 4, 6]
 
-    mso = spin_states.multistage_opt_settings
-    assert mso
-    assert mso.optimization_settings
-    assert len(mso.optimization_settings) == 3
-    assert mso.singlepoint_settings
-    assert mso.singlepoint_settings.method == Method.WB97MD3BJ
-    assert mso.singlepoint_settings.basis_set
-    assert mso.singlepoint_settings.basis_set.name == "def2-TZVPPD"
-    assert mso.singlepoint_settings.solvent_settings is None
-    assert mso.solvent is None
-    assert not mso.constraints
-    assert mso.xtb_preopt
-    assert not mso.transition_state
+    msow = spin_states.multistage_opt_workflow
+    assert msow
+    assert msow.optimization_settings
+    assert len(msow.optimization_settings) == 3
+    assert msow.singlepoint_settings
+    assert msow.singlepoint_settings.method == Method.WB97MD3BJ
+    assert msow.singlepoint_settings.basis_set
+    assert msow.singlepoint_settings.basis_set.name == "def2-TZVPPD"
+    assert msow.singlepoint_settings.solvent_settings is None
+    assert msow.solvent is None
+    assert not msow.constraints
+    assert msow.xtb_preopt
+    assert not msow.transition_state
 
-    mso_opt0, mso_opt1, mso_opt2 = mso.optimization_settings
+    msow_opt0, msow_opt1, msow_opt2 = msow.optimization_settings
 
-    assert mso_opt0.method == Method.GFN2_XTB
-    assert mso_opt0.tasks == [Task.OPTIMIZE]
-    assert mso_opt0.corrections == []
-    assert mso_opt0.mode == Mode.RAPID
-    assert mso_opt0.solvent_settings is None
-    assert not mso_opt0.opt_settings.transition_state
+    assert msow_opt0.method == Method.GFN2_XTB
+    assert msow_opt0.tasks == [Task.OPTIMIZE]
+    assert msow_opt0.corrections == []
+    assert msow_opt0.mode == Mode.RAPID
+    assert msow_opt0.solvent_settings is None
+    assert not msow_opt0.opt_settings.transition_state
 
-    assert mso_opt1.method == Method.B973C
-    assert mso_opt1.tasks == [Task.OPTIMIZE]
-    assert mso_opt1.corrections == []
-    assert mso_opt1.mode == Mode.AUTO
-    assert mso_opt1.solvent_settings is None
-    assert mso_opt1.basis_set
-    assert mso_opt1.basis_set.name == "def2-mTZVP"
-    assert not mso_opt1.opt_settings.transition_state
+    assert msow_opt1.method == Method.B973C
+    assert msow_opt1.tasks == [Task.OPTIMIZE]
+    assert msow_opt1.corrections == []
+    assert msow_opt1.mode == Mode.AUTO
+    assert msow_opt1.solvent_settings is None
+    assert msow_opt1.basis_set
+    assert msow_opt1.basis_set.name == "def2-mTZVP"
+    assert not msow_opt1.opt_settings.transition_state
 
-    assert mso_opt2.method == Method.WB97X3C
-    assert mso_opt2.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
-    assert mso_opt2.corrections == []
-    assert mso_opt2.mode == Mode.AUTO
-    assert mso_opt2.solvent_settings is None
-    assert mso_opt2.basis_set
-    assert mso_opt2.basis_set.name == "vDZP"
-    assert not mso_opt2.opt_settings.transition_state
+    assert msow_opt2.method == Method.WB97X3C
+    assert msow_opt2.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
+    assert msow_opt2.corrections == []
+    assert msow_opt2.mode == Mode.AUTO
+    assert msow_opt2.solvent_settings is None
+    assert msow_opt2.basis_set
+    assert msow_opt2.basis_set.name == "vDZP"
+    assert not msow_opt2.opt_settings.transition_state
 
 
 def test_manual(Fe: Molecule) -> None:
@@ -263,7 +263,7 @@ def test_manual(Fe: Molecule) -> None:
         Settings(method=Method.B3LYP, basis_set="def2-SVP", tasks=[Task.OPTIMIZE]),
     ]
     singlepoint_settings = Settings(method=Method.PBE, basis_set="def2-TZVP")
-    mso = MultiStageOptWorkflow(
+    msow = MultiStageOptWorkflow(
         initial_molecule=Fe,
         mode=Mode.MANUAL,
         optimization_settings=optimization_settings,
@@ -273,41 +273,41 @@ def test_manual(Fe: Molecule) -> None:
         initial_molecule=Fe,
         mode=Mode.MANUAL,
         states=[1, 3, 5],
-        multistage_opt_settings=mso,
+        multistage_opt_workflow=msow,
     )
 
     assert spin_states.states == [1, 3, 5]
 
-    assert spin_states.multistage_opt_settings
-    mso = spin_states.multistage_opt_settings
-    assert mso
-    assert mso.optimization_settings
-    assert len(mso.optimization_settings) == 2
-    assert mso.singlepoint_settings
-    assert mso.singlepoint_settings.method == Method.PBE
-    assert mso.singlepoint_settings.basis_set
-    assert mso.singlepoint_settings.basis_set.name == "def2-TZVP"
-    assert mso.singlepoint_settings.solvent_settings is None
-    assert mso.solvent is None
-    assert not mso.constraints
-    assert not mso.xtb_preopt
-    assert not mso.transition_state
+    assert spin_states.multistage_opt_workflow
+    msow = spin_states.multistage_opt_workflow
+    assert msow
+    assert msow.optimization_settings
+    assert len(msow.optimization_settings) == 2
+    assert msow.singlepoint_settings
+    assert msow.singlepoint_settings.method == Method.PBE
+    assert msow.singlepoint_settings.basis_set
+    assert msow.singlepoint_settings.basis_set.name == "def2-TZVP"
+    assert msow.singlepoint_settings.solvent_settings is None
+    assert msow.solvent is None
+    assert not msow.constraints
+    assert not msow.xtb_preopt
+    assert not msow.transition_state
 
-    mso_opt0, mso_opt1 = mso.optimization_settings
+    msow_opt0, msow_opt1 = msow.optimization_settings
 
-    assert mso_opt0.method == Method.GFN0_XTB
-    assert mso_opt0.tasks == [Task.OPTIMIZE]
-    assert mso_opt0.corrections == []
-    assert mso_opt0.mode == Mode.AUTO
-    assert mso_opt0.solvent_settings is None
-    assert not mso_opt0.opt_settings.transition_state
+    assert msow_opt0.method == Method.GFN0_XTB
+    assert msow_opt0.tasks == [Task.OPTIMIZE]
+    assert msow_opt0.corrections == []
+    assert msow_opt0.mode == Mode.AUTO
+    assert msow_opt0.solvent_settings is None
+    assert not msow_opt0.opt_settings.transition_state
 
-    assert mso_opt1.method == Method.B3LYP
-    assert mso_opt1.tasks == [Task.OPTIMIZE]
-    assert mso_opt1.corrections == []
-    assert mso_opt1.mode == Mode.AUTO
-    assert mso_opt1.solvent_settings is None
+    assert msow_opt1.method == Method.B3LYP
+    assert msow_opt1.tasks == [Task.OPTIMIZE]
+    assert msow_opt1.corrections == []
+    assert msow_opt1.mode == Mode.AUTO
+    assert msow_opt1.solvent_settings is None
 
-    assert mso_opt1.basis_set
-    assert mso_opt1.basis_set.name == "def2-SVP"
-    assert not mso_opt1.opt_settings.transition_state
+    assert msow_opt1.basis_set
+    assert msow_opt1.basis_set.name == "def2-SVP"
+    assert not msow_opt1.opt_settings.transition_state
