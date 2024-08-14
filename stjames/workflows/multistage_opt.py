@@ -27,7 +27,7 @@ class MultiStageOptWorkflow(Workflow):
 
     Notes:
     - No solvent in pre-opt
-    - For solvent: xTB singlepoints use CPCMX, xTB optimizations use ALBP, all else use CPCM
+    - If solvent: xTB singlepoints use CPCMX, xTB optimizations use ALBP, all else use CPCM
     - Allows a single point to be called with no optimization
 
     Inherited
@@ -165,7 +165,7 @@ class MultiStageOptWorkflow(Workflow):
                 self.xtb_preopt = bool(self.xtb_preopt)
                 self.optimization_settings = [
                     *gfn0_pre_opt * self.xtb_preopt,
-                    opt(Method.GFN2_XTB, freq=True, solvent=self.solvent),
+                    opt(Method.GFN2_XTB, solvent=self.solvent, freq=True),
                 ]
                 self.singlepoint_settings = sp(Method.R2SCAN3C, solvent=self.solvent)
 
