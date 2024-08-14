@@ -112,7 +112,8 @@ def test_reckless(Mn: Molecule) -> None:
     assert getattr(msow_opt0, "tasks") == [Task.OPTIMIZE]
     assert getattr(msow_opt0, "corrections") == []
     assert getattr(msow_opt0, "mode") == Mode.AUTO
-    assert getattr(msow_opt0, "solvent_settings", "Not None") is None
+    assert msow_opt0.solvent_settings
+    assert msow_opt0.solvent_settings.solvent == "acetonitrile"
     assert not msow_opt0.opt_settings.transition_state
 
 
@@ -156,7 +157,8 @@ def test_rapid(Mn: Molecule) -> None:
     assert msow_opt1.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
     assert msow_opt1.corrections == []
     assert msow_opt1.mode == Mode.AUTO
-    assert msow_opt1.solvent_settings is None
+    assert msow_opt1.solvent_settings
+    assert msow_opt1.solvent_settings.solvent == "hexane"
     assert not msow_opt1.opt_settings.transition_state
 
 

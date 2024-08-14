@@ -14,8 +14,8 @@ def He() -> Molecule:
 @mark.parametrize(
     "mode, level_of_theory",
     [
-        (Mode.RECKLESS, "gfn2_xtb/cpcmx(water)//gfn_ff"),
-        (Mode.RAPID, "r2scan_3c/cpcm(water)//gfn2_xtb"),
+        (Mode.RECKLESS, "gfn2_xtb/cpcmx(water)//gfn_ff/alpb(water)"),
+        (Mode.RAPID, "r2scan_3c/cpcm(water)//gfn2_xtb/alpb(water)"),
         (Mode.CAREFUL, "wb97x_3c/cpcm(water)//b97_3c/cpcm(water)//gfn2_xtb"),
         (Mode.METICULOUS, "wb97m_d3bj/def2-tzvppd/cpcm(water)//wb97x_3c/cpcm(water)//b97_3c/cpcm(water)//gfn2_xtb"),
     ],
@@ -79,10 +79,12 @@ def test_reckless(He: Molecule) -> None:
         "tasks": [Task.OPTIMIZE],
         "corrections": [],
         "mode": Mode.AUTO,
-        "solvent_settings": None,
     }
     for key, value in settings.items():
         assert getattr(mso_opt0, key) == value
+
+    assert mso_opt0.solvent_settings
+    assert mso_opt0.solvent_settings.solvent == "acetonitrile"
 
     assert not mso_opt0.opt_settings.transition_state
 
@@ -121,10 +123,12 @@ def test_rapid(He: Molecule) -> None:
         "tasks": [Task.OPTIMIZE, Task.FREQUENCIES],
         "corrections": [],
         "mode": Mode.AUTO,
-        "solvent_settings": None,
     }
     for key, value in settings1.items():
         assert getattr(mso_opt1, key) == value
+
+    assert mso_opt1.solvent_settings
+    assert mso_opt1.solvent_settings.solvent == "hexane"
 
     assert not mso_opt1.opt_settings.transition_state
 

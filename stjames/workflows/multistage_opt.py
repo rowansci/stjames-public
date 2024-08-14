@@ -25,7 +25,10 @@ class MultiStageOptWorkflow(Workflow):
     METICULOUS
         wB97M-D3BJ/def2-TZVPPD//wB97X-3c//B97-3c with GFN2-xTB pre-opt
 
-    Note: allows a single point to be called with no optimization.
+    Notes:
+    - No solvent in pre-opt
+    - For solvent: xTB singlepoints use CPCMX, xTB optimizations use ALBP, all else use CPCM
+    - Allows a single point to be called with no optimization
 
     Inherited
     :param initial_molecule: Molecule of interest
@@ -44,7 +47,7 @@ class MultiStageOptWorkflow(Workflow):
     >>> mso
     <MultiStageOptWorkflow RAPID>
     >>> mso.level_of_theory
-    'r2scan_3c/cpcm(water)//gfn2_xtb'
+    'r2scan_3c/cpcm(water)//gfn2_xtb/alpb(water)'
     """
 
     mode: Mode
@@ -82,9 +85,9 @@ class MultiStageOptWorkflow(Workflow):
 
         >>> from stjames.molecule import Atom, Molecule
         >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
-        >>> mso = MultiStageOptWorkflow(initial_molecule=He, mode=Mode.RAPID, solvent="water")
+        >>> mso = MultiStageOptWorkflow(initial_molecule=He, mode=Mode.RAPID, solvent="hexane")
         >>> mso.level_of_theory
-        'r2scan_3c/cpcm(water)//gfn2_xtb'
+        'r2scan_3c/cpcm(hexane)//gfn2_xtb/alpb(hexane)'
         """
         methods = [self.singlepoint_settings] if self.singlepoint_settings else []
         methods += reversed(self.optimization_settings)
@@ -131,7 +134,7 @@ class MultiStageOptWorkflow(Workflow):
 
         def opt(method: Method, basis_set: str | None = None, solvent: Solvent | None = None, freq: bool = False) -> Settings:
             """Generates optimization settings."""
-            model = "gbsa" if method in XTB_METHODS else "cpcm"
+            model = "alpb" if method in XTB_METHODS else "cpcm"
 
             return Settings(
                 method=method,
@@ -155,14 +158,14 @@ class MultiStageOptWorkflow(Workflow):
             case Mode.RECKLESS:
                 # no-pre-opt
                 self.xtb_preopt = False
-                self.optimization_settings = [opt(Method.GFN_FF)]
+                self.optimization_settings = [opt(Method.GFN_FF, solvent=self.solvent)]
                 self.singlepoint_settings = sp(Method.GFN2_XTB, solvent=self.solvent)
 
             case Mode.RAPID:
                 self.xtb_preopt = bool(self.xtb_preopt)
                 self.optimization_settings = [
                     *gfn0_pre_opt * self.xtb_preopt,
-                    opt(Method.GFN2_XTB, freq=True),
+                    opt(Method.GFN2_XTB, freq=True, solvent=self.solvent),
                 ]
                 self.singlepoint_settings = sp(Method.R2SCAN3C, solvent=self.solvent)
 
