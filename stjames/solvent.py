@@ -35,6 +35,7 @@ class SolventModel(LowercaseStrEnum):
     CPCM = "cpcm"
     ALPB = "alpb"
     COSMO = "cosmo"
+    GBSA = "gbsa"
     CPCMX = "cpcmx"
 
 

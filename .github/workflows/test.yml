@@ -10,10 +10,10 @@ jobs:
   test:
     strategy:
       matrix:
-        python-version: ['3.12']
+        python-version: ['3.11', '3.12']
         os: [ubuntu-latest]
 
-    name: Python ${{ matrix.os }} ${{ matrix.python-version }}
+    name: "Python ${{ matrix.os }} ${{ matrix.python-version }}"
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v4
@@ -27,4 +27,6 @@ jobs:
 
       - run: ruff format . --check
       - run: ruff check .
-      - run: mypy stjames
+      - run: mypy stjames tests
+
+      - run: pytest --cov

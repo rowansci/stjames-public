@@ -7,7 +7,7 @@ repos:
 
 - repo: https://github.com/astral-sh/ruff-pre-commit
   # Ruff version.
-  rev: v0.4.9
+  rev: v0.5.4
   hooks:
     # Run the linter.
     - id: ruff
@@ -16,11 +16,22 @@ repos:
     - id: ruff-format
 
 - repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.10.0
+  rev: v1.11.0
   hooks:
     - id: mypy
       stages: [commit, push]
       args: ['--config-file', 'pyproject.toml']
       additional_dependencies:
-        - pydantic
         - numpy
+        - pydantic
+        - pytest
+
+- repo: local
+  hooks:
+  - id: Pytest
+    name: pytest
+    stages: [commit]
+    types: [python]
+    entry: pytest -m smoke
+    language: system
+    pass_filenames: false

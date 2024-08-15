@@ -14,7 +14,7 @@ This is not intended to be run as a standalone library: it's basically just a bi
 
 ## Installation
 
-To install, ensure you have Python 3.8 or newer. Then run:
+To install, ensure you have Python 3.11 or newer. Then run:
 
 ```
 pip install stjames

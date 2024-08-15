@@ -29,10 +29,43 @@ class Method(LowercaseStrEnum):
 
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
 
+    GFN_FF = "gfn_ff"
     GFN0_XTB = "gfn0_xtb"
     GFN1_XTB = "gfn1_xtb"
     GFN2_XTB = "gfn2_xtb"
-    GFN_FF = "gfn_ff"
 
     # this was going to be removed, but Jonathon wrote such a nice basis set test... it's off the front end.
     BP86 = "bp86"
+
+
+MLFF = [
+    Method.AIMNET2_WB97MD3,
+]
+
+XTB_METHODS = [
+    Method.GFN_FF,
+    Method.GFN0_XTB,
+    Method.GFN1_XTB,
+    Method.GFN2_XTB,
+]
+
+COMPOSITE_METHODS = [
+    Method.HF3C,
+    Method.B973C,
+    Method.R2SCAN3C,
+    Method.WB97X3C,
+]
+
+PREPACKAGED_METHODS = [
+    *MLFF,
+    *XTB_METHODS,
+    *COMPOSITE_METHODS,
+]
+
+METHODS_WITH_CORRECTION = [
+    Method.WB97XD3,
+    Method.WB97XV,
+    Method.WB97MV,
+    Method.WB97MD3BJ,
+    Method.DSDBLYPD3BJ,
+]

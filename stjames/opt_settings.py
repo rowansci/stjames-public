@@ -1,4 +1,6 @@
-from pydantic import Field, PositiveFloat, PositiveInt
+from typing import Sequence
+
+from pydantic import PositiveFloat, PositiveInt
 
 from .base import Base
 from .constraint import Constraint
@@ -13,4 +15,4 @@ class OptimizationSettings(Base):
     rms_gradient_threshold: PositiveFloat = 3.0e-4
     energy_threshold: PositiveFloat = 1e-6
 
-    constraints: list[Constraint] = Field(default_factory=list)
+    constraints: Sequence[Constraint] = tuple()

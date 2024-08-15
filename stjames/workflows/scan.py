@@ -1,6 +1,7 @@
 from typing import Optional
 
 import numpy as np
+from numpy.typing import NDArray
 
 from ..base import Base
 from ..molecule import Molecule
@@ -22,7 +23,7 @@ class ScanSettings(Base):
     stop: float
     num: int
 
-    def vals(self) -> np.ndarray:
+    def vals(self) -> NDArray[np.float64]:
         return np.linspace(self.start, self.stop, self.num)
 
     class Config:
