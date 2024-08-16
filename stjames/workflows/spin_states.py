@@ -6,11 +6,11 @@ from ..constraint import Constraint
 from ..mode import Mode
 from ..solvent import Solvent
 from ..types import UUID
-from .multistage_opt import MultiStageOptWorkflow
+from .multistage_opt import MultiStageOptSettings
 from .workflow import Workflow
 
 # the id of a mutable object may change, thus using object()
-_sentinel_msow = object()
+_sentinel_msos = object()
 
 
 class SpinState(BaseModel):
@@ -42,7 +42,7 @@ class SpinStatesWorkflow(Workflow):
     """
     Workflow for computing spin states of molecules.
 
-    Uses the modes from MultiStageOptWorkflow.
+    Uses the modes from MultiStageOptSettings.
 
     Influenced by:
     [Performance of Quantum Chemistry Methods for Benchmark Set of Spin–State
@@ -55,7 +55,7 @@ class SpinStatesWorkflow(Workflow):
     :param mode: Mode for workflow
     :param states: multiplicities of the spin state targetted
     :param mode: Mode to use
-    :param multistage_opt_workflow: set by mode unless mode=MANUAL (ignores additional settings if set)
+    :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
     :param solvent: solvent to use
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
     :param constraints: constraints to add
@@ -73,7 +73,7 @@ class SpinStatesWorkflow(Workflow):
     mode: Mode
     states: list[PositiveInt]
     # Need to use a sentinel object to make both mypy and pydantic happy
-    multistage_opt_workflow: MultiStageOptWorkflow = _sentinel_msow  # type: ignore [assignment]
+    multistage_opt_settings: MultiStageOptSettings = _sentinel_msos  # type: ignore [assignment]
     solvent: Solvent | None = None
     xtb_preopt: bool | None = None
     constraints: Sequence[Constraint] = tuple()
@@ -96,7 +96,7 @@ class SpinStatesWorkflow(Workflow):
 
     @property
     def level_of_theory(self) -> str:
-        return self.multistage_opt_workflow.level_of_theory
+        return self.multistage_opt_settings.level_of_theory
 
     @field_validator("states")
     @classmethod
@@ -115,21 +115,20 @@ class SpinStatesWorkflow(Workflow):
         if self.mode == Mode.AUTO:
             self.mode = Mode.RAPID
 
-        match self.mode, self.multistage_opt_workflow:
+        match self.mode, self.multistage_opt_settings:
             case (Mode.DEBUG, _):
                 raise NotImplementedError("Unsupported mode: DEBUG")
 
-            case (Mode.MANUAL, msow) if msow is _sentinel_msow:
-                raise ValueError("Must specify multistage_opt_workflow with MANUAL mode")
+            case (Mode.MANUAL, msos) if msos is _sentinel_msos:
+                raise ValueError("Must specify multistage_opt_settings with MANUAL mode")
             case (Mode.MANUAL, _):
                 pass
 
-            case (mode, msow) if msow is not _sentinel_msow:
-                raise ValueError(f"Cannot specify multistage_opt_workflow with {mode=}, {msow=}")
+            case (mode, msos) if msos is not _sentinel_msos:
+                raise ValueError(f"Cannot specify multistage_opt_settings with {mode=}, {msos=}")
 
             case (mode, _):
-                self.multistage_opt_workflow = MultiStageOptWorkflow(
-                    initial_molecule=self.initial_molecule,
+                self.multistage_opt_settings = MultiStageOptSettings(
                     mode=self.mode,
                     solvent=self.solvent,
                     xtb_preopt=self.xtb_preopt,
