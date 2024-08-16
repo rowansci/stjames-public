@@ -47,7 +47,7 @@ def test_spin_states_basic(mode: Mode, level_of_theory: str, Mn: Molecule) -> No
 
 
 def test_raises(Mn: Molecule) -> None:
-    with raises(ValueError):
+    with raises(KeyError):
         # mypy is correct, but needs to be silenced to test pydantic error
         SpinStatesWorkflow(initial_molecule=Mn, states=[1, 3, 5])  # type: ignore [call-arg]
 

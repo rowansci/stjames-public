@@ -211,3 +211,51 @@ class MultiStageOptWorkflow(Workflow, MultiStageOptSettings):
 
     # Populated while running the workflow
     calculations: list[UUID] | None = None
+
+
+# the id of a mutable object may change, thus using object()
+_sentinel_msos = object()
+
+
+class MultiStageOptMixin(BaseModel):
+    """
+    Mixin for workflows that use MultiStageOptSettings.
+    """
+
+    mso_mode: Mode
+    # Need to use a sentinel object to make both mypy and pydantic happy
+    multistage_opt_settings: MultiStageOptSettings = _sentinel_msos  # type: ignore [assignment]
+    solvent: Solvent | None = None
+    xtb_preopt: bool | None = None
+    constraints: Sequence[Constraint] = tuple()
+    transition_state: bool = False
+    frequencies: bool = True
+
+    @model_validator(mode="after")
+    def set_mso_settings(self) -> Self:
+        if self.mso_mode == Mode.AUTO:
+            self.mso_mode = Mode.RAPID
+
+        match self.mso_mode, self.multistage_opt_settings:
+            case (Mode.DEBUG, _):
+                raise NotImplementedError("Unsupported mode: DEBUG")
+
+            case (Mode.MANUAL, msos) if msos is _sentinel_msos:
+                raise ValueError("Must specify multistage_opt_settings with MANUAL mode")
+            case (Mode.MANUAL, _):
+                pass
+
+            case (mso_mode, msos) if msos is not _sentinel_msos:
+                raise ValueError(f"Cannot specify multistage_opt_settings with {mso_mode=}, {msos=}")
+
+            case (mso_mode, _):
+                self.multistage_opt_settings = MultiStageOptSettings(
+                    mode=mso_mode,
+                    solvent=self.solvent,
+                    xtb_preopt=self.xtb_preopt,
+                    constraints=self.constraints,
+                    transition_state=self.transition_state,
+                    frequencies=self.frequencies,
+                )
+
+        return self
