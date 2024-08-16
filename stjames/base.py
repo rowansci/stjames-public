@@ -21,11 +21,11 @@ class LowercaseStrEnum(str, Enum):
     """Enum where hyphens, underscores, and case are ignored."""
 
     @classmethod
-    def _missing_(cls, value: str) -> str | None:  # type: ignore
-        # Type note: technically breaking Liskov, value: object in Enum
+    def _missing_(cls, value: object) -> str | None:
         for member in cls:
-            if member.lower().replace("-", "").replace("_", "") == value.lower().replace("-", "").replace("_", ""):
-                return member
+            if isinstance(value, str):
+                if member.lower().replace("-", "").replace("_", "") == value.lower().replace("-", "").replace("_", ""):
+                    return member
         return None
 
 
