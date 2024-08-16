@@ -1,10 +1,6 @@
-import pydantic
-from pydantic import PositiveFloat, PositiveInt
+from typing import Optional, Self
 
-try:
-    from typing import Optional, Self
-except ImportError:
-    from typing_extensions import Optional, Self
+from pydantic import PositiveFloat, PositiveInt, model_validator
 
 from .base import Base
 
@@ -14,7 +10,7 @@ class BasisSetOverride(Base):
     atomic_numbers: Optional[list[PositiveInt]] = None
     atoms: Optional[list[PositiveInt]] = None  # 1-indexed
 
-    @pydantic.model_validator(mode="after")
+    @model_validator(mode="after")
     def check_override(self) -> Self:
         # ^ is xor
         assert (self.atomic_numbers is not None) ^ (self.atoms is not None), "Exactly one of ``atomic_numbers`` or ``atoms`` must be specified!"
