@@ -78,6 +78,7 @@ class SpinStatesWorkflow(Workflow):
     xtb_preopt: bool | None = None
     constraints: Sequence[Constraint] = tuple()
     transition_state: bool = False
+    frequencies: bool = True
 
     spin_states: list[SpinState] = Field(default_factory=list)
 
@@ -134,6 +135,7 @@ class SpinStatesWorkflow(Workflow):
                     xtb_preopt=self.xtb_preopt,
                     constraints=self.constraints,
                     transition_state=self.transition_state,
+                    frequencies=self.frequencies,
                 )
 
         return self
