@@ -1,6 +1,6 @@
 from typing import Self, Sequence
 
-from pydantic import model_validator
+from pydantic import BaseModel, model_validator
 
 from ..constraint import Constraint
 from ..method import XTB_METHODS, Method
@@ -13,9 +13,9 @@ from ..types import UUID
 from .workflow import Workflow
 
 
-class MultiStageOptWorkflow(Workflow):
+class MultiStageOptSettings(BaseModel):
     """
-    Workflow for multi-stage optimizations.
+    Settings for multi-stage optimizations.
 
     RECKLESS
         GFN2-xTB//GFN-FF (no pre-opt)
@@ -31,10 +31,7 @@ class MultiStageOptWorkflow(Workflow):
     - If solvent: xTB singlepoints use CPCMX, xTB optimizations use ALBP, all else use CPCM
     - Allows a single point to be called with no optimization
 
-    Inherited
-    :param initial_molecule: Molecule of interest
-
-    :param mode: Mode for workflow
+    :param mode: Mode for settings
     :param optimization_settings: list of opt settings to apply successively
     :param singlepoint_settings: final single point settings
     :param solvent: solvent to use
@@ -43,12 +40,10 @@ class MultiStageOptWorkflow(Workflow):
     :param transition_state: whether this is a transition state
     :param frequencies: whether to calculate frequencies
 
-    >>> from stjames.molecule import Atom, Molecule
-    >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
-    >>> mso = MultiStageOptWorkflow(initial_molecule=He, mode=Mode.RAPID, solvent="water")
-    >>> mso
-    <MultiStageOptWorkflow RAPID>
-    >>> mso.level_of_theory
+    >>> msos = MultiStageOptSettings(mode=Mode.RAPID, solvent="water")
+    >>> msos
+    <MultiStageOptSettings RAPID>
+    >>> msos.level_of_theory
     'r2scan_3c/cpcm(water)//gfn2_xtb/alpb(water)'
     """
 
@@ -61,35 +56,28 @@ class MultiStageOptWorkflow(Workflow):
     transition_state: bool = False
     frequencies: bool = True
 
-    # Populated while running the workflow
-    calculations: list[UUID] | None = None
-
     def __str__(self) -> str:
         return repr(self)
 
     def __repr__(self) -> str:
         """
-        String representation of the workflow.
+        String representation of the settings.
 
-        >>> from stjames.molecule import Atom, Molecule
-        >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
-        >>> print(MultiStageOptWorkflow(initial_molecule=He, mode=Mode.RAPID, solvent="water"))
-        <MultiStageOptWorkflow RAPID>
+        >>> print(MultiStageOptSettings(mode=Mode.RAPID, solvent="water"))
+        <MultiStageOptSettings RAPID>
         """
         if self.mode != Mode.MANUAL:
-            return f"<MultiStageOptWorkflow {self.mode.name}>"
+            return f"<{type(self).__name__} {self.mode.name}>"
 
-        return f"<MultiStageOptWorkflow {self.level_of_theory}>"
+        return f"<{type(self).__name__} {self.level_of_theory}>"
 
     @property
     def level_of_theory(self) -> str:
         """
         Returns the level of theory for the workflow.
 
-        >>> from stjames.molecule import Atom, Molecule
-        >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
-        >>> mso = MultiStageOptWorkflow(initial_molecule=He, mode=Mode.RAPID, solvent="hexane")
-        >>> mso.level_of_theory
+        >>> msos = MultiStageOptSettings(mode=Mode.RAPID, solvent="hexane")
+        >>> msos.level_of_theory
         'r2scan_3c/cpcm(hexane)//gfn2_xtb/alpb(hexane)'
         """
         methods = [self.singlepoint_settings] if self.singlepoint_settings else []
@@ -192,3 +180,34 @@ class MultiStageOptWorkflow(Workflow):
                 raise NotImplementedError(f"Cannot assign settings for {mode=}")
 
         assert self.xtb_preopt is not None
+
+
+class MultiStageOptWorkflow(Workflow, MultiStageOptSettings):
+    """
+    Workflow for multi-stage optimizations.
+
+    Inherited
+    :param initial_molecule: Molecule of interest
+    :param mode: Mode for workflow
+    :param optimization_settings: list of opt settings to apply successively
+    :param singlepoint_settings: final single point settings
+    :param solvent: solvent to use
+    :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
+    :param constraints: constraints for optimization
+    :param transition_state: whether this is a transition state
+    :param frequencies: whether to calculate frequencies
+
+    Populated while running
+    :param calculations: list of calculation UUIDs
+
+    >>> from stjames.molecule import Atom, Molecule
+    >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
+    >>> msow = MultiStageOptWorkflow(initial_molecule=He, mode=Mode.RAPID, solvent="water")
+    >>> msow
+    <MultiStageOptWorkflow RAPID>
+    >>> msow.level_of_theory
+    'r2scan_3c/cpcm(water)//gfn2_xtb/alpb(water)'
+    """
+
+    # Populated while running the workflow
+    calculations: list[UUID] | None = None
