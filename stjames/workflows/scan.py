@@ -1,19 +1,18 @@
-from typing import Optional
-
 import numpy as np
 from numpy.typing import NDArray
 
 from ..base import Base
 from ..molecule import Molecule
 from ..settings import Settings
-from .workflow import UUID, Workflow
+from ..types import UUID
+from .workflow import Workflow
 
 
 class ScanPoint(Base):
     index: int
     molecule: Molecule
-    energy: Optional[float] = None
-    uuid: Optional[UUID] = None
+    energy: float | None = None
+    uuid: UUID | None = None
 
 
 class ScanSettings(Base):

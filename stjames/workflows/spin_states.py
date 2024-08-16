@@ -5,8 +5,9 @@ from pydantic import BaseModel, Field, PositiveInt, field_validator, model_valid
 from ..constraint import Constraint
 from ..mode import Mode
 from ..solvent import Solvent
+from ..types import UUID
 from .multistage_opt import MultiStageOptWorkflow
-from .workflow import UUID, Workflow
+from .workflow import Workflow
 
 # the id of a mutable object may change, thus using object()
 _sentinel_msow = object()

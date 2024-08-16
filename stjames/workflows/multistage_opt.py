@@ -9,7 +9,8 @@ from ..opt_settings import OptimizationSettings
 from ..settings import Settings
 from ..solvent import Solvent, SolventSettings
 from ..task import Task
-from .workflow import UUID, Workflow
+from ..types import UUID
+from .workflow import Workflow
 
 
 class MultiStageOptWorkflow(Workflow):
