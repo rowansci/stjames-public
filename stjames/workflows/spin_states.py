@@ -35,7 +35,7 @@ class SpinState(BaseModel):
         return repr(self)
 
     def __repr__(self) -> str:
-        return f"<SpinState {self.multiplicity} {self.energy:.3f}>"
+        return f"<{type(self).__name__} {self.multiplicity} {self.energy:.3f}>"
 
 
 class SpinStatesWorkflow(Workflow):
@@ -87,9 +87,9 @@ class SpinStatesWorkflow(Workflow):
 
     def __repr__(self) -> str:
         if self.mode != Mode.MANUAL:
-            return f"<SpinStatesWorkflow {self.states} {self.mode.name}>"
+            return f"<{type(self).__name__} {self.states} {self.mode.name}>"
 
-        return f"<SpinStatesWorkflow {self.states} {self.level_of_theory}>"
+        return f"<{type(self).__name__} {self.states} {self.level_of_theory}>"
 
     def __len__(self) -> int:
         return len(self.states)
