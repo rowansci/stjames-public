@@ -9,7 +9,8 @@ from ..opt_settings import OptimizationSettings
 from ..settings import Settings
 from ..solvent import Solvent, SolventSettings
 from ..task import Task
-from .workflow import UUID, Workflow
+from ..types import UUID
+from .workflow import Workflow
 
 
 class MultiStageOptWorkflow(Workflow):
@@ -40,6 +41,7 @@ class MultiStageOptWorkflow(Workflow):
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
     :param constraints: constraints for optimization
     :param transition_state: whether this is a transition state
+    :param frequencies: whether to calculate frequencies
 
     >>> from stjames.molecule import Atom, Molecule
     >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
@@ -57,6 +59,7 @@ class MultiStageOptWorkflow(Workflow):
     xtb_preopt: bool | None = None
     constraints: Sequence[Constraint] = tuple()
     transition_state: bool = False
+    frequencies: bool = True
 
     # Populated while running the workflow
     calculations: list[UUID] | None = None
@@ -156,16 +159,15 @@ class MultiStageOptWorkflow(Workflow):
 
         match mode:
             case Mode.RECKLESS:
-                # no-pre-opt
                 self.xtb_preopt = False
-                self.optimization_settings = [opt(Method.GFN_FF, solvent=self.solvent)]
+                self.optimization_settings = [opt(Method.GFN_FF, solvent=self.solvent, freq=self.frequencies)]
                 self.singlepoint_settings = sp(Method.GFN2_XTB, solvent=self.solvent)
 
             case Mode.RAPID:
                 self.xtb_preopt = bool(self.xtb_preopt)
                 self.optimization_settings = [
                     *gfn0_pre_opt * self.xtb_preopt,
-                    opt(Method.GFN2_XTB, solvent=self.solvent, freq=True),
+                    opt(Method.GFN2_XTB, solvent=self.solvent, freq=self.frequencies),
                 ]
                 self.singlepoint_settings = sp(Method.R2SCAN3C, solvent=self.solvent)
 
@@ -173,7 +175,7 @@ class MultiStageOptWorkflow(Workflow):
                 self.xtb_preopt = (self.xtb_preopt is None) or self.xtb_preopt
                 self.optimization_settings = [
                     *gfn2_pre_opt * self.xtb_preopt,
-                    opt(Method.B973C, solvent=self.solvent, freq=True),
+                    opt(Method.B973C, solvent=self.solvent, freq=self.frequencies),
                 ]
                 self.singlepoint_settings = sp(Method.WB97X3C, solvent=self.solvent)
 
@@ -182,7 +184,7 @@ class MultiStageOptWorkflow(Workflow):
                 self.optimization_settings = [
                     *gfn2_pre_opt * self.xtb_preopt,
                     opt(Method.B973C, solvent=self.solvent),
-                    opt(Method.WB97X3C, solvent=self.solvent, freq=True),
+                    opt(Method.WB97X3C, solvent=self.solvent, freq=self.frequencies),
                 ]
                 self.singlepoint_settings = sp(Method.WB97MD3BJ, "def2-TZVPPD", solvent=self.solvent)
 

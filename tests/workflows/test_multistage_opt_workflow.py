@@ -71,7 +71,7 @@ def test_reckless(He: Molecule) -> None:
 
     assert msow_opt0.method == Method.GFN_FF
     assert msow_opt0.basis_set is None
-    assert msow_opt0.tasks == [Task.OPTIMIZE]
+    assert msow_opt0.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
     assert msow_opt0.corrections == []
     assert msow_opt0.mode == Mode.AUTO
     assert msow_opt0.solvent_settings

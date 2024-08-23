@@ -5,8 +5,9 @@ from pydantic import BaseModel, Field, PositiveInt, field_validator, model_valid
 from ..constraint import Constraint
 from ..mode import Mode
 from ..solvent import Solvent
+from ..types import UUID
 from .multistage_opt import MultiStageOptWorkflow
-from .workflow import UUID, Workflow
+from .workflow import Workflow
 
 # the id of a mutable object may change, thus using object()
 _sentinel_msow = object()
@@ -77,6 +78,7 @@ class SpinStatesWorkflow(Workflow):
     xtb_preopt: bool | None = None
     constraints: Sequence[Constraint] = tuple()
     transition_state: bool = False
+    frequencies: bool = True
 
     spin_states: list[SpinState] = Field(default_factory=list)
 
@@ -133,6 +135,7 @@ class SpinStatesWorkflow(Workflow):
                     xtb_preopt=self.xtb_preopt,
                     constraints=self.constraints,
                     transition_state=self.transition_state,
+                    frequencies=self.frequencies,
                 )
 
         return self

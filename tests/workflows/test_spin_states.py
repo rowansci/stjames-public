@@ -107,11 +107,11 @@ def test_reckless(Mn: Molecule) -> None:
 
     msow_opt0 = msow.optimization_settings[0]
 
-    assert getattr(msow_opt0, "method") == Method.GFN_FF
-    assert getattr(msow_opt0, "basis_set") is None
-    assert getattr(msow_opt0, "tasks") == [Task.OPTIMIZE]
-    assert getattr(msow_opt0, "corrections") == []
-    assert getattr(msow_opt0, "mode") == Mode.AUTO
+    assert msow_opt0.method == Method.GFN_FF
+    assert msow_opt0.basis_set is None
+    assert msow_opt0.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
+    assert msow_opt0.corrections == []
+    assert msow_opt0.mode == Mode.AUTO
     assert msow_opt0.solvent_settings
     assert msow_opt0.solvent_settings.solvent == "acetonitrile"
     assert not msow_opt0.opt_settings.transition_state
