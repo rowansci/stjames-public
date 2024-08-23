@@ -23,6 +23,9 @@ class Molecule(Base):
     multiplicity: PositiveInt
     atoms: list[Atom]
 
+    # for periodic boundary conditions
+    cell: Optional[list[list[float]]] = None
+
     energy: Optional[float] = None  # in Hartree
     scf_iterations: Optional[NonNegativeInt] = None
     scf_completed: Optional[bool] = None
@@ -89,3 +92,10 @@ class Molecule(Base):
             )
 
         return self
+
+    @pydantic.field_validator("cell")
+    @classmethod
+    def check_tensor(cls, v: list[list[float]]) -> list[list[float]]:
+        if len(v) != 3 or any(len(row) != 3 for row in v):
+            raise ValueError("Cell tensor must be a 3x3 list of floats")
+        return v
