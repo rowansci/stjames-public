@@ -1,9 +1,15 @@
-from typing import Optional, Self
+from typing import Optional, Self, TypeAlias
 
 import pydantic
 from pydantic import NonNegativeInt, PositiveInt
 
 from .base import Base
+
+PeriodicCell: TypeAlias = tuple[
+    tuple[float, float, float],
+    tuple[float, float, float],
+    tuple[float, float, float],
+]
 
 
 class VibrationalMode(Base):
@@ -24,7 +30,7 @@ class Molecule(Base):
     atoms: list[Atom]
 
     # for periodic boundary conditions
-    cell: Optional[list[list[float]]] = None
+    cell: Optional[PeriodicCell] = None
 
     energy: Optional[float] = None  # in Hartree
     scf_iterations: Optional[NonNegativeInt] = None
@@ -95,7 +101,10 @@ class Molecule(Base):
 
     @pydantic.field_validator("cell")
     @classmethod
-    def check_tensor(cls, v: list[list[float]]) -> list[list[float]]:
+    def check_tensor_3D(cls, v: Optional[PeriodicCell]) -> Optional[PeriodicCell]:
+        if v is None:
+            return v
+
         if len(v) != 3 or any(len(row) != 3 for row in v):
             raise ValueError("Cell tensor must be a 3x3 list of floats")
         return v
