@@ -4,18 +4,19 @@ import pydantic
 from pydantic import NonNegativeInt, PositiveInt
 
 from .base import Base
+from .types import Vector3D, Vector3DPerAtom
 
 
 class VibrationalMode(Base):
     frequency: float  # in cm-1
     reduced_mass: float
     force_constant: float
-    displacements: list[list[float]]
+    displacements: Vector3DPerAtom
 
 
 class Atom(Base):
     atomic_number: NonNegativeInt
-    position: list[float]  # in Å
+    position: Vector3D  # in Å
 
 
 class Molecule(Base):
@@ -30,11 +31,13 @@ class Molecule(Base):
 
     homo_lumo_gap: Optional[float] = None  # in eV
 
-    gradient: Optional[list[list[float]]] = None  # Hartree/Bohr
+    gradient: Optional[Vector3DPerAtom] = None  # Hartree/Bohr
+
+    velocities: Optional[Vector3DPerAtom] = None  # Å/fs
 
     mulliken_charges: Optional[list[float]] = None
     mulliken_spin_densities: Optional[list[float]] = None
-    dipole: Optional[list[float]] = None  # in Debye
+    dipole: Optional[Vector3D] = None  # in Debye
 
     vibrational_modes: Optional[list[VibrationalMode]] = None
 
@@ -47,7 +50,7 @@ class Molecule(Base):
         return len(self.atoms)
 
     @property
-    def coordinates(self) -> list[list[float]]:
+    def coordinates(self) -> Vector3DPerAtom:
         return [a.position for a in self.atoms]
 
     @property

@@ -1,10 +1,9 @@
 from pytest import raises
 
-from stjames import Molecule
 from stjames.workflows import MolecularDynamicsSettings, ThermodynamicEnsemble
 
 
-def test_md_settings_raises(Mn: Molecule) -> None:
+def test_md_settings_raises() -> None:
     MolecularDynamicsSettings()
 
     MolecularDynamicsSettings(temperature=100)
