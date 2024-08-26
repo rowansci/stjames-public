@@ -1,16 +1,11 @@
-from typing import Self, Sequence
+from typing import Any
 
 from pydantic import BaseModel, Field, PositiveInt, field_validator, model_validator
 
-from ..constraint import Constraint
 from ..mode import Mode
-from ..solvent import Solvent
 from ..types import UUID
-from .multistage_opt import MultiStageOptWorkflow
+from .multistage_opt import MultiStageOptMixin
 from .workflow import Workflow
-
-# the id of a mutable object may change, thus using object()
-_sentinel_msow = object()
 
 
 class SpinState(BaseModel):
@@ -35,14 +30,17 @@ class SpinState(BaseModel):
         return repr(self)
 
     def __repr__(self) -> str:
-        return f"<SpinState {self.multiplicity} {self.energy:.3f}>"
+        return f"<{type(self).__name__} {self.multiplicity} {self.energy:.3f}>"
 
 
-class SpinStatesWorkflow(Workflow):
+_sentinel_mso_mode = object()
+
+
+class SpinStatesWorkflow(Workflow, MultiStageOptMixin):
     """
     Workflow for computing spin states of molecules.
 
-    Uses the modes from MultiStageOptWorkflow.
+    Uses the modes from MultiStageOptSettings.
 
     Influenced by:
     [Performance of Quantum Chemistry Methods for Benchmark Set of Spin–State
@@ -51,16 +49,15 @@ class SpinStatesWorkflow(Workflow):
 
     Inherited
     :param initial_molecule: Molecule of interest
-
-    :param mode: Mode for workflow
-    :param states: multiplicities of the spin state targetted
-    :param mode: Mode to use
-    :param multistage_opt_workflow: set by mode unless mode=MANUAL (ignores additional settings if set)
+    :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
     :param solvent: solvent to use
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
     :param constraints: constraints to add
     :param transition_state: whether this is a transition state
+    :param frequencies: whether to calculate frequencies
 
+    :param mode: Mode for workflow
+    :param states: multiplicities of the spin state targetted
     :param spin_states: resulting spin states data
 
     >>> from stjames.molecule import Atom, Molecule
@@ -71,14 +68,8 @@ class SpinStatesWorkflow(Workflow):
     """
 
     mode: Mode
+    mso_mode: Mode = _sentinel_mso_mode  # type: ignore [assignment]
     states: list[PositiveInt]
-    # Need to use a sentinel object to make both mypy and pydantic happy
-    multistage_opt_workflow: MultiStageOptWorkflow = _sentinel_msow  # type: ignore [assignment]
-    solvent: Solvent | None = None
-    xtb_preopt: bool | None = None
-    constraints: Sequence[Constraint] = tuple()
-    transition_state: bool = False
-    frequencies: bool = True
 
     spin_states: list[SpinState] = Field(default_factory=list)
 
@@ -87,16 +78,16 @@ class SpinStatesWorkflow(Workflow):
 
     def __repr__(self) -> str:
         if self.mode != Mode.MANUAL:
-            return f"<SpinStatesWorkflow {self.states} {self.mode.name}>"
+            return f"<{type(self).__name__} {self.states} {self.mode.name}>"
 
-        return f"<SpinStatesWorkflow {self.states} {self.level_of_theory}>"
+        return f"<{type(self).__name__} {self.states} {self.level_of_theory}>"
 
     def __len__(self) -> int:
         return len(self.states)
 
     @property
     def level_of_theory(self) -> str:
-        return self.multistage_opt_workflow.level_of_theory
+        return self.multistage_opt_settings.level_of_theory
 
     @field_validator("states")
     @classmethod
@@ -110,42 +101,27 @@ class SpinStatesWorkflow(Workflow):
 
         return states
 
-    @model_validator(mode="after")
-    def set_mode_and_settings(self) -> Self:
-        if self.mode == Mode.AUTO:
-            self.mode = Mode.RAPID
-
-        match self.mode, self.multistage_opt_workflow:
-            case (Mode.DEBUG, _):
-                raise NotImplementedError("Unsupported mode: DEBUG")
-
-            case (Mode.MANUAL, msow) if msow is _sentinel_msow:
-                raise ValueError("Must specify multistage_opt_workflow with MANUAL mode")
-            case (Mode.MANUAL, _):
-                pass
-
-            case (mode, msow) if msow is not _sentinel_msow:
-                raise ValueError(f"Cannot specify multistage_opt_workflow with {mode=}, {msow=}")
-
-            case (mode, _):
-                self.multistage_opt_workflow = MultiStageOptWorkflow(
-                    initial_molecule=self.initial_molecule,
-                    mode=self.mode,
-                    solvent=self.solvent,
-                    xtb_preopt=self.xtb_preopt,
-                    constraints=self.constraints,
-                    transition_state=self.transition_state,
-                    frequencies=self.frequencies,
-                )
-
-        return self
-
     def str_results(self) -> str:
         return "SpinStatesResults\n" + "\n".join(f"  {ss.multiplicity}: {ss.energy:>5.2f}" for ss in self.spin_states)
 
     @property
     def energies(self) -> list[float]:
         return [ss.energy for ss in self.spin_states]
+
+    @model_validator(mode="before")
+    @classmethod
+    def set_mso_mode(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Set the MultiStageOptSettings mode to match current SpinStates mode."""
+        values["mso_mode"] = values["mode"]
+        return values
+
+    @field_validator("mode")
+    @classmethod
+    def set_mode_auto(cls, mode: Mode) -> Mode:
+        if mode == Mode.AUTO:
+            return Mode.RAPID
+
+        return mode
 
     @field_validator("spin_states")
     @classmethod
