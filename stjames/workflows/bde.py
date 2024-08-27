@@ -19,21 +19,32 @@ class BDE(BaseModel):
     """
     Bond Dissociation Energy (BDE) result.
 
+    energy => (E_{fragment1} + E_{fragment2}) - E_{starting molecule}
+
     :param fragments: two fragments after dissociation
     :param energy: BDE in kcal/mol
+    :param fragment1_energy: energy of fragment 1
+    :param fragment2_energy: energy of fragment 2
+    :param calculations: list of calculation UUIDs
     """
 
-    fragments: tuple[Molecule, Molecule]
+    fragment: tuple[NNInt, ...]
     energy: float
     fragment1_energy: float
     fragment2_energy: float
-    calculation: list[UUID]
+    calculations: list[UUID]
 
     def __str__(self) -> str:
         return repr(self)
 
     def __repr__(self) -> str:
-        return f"<{type(self).__name__} {self.energy:>5.2f}>"
+        """
+        Return a string representation of the BDE result.
+
+        >>> BDE(fragment=(1, 2), energy=1.0, fragment1_energy=50.0, fragment2_energy=50.0, calculations=[])
+        <BDE (1, 2)  1.00>
+        """
+        return f"<{type(self).__name__} {self.fragment} {self.energy:>5.2f}>"
 
 
 class BDEWorkflow(Workflow, MultiStageOptMixin):
@@ -116,20 +127,13 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
 
 
 def atomic_number_indices(molecule: Molecule, atomic_numbers: set[PositiveInt] | PositiveInt) -> tuple[PositiveInt, ...]:
-    """
+    r"""
     Return the indices of the atoms with the given atomic numbers.
 
     :param molecule: Molecule of interest
     :param atomic_numbers: atomic number(s) of interest
 
-    >>> from stjames.molecule import Atom, Molecule
-    >>> H2O = Molecule(
-    ...     charge=0, multiplicity=1,
-    ...     atoms=[
-    ...         Atom(atomic_number=1, position=[0, 0, 0]),
-    ...         Atom(atomic_number=8, position=[0, 0, 1]),
-    ...         Atom(atomic_number=1, position=[0, 1, 1])]
-    ... )
+    >>> H2O = Molecule.from_xyz("H 0 0 0\nO 0 0 1\nH 0 1 1")
     >>> atomic_number_indices(H2O, 1)
     (0, 2)
     >>> atomic_number_indices(H2O, {8, 1})
