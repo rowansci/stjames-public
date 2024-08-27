@@ -10,6 +10,7 @@ from .data import INV_ELEMENT_DICTIONARY, get_atomic_symbol
 class MoleculeReadError(RuntimeError):
     pass
 
+
 PeriodicCell: TypeAlias = tuple[
     tuple[float, float, float],
     tuple[float, float, float],
