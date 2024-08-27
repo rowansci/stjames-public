@@ -66,6 +66,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
 
     New:
     :param mode: Mode for workflow
+    :param optimize_fragments: whether to optimize the fragments, or just the starting molecule (default depends on mode)
     :param atoms: atoms to dissociate (1-indexed)
     :param fragments: fragments to dissociate (all fields feed into this, 1-indexed)
     :param all_CH: dissociate all C–H bonds
@@ -76,6 +77,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
 
     mode: Mode
     mso_mode: Mode = _sentinel_mso_mode  # type: ignore [assignment]
+    optimize_fragments: bool = None  # type: ignore [assignment]
 
     atoms: Sequence[PositiveInt] = Field(default_factory=tuple)
     fragments: Sequence[Sequence[PositiveInt]] = Field(default_factory=tuple)
@@ -112,6 +114,16 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
         """Validate atomic numbers and build the atoms field."""
         self.atoms = tuple(self.atoms)
         self.fragments = tuple(map(tuple, self.fragments))
+
+        match self.mode:
+            case Mode.RECKLESS | Mode.RAPID:
+                # Default off
+                self.optimize_fragments = self.optimize_fragments or False
+            case Mode.CAREFUL | Mode.METICULOUS:
+                # Default on
+                self.optimize_fragments = self.optimize_fragments or self.optimize_fragments is None
+            case _:
+                raise NotImplementedError(f"{self.mode} not implemented.")
 
         for atom in self.atoms:
             if atom > len(self.initial_molecule):
