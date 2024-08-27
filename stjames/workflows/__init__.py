@@ -1,5 +1,6 @@
 from .admet import *
 from .basic_calculation import *
+from .bde import *
 from .conformer import *
 from .descriptors import *
 from .fukui import *

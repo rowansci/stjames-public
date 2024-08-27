@@ -56,9 +56,14 @@ class SpinStatesWorkflow(Workflow, MultiStageOptMixin):
     :param transition_state: whether this is a transition state
     :param frequencies: whether to calculate frequencies
 
+    Overridden:
+    :param mso_mode: Mode for MultiStageOptSettings
+
+    New:
     :param mode: Mode for workflow
     :param states: multiplicities of the spin state targetted
     :param spin_states: resulting spin states data
+
 
     >>> from stjames.molecule import Atom, Molecule
     >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
@@ -71,6 +76,7 @@ class SpinStatesWorkflow(Workflow, MultiStageOptMixin):
     mso_mode: Mode = _sentinel_mso_mode  # type: ignore [assignment]
     states: list[PositiveInt]
 
+    # Results
     spin_states: list[SpinState] = Field(default_factory=list)
 
     def __str__(self) -> str:
