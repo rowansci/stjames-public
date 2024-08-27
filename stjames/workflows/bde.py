@@ -3,7 +3,6 @@
 from typing import Any, Self, Sequence
 
 from pydantic import BaseModel, Field, PositiveInt, model_validator
-from pydantic import NonNegativeInt as NNInt
 
 from ..mode import Mode
 from ..molecule import Molecule
@@ -21,14 +20,14 @@ class BDE(BaseModel):
 
     energy => (E_{fragment1} + E_{fragment2}) - E_{starting molecule}
 
-    :param fragments: two fragments after dissociation
+    :param fragment: indices of the atoms in the fragment that was dissociated (1-indexed)
     :param energy: BDE in kcal/mol
     :param fragment1_energy: energy of fragment 1
     :param fragment2_energy: energy of fragment 2
     :param calculations: list of calculation UUIDs
     """
 
-    fragment: tuple[NNInt, ...]
+    fragment: tuple[PositiveInt, ...]
     energy: float
     fragment1_energy: float
     fragment2_energy: float
@@ -67,8 +66,8 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
 
     New:
     :param mode: Mode for workflow
-    :param atoms: atoms to dissociate
-    :param fragments: fragments to dissociate (all fields feed into this)
+    :param atoms: atoms to dissociate (1-indexed)
+    :param fragments: fragments to dissociate (all fields feed into this, 1-indexed)
     :param all_CH: dissociate all C–H bonds
     :param all_CX: dissociate all C–X bonds (X ∈ {F, Cl, Br, I, At, Ts})
     :param opt_molecule: optimized starting molecule
@@ -78,8 +77,8 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     mode: Mode
     mso_mode: Mode = _sentinel_mso_mode  # type: ignore [assignment]
 
-    atoms: Sequence[NNInt] = Field(default_factory=tuple)
-    fragments: Sequence[Sequence[NNInt]] = Field(default_factory=tuple)
+    atoms: Sequence[PositiveInt] = Field(default_factory=tuple)
+    fragments: Sequence[Sequence[PositiveInt]] = Field(default_factory=tuple)
 
     all_CH: bool = False
     all_CX: bool = False
@@ -135,12 +134,12 @@ def atomic_number_indices(molecule: Molecule, atomic_numbers: set[PositiveInt] |
 
     >>> H2O = Molecule.from_xyz("H 0 0 0\nO 0 0 1\nH 0 1 1")
     >>> atomic_number_indices(H2O, 1)
-    (0, 2)
+    (1, 3)
     >>> atomic_number_indices(H2O, {8, 1})
-    (0, 1, 2)
+    (1, 2, 3)
     >>> atomic_number_indices(H2O, {6, 9})
     ()
     """
     if isinstance(atomic_numbers, int):
-        return tuple(i for i, an in enumerate(molecule.atomic_numbers) if an == atomic_numbers)
-    return tuple(i for i, an in enumerate(molecule.atomic_numbers) if an in atomic_numbers)
+        return tuple(i for i, an in enumerate(molecule.atomic_numbers, start=1) if an == atomic_numbers)
+    return tuple(i for i, an in enumerate(molecule.atomic_numbers, start=1) if an in atomic_numbers)

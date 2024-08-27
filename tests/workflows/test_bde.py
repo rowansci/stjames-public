@@ -39,30 +39,30 @@ H   1.15  0.00  1.10
 
 def test_raises(water: Molecule) -> None:
     with raises(ValueError):
-        BDEWorkflow(initial_molecule=water, mode=Mode.RAPID, atoms=[4])
+        BDEWorkflow(initial_molecule=water, mode=Mode.RAPID, atoms=[5])
 
 
 def test_ethane(ethane: Molecule) -> None:
-    all_Hs = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, atoms=[2, 3, 4, 5, 6, 7])
-    duplicated = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, atoms=[2, 3, 4, 5, 6, 7, 2, 3, 4, 5, 6, 7])
+    all_Hs = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, atoms=[3, 4, 5, 6, 7, 8])
+    duplicated = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, atoms=[3, 4, 5, 6, 7, 8, 3, 4, 5, 6, 7, 8])
     all_CH = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, all_CH=True)
     all_CX = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, all_CX=True)
-    ch3_frag_and_all_CH = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, fragments=[(1, 5, 6, 7)], all_CH=True)
+    ch3_frag_and_all_CH = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, fragments=[(2, 6, 7, 8)], all_CH=True)
 
     assert all_Hs.fragments == all_CH.fragments
     assert all_Hs.fragments == duplicated.fragments
     assert all_CX.fragments == ()
-    assert ch3_frag_and_all_CH.fragments == ((1, 5, 6, 7), (2,), (3,), (4,), (5,), (6,), (7,))
+    assert ch3_frag_and_all_CH.fragments == ((2, 6, 7, 8), (3,), (4,), (5,), (6,), (7,), (8,))
 
 
 def test_chloroethane(chloroethane: Molecule) -> None:
-    all_Hs = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, atoms=[3, 4, 5, 6, 7])
+    all_Hs = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, atoms=[4, 5, 6, 7, 8])
     all_CH = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, all_CH=True)
     all_CX = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, all_CX=True)
-    duplicated = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, all_CX=True, atoms=[2])
-    ch3_frag_and_all_CH = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, fragments=[(1, 5, 6, 7)], all_CH=True)
+    duplicated = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, all_CX=True, atoms=[3])
+    ch3_frag_and_all_CH = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, fragments=[(2, 6, 7, 8)], all_CH=True)
 
     assert all_Hs.fragments == all_CH.fragments
-    assert all_CX.fragments == ((2,),)
-    assert duplicated.fragments == ((2,),)
-    assert ch3_frag_and_all_CH.fragments == ((1, 5, 6, 7), (3,), (4,), (5,), (6,), (7,))
+    assert all_CX.fragments == ((3,),)
+    assert duplicated.fragments == ((3,),)
+    assert ch3_frag_and_all_CH.fragments == ((2, 6, 7, 8), (4,), (5,), (6,), (7,), (8,))
