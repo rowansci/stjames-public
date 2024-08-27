@@ -1,4 +1,4 @@
-from typing import Iterable, Optional, Self, Sequence
+from typing import Iterable, Optional, Self, Sequence, TypeAlias
 
 import pydantic
 from pydantic import NonNegativeInt, PositiveInt
@@ -9,6 +9,12 @@ from .data import INV_ELEMENT_DICTIONARY, get_atomic_symbol
 
 class MoleculeReadError(RuntimeError):
     pass
+
+PeriodicCell: TypeAlias = tuple[
+    tuple[float, float, float],
+    tuple[float, float, float],
+    tuple[float, float, float],
+]
 
 
 class VibrationalMode(Base):
@@ -82,6 +88,9 @@ class Molecule(Base):
     multiplicity: PositiveInt
     atoms: list[Atom]
 
+    # for periodic boundary conditions
+    cell: Optional[PeriodicCell] = None
+
     energy: Optional[float] = None  # in Hartree
     scf_iterations: Optional[NonNegativeInt] = None
     scf_completed: Optional[bool] = None
@@ -148,6 +157,16 @@ class Molecule(Base):
             )
 
         return self
+
+    @pydantic.field_validator("cell")
+    @classmethod
+    def check_tensor_3D(cls, v: Optional[PeriodicCell]) -> Optional[PeriodicCell]:
+        if v is None:
+            return v
+
+        if len(v) != 3 or any(len(row) != 3 for row in v):
+            raise ValueError("Cell tensor must be a 3x3 list of floats")
+        return v
 
     @classmethod
     def from_xyz(cls: type[Self], xyz: str, charge: int = 0, multiplicity: PositiveInt = 1) -> Self:
