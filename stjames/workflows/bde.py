@@ -2,7 +2,7 @@
 
 from typing import Any, Self, Sequence
 
-from pydantic import BaseModel, Field, PositiveInt, model_validator
+from pydantic import BaseModel, Field, PositiveInt, field_validator, model_validator
 
 from ..mode import Mode
 from ..molecule import Molecule
@@ -90,6 +90,15 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     @property
     def energies(self) -> list[float]:
         return [bde.energy for bde in self.bdes]
+
+    @field_validator("initial_molecule", mode="before")
+    @classmethod
+    def no_charge_or_spin(cls, mol: Molecule) -> Molecule:
+        """Ensure the molecule has no charge or spin."""
+        if mol.charge != 0 or mol.multiplicity != 1:
+            raise ValueError("Charge and spin partitioning undefined for BDE, only neutral singlet molecules supported.")
+
+        return mol
 
     @model_validator(mode="before")
     @classmethod
