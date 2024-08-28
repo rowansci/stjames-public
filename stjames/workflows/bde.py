@@ -88,7 +88,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
 
     # Results
     opt_molecule: Molecule | None = None
-    bdes: tuple[BDE] = Field(default_factory=tuple)
+    bdes: tuple[BDE, ...] = Field(default_factory=tuple)
 
     def __str__(self) -> str:
         r"""
