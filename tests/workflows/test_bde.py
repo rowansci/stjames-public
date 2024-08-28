@@ -42,6 +42,23 @@ def test_raises(water: Molecule) -> None:
         BDEWorkflow(initial_molecule=water, mode=Mode.RAPID, atoms=[5])
 
 
+def test_water(water: Molecule) -> None:
+    all_Hs = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, atoms=[1, 2], optimize_fragments=True)
+    duplicated = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, atoms=[1, 2, 1, 2])
+    all_CH = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, all_CH=True, optimize_fragments=False)
+    all_CX = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, all_CX=True)
+
+    assert all_Hs.fragment_indices == ((1,), (2,))
+    assert duplicated.fragment_indices == ((1,), (2,))
+    assert all_CH.fragment_indices == ()
+    assert all_CX.fragment_indices == ()
+
+    assert all_Hs.optimize_fragments
+    assert duplicated.optimize_fragments
+    assert not all_CH.optimize_fragments
+    assert all_CX.optimize_fragments
+
+
 def test_ethane(ethane: Molecule) -> None:
     all_Hs = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, atoms=[3, 4, 5, 6, 7, 8], optimize_fragments=True)
     duplicated = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, atoms=[3, 4, 5, 6, 7, 8, 3, 4, 5, 6, 7, 8])

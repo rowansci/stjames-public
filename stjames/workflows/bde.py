@@ -1,6 +1,7 @@
 """Bond Dissociation Energy (BDE) workflow."""
 
-from typing import Any, Self
+import itertools
+from typing import Any, Iterable, Self
 
 from pydantic import BaseModel, Field, PositiveInt, field_validator, model_validator
 
@@ -133,10 +134,9 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
                 raise ValueError(f"{fragment_idxs=} contains atoms that are out of range.")
 
         if self.all_CH:
-            self.atoms = self.atoms + atomic_number_indices(self.initial_molecule, 1)
+            self.atoms = self.atoms + tuple(H for _C, H in find_CH_bonds(self.initial_molecule))
         if self.all_CX:
-            X = {9, 17, 35, 53, 85, 117}
-            self.atoms = self.atoms + atomic_number_indices(self.initial_molecule, X)
+            self.atoms = self.atoms + tuple(X for _C, X in find_CX_bonds(self.initial_molecule))
 
         # Combine atoms and fragments, remove duplicates, and sort
         self.fragment_indices = self.fragment_indices + tuple((a,) for a in self.atoms)
@@ -164,3 +164,64 @@ def atomic_number_indices(molecule: Molecule, atomic_numbers: set[PositiveInt] |
     if isinstance(atomic_numbers, int):
         return tuple(i for i, an in enumerate(molecule.atomic_numbers, start=1) if an == atomic_numbers)
     return tuple(i for i, an in enumerate(molecule.atomic_numbers, start=1) if an in atomic_numbers)
+
+
+def find_CH_bonds(molecule: Molecule, distance_max: float = 1.2) -> Iterable[tuple[PositiveInt, PositiveInt]]:
+    r"""
+    Find all C–H bonds in the molecule.
+
+    :param molecule: Molecule of interest
+    :param distance_max: distance max for bond
+
+    >>> H2O = Molecule.from_xyz("H 0 0 0\nO 0 0 1\nH 0 1 1")
+    >>> CH4 = Molecule.from_xyz("C 0 0 0\nH 0 0 1\nH 0 1 0\nH 1 0 0\nH 0 0 -1")
+    >>> ethane = Molecule.from_xyz("C -1 0 0\nC 1 0 0\nH -1 0 1\nH -1 0 -1\nH -1 1 0\nH 1 0 1\nH 1 0 -1\nH 1 1 0")
+    >>> list(find_CH_bonds(H2O))
+    []
+    >>> list(find_CH_bonds(CH4))
+    [(1, 2), (1, 3), (1, 4), (1, 5)]
+    >>> list(find_CH_bonds(ethane))
+    [(1, 3), (1, 4), (1, 5), (2, 6), (2, 7), (2, 8)]
+    """
+    yield from find_AB_bonds(molecule, 6, 1, distance_max)
+
+
+def find_CX_bonds(molecule: Molecule) -> Iterable[tuple[PositiveInt, PositiveInt]]:
+    r"""
+    Find all C–X bonds in the molecule.
+
+    :param molecule: Molecule of interest
+    :param distance_max: distance max for bond
+
+    >>> HCF = Molecule.from_xyz("H 0 0 0\nC 0 0 1\nF 0 1 1")
+    >>> list(find_CX_bonds(HCF))
+    [(2, 3)]
+    """
+    halogens = {9: 2.0, 17: 2.2, 35: 2.5, 53: 2.8, 85: 3.0, 117: 4.0}
+    yield from itertools.chain.from_iterable(find_AB_bonds(molecule, 6, x, distance) for x, distance in halogens.items())
+
+
+def find_AB_bonds(molecule: Molecule, a: int, b: int, distance_max: float) -> Iterable[tuple[PositiveInt, PositiveInt]]:
+    r"""
+    Find all A–B bonds in the molecule.
+
+    :param molecule: Molecule of interest
+    :param a: atomic number of atom A
+    :param b: atomic number of atom B
+    :param distance_max: distance max for bond
+
+    >>> H2O = Molecule.from_xyz("H 0 0 0\nO 0 0 1\nH 0 1 1")
+    >>> list(find_AB_bonds(H2O, 8, 1, 1.1))
+    [(2, 1), (2, 3)]
+    """
+
+    def close(idxs: tuple[PositiveInt, PositiveInt]) -> bool:
+        return molecule.distance(*idxs) < distance_max
+
+    yield from filter(
+        close,
+        itertools.product(
+            atomic_number_indices(molecule, a),
+            atomic_number_indices(molecule, b),
+        ),
+    )
