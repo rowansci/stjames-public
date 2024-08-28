@@ -54,3 +54,4 @@ markers = [
 [tool.mypy]
 plugins = ["pydantic.mypy"]
 strict = true
+warn_unused_ignores = true

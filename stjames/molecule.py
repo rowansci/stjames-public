@@ -115,7 +115,7 @@ class Molecule(Base):
     def __len__(self) -> int:
         return len(self.atoms)
 
-    def distance(self, atom1: int, atom2: int) -> float:
+    def distance(self, atom1: PositiveInt, atom2: PositiveInt) -> float:
         r"""
         Get the distance between atoms.
 
@@ -123,7 +123,7 @@ class Molecule(Base):
         >>> mol.distance(1, 2)
         1.4142135623730951
         """
-        return sum((q2 - q1) ** 2 for q1, q2 in zip(self.atoms[atom1 - 1].position, self.atoms[atom2 - 1].position)) ** 0.5  # type: ignore
+        return sum((q2 - q1) ** 2 for q1, q2 in zip(self.atoms[atom1 - 1].position, self.atoms[atom2 - 1].position)) ** 0.5  # type: ignore [no-any-return,unused-ignore]
 
     @property
     def coordinates(self) -> list[list[float]]:
