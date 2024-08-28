@@ -90,6 +90,26 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     opt_molecule: Molecule | None = None
     bdes: tuple[BDE] = Field(default_factory=tuple)
 
+    def __str__(self) -> str:
+        r"""
+        Return a string representation of the BDE workflow.
+
+        >>> print(BDEWorkflow(initial_molecule=Molecule.from_xyz("H 0 0 0\nF 0 0 1"), mode=Mode.METICULOUS, atoms=[1, 2]))
+        BDEWorkflow METICULOUS
+        (1,)
+        (2,)
+        """
+        return f"{type(self).__name__} {self.mode.name}\n" + "\n".join(map(str, self.fragment_indices))
+
+    def __repr__(self) -> str:
+        """
+        Return a string representation of the BDE workflow.
+
+        >>> BDEWorkflow(initial_molecule=Molecule.from_xyz("He 0 0 0"), mode=Mode.METICULOUS, atoms=[])
+        <BDEWorkflow METICULOUS>
+        """
+        return f"<{type(self).__name__} {self.mode.name}>"
+
     @property
     def energies(self) -> tuple[float, ...]:
         return tuple(bde.energy for bde in self.bdes)

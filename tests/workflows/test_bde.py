@@ -48,6 +48,9 @@ def test_water(water: Molecule) -> None:
     all_CH = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, all_CH=True, optimize_fragments=False)
     all_CX = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, all_CX=True)
 
+    assert repr(all_Hs) == "<BDEWorkflow METICULOUS>"
+    assert str(all_Hs) == "BDEWorkflow METICULOUS\n(1,)\n(2,)"
+
     assert all_Hs.fragment_indices == ((1,), (2,))
     assert duplicated.fragment_indices == ((1,), (2,))
     assert all_CH.fragment_indices == ()
@@ -65,6 +68,9 @@ def test_ethane(ethane: Molecule) -> None:
     all_CH = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, all_CH=True, optimize_fragments=False)
     all_CX = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, all_CX=True)
     ch3_frag_and_all_CH = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, fragment_indices=[(2, 6, 7, 8)], all_CH=True)
+
+    assert repr(all_Hs) == "<BDEWorkflow RAPID>"
+    assert str(all_Hs) == "BDEWorkflow RAPID\n(3,)\n(4,)\n(5,)\n(6,)\n(7,)\n(8,)"
 
     assert all_Hs.fragment_indices == all_CH.fragment_indices
     assert all_Hs.fragment_indices == duplicated.fragment_indices
@@ -84,6 +90,9 @@ def test_chloroethane(chloroethane: Molecule) -> None:
     all_CX = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, all_CX=True)
     duplicated = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, all_CX=True, atoms=[3])
     ch3_frag_and_all_CH = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, fragment_indices=[(2, 6, 7, 8)], all_CH=True)
+
+    assert repr(all_Hs) == "<BDEWorkflow RAPID>"
+    assert str(all_Hs) == "BDEWorkflow RAPID\n(4,)\n(5,)\n(6,)\n(7,)\n(8,)"
 
     assert all_Hs.fragment_indices == all_CH.fragment_indices
     assert all_CX.fragment_indices == ((3,),)
