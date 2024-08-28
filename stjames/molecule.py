@@ -4,7 +4,7 @@ import pydantic
 from pydantic import NonNegativeInt, PositiveInt
 
 from .base import Base
-from .data import INV_ELEMENT_DICTIONARY, get_atomic_symbol
+from .data import ELEMENT_SYMBOL, SYMBOL_ELEMENT
 
 
 class MoleculeReadError(RuntimeError):
@@ -51,7 +51,7 @@ class Atom(Base):
         >>> Atom(atomic_number=2, position=[0, 1, 2]).atomic_symbol
         'He'
         """
-        return get_atomic_symbol(self.atomic_number)
+        return ELEMENT_SYMBOL[self.atomic_number]
 
     def edited(self, atomic_number: int | None = None, position: Sequence[float] | None = None) -> Self:
         """
@@ -78,7 +78,7 @@ class Atom(Base):
         Atom(1, [0.00000, 0.00000, 0.00000])
         """
         name, *xyz = xyz_line.split()
-        symbol = int(name) if name.isdigit() else INV_ELEMENT_DICTIONARY[name]
+        symbol = int(name) if name.isdigit() else SYMBOL_ELEMENT[name]
         if not len(xyz) == 3:
             raise ValueError("XYZ file should have 3 coordinates per atom")
         return cls(atomic_number=symbol, position=xyz)
