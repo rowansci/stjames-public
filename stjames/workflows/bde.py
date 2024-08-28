@@ -24,14 +24,14 @@ class BDE(BaseModel):
     :param energy: BDE in kcal/mol
     :param fragment1_energy: energy of fragment 1
     :param fragment2_energy: energy of fragment 2
-    :param calculations: list of calculation UUIDs
+    :param calculations: calculation UUIDs
     """
 
     fragment_idxs: tuple[PositiveInt, ...]
     energy: float
     fragment1_energy: float
     fragment2_energy: float
-    calculations: list[UUID]
+    calculations: tuple[UUID, ...]
 
     def __str__(self) -> str:
         return repr(self)
@@ -72,7 +72,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param all_CH: dissociate all C–H bonds
     :param all_CX: dissociate all C–X bonds (X ∈ {F, Cl, Br, I, At, Ts})
     :param opt_molecule: optimized starting molecule
-    :param bdes: list of BDE results
+    :param bdes: BDE results
     """
 
     mode: Mode
@@ -87,11 +87,11 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
 
     # Results
     opt_molecule: Molecule | None = None
-    bdes: list[BDE] = Field(default_factory=list)
+    bdes: tuple[BDE] = Field(default_factory=tuple)
 
     @property
-    def energies(self) -> list[float]:
-        return [bde.energy for bde in self.bdes]
+    def energies(self) -> tuple[float, ...]:
+        return tuple(bde.energy for bde in self.bdes)
 
     @field_validator("initial_molecule", mode="before")
     @classmethod
