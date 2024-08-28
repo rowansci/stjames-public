@@ -42,17 +42,40 @@ def test_raises(water: Molecule) -> None:
         BDEWorkflow(initial_molecule=water, mode=Mode.RAPID, atoms=[5])
 
 
+def test_water(water: Molecule) -> None:
+    all_Hs = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, atoms=[1, 2], optimize_fragments=True)
+    duplicated = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, atoms=[1, 2, 1, 2])
+    all_CH = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, all_CH=True, optimize_fragments=False)
+    all_CX = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, all_CX=True)
+
+    assert repr(all_Hs) == "<BDEWorkflow METICULOUS>"
+    assert str(all_Hs) == "BDEWorkflow METICULOUS\n(1,)\n(2,)"
+
+    assert all_Hs.fragment_indices == ((1,), (2,))
+    assert duplicated.fragment_indices == ((1,), (2,))
+    assert all_CH.fragment_indices == ()
+    assert all_CX.fragment_indices == ()
+
+    assert all_Hs.optimize_fragments
+    assert duplicated.optimize_fragments
+    assert not all_CH.optimize_fragments
+    assert all_CX.optimize_fragments
+
+
 def test_ethane(ethane: Molecule) -> None:
     all_Hs = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, atoms=[3, 4, 5, 6, 7, 8], optimize_fragments=True)
     duplicated = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, atoms=[3, 4, 5, 6, 7, 8, 3, 4, 5, 6, 7, 8])
     all_CH = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, all_CH=True, optimize_fragments=False)
     all_CX = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, all_CX=True)
-    ch3_frag_and_all_CH = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, fragments=[(2, 6, 7, 8)], all_CH=True)
+    ch3_frag_and_all_CH = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, fragment_indices=[(2, 6, 7, 8)], all_CH=True)
 
-    assert all_Hs.fragments == all_CH.fragments
-    assert all_Hs.fragments == duplicated.fragments
-    assert all_CX.fragments == ()
-    assert ch3_frag_and_all_CH.fragments == ((2, 6, 7, 8), (3,), (4,), (5,), (6,), (7,), (8,))
+    assert repr(all_Hs) == "<BDEWorkflow RAPID>"
+    assert str(all_Hs) == "BDEWorkflow RAPID\n(3,)\n(4,)\n(5,)\n(6,)\n(7,)\n(8,)"
+
+    assert all_Hs.fragment_indices == all_CH.fragment_indices
+    assert all_Hs.fragment_indices == duplicated.fragment_indices
+    assert all_CX.fragment_indices == ()
+    assert ch3_frag_and_all_CH.fragment_indices == ((2, 6, 7, 8), (3,), (4,), (5,), (6,), (7,), (8,))
 
     assert all_Hs.optimize_fragments
     assert not duplicated.optimize_fragments
@@ -66,12 +89,15 @@ def test_chloroethane(chloroethane: Molecule) -> None:
     all_CH = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, all_CH=True)
     all_CX = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, all_CX=True)
     duplicated = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, all_CX=True, atoms=[3])
-    ch3_frag_and_all_CH = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, fragments=[(2, 6, 7, 8)], all_CH=True)
+    ch3_frag_and_all_CH = BDEWorkflow(initial_molecule=chloroethane, mode=Mode.RAPID, fragment_indices=[(2, 6, 7, 8)], all_CH=True)
 
-    assert all_Hs.fragments == all_CH.fragments
-    assert all_CX.fragments == ((3,),)
-    assert duplicated.fragments == ((3,),)
-    assert ch3_frag_and_all_CH.fragments == ((2, 6, 7, 8), (4,), (5,), (6,), (7,), (8,))
+    assert repr(all_Hs) == "<BDEWorkflow RAPID>"
+    assert str(all_Hs) == "BDEWorkflow RAPID\n(4,)\n(5,)\n(6,)\n(7,)\n(8,)"
+
+    assert all_Hs.fragment_indices == all_CH.fragment_indices
+    assert all_CX.fragment_indices == ((3,),)
+    assert duplicated.fragment_indices == ((3,),)
+    assert ch3_frag_and_all_CH.fragment_indices == ((2, 6, 7, 8), (4,), (5,), (6,), (7,), (8,))
 
 
 @mark.parametrize(
@@ -86,5 +112,5 @@ def test_chloroethane(chloroethane: Molecule) -> None:
 def test_mode_defaults(chloroethane: Molecule, mode: Mode, opt_frag: bool) -> None:
     wf = BDEWorkflow(initial_molecule=chloroethane, mode=mode, atoms=[4, 5, 6, 7, 8])
 
-    assert wf.fragments == ((4,), (5,), (6,), (7,), (8,))
+    assert wf.fragment_indices == ((4,), (5,), (6,), (7,), (8,))
     assert wf.optimize_fragments == opt_frag
