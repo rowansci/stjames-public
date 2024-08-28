@@ -20,14 +20,14 @@ class BDE(BaseModel):
 
     energy => (E_{fragment1} + E_{fragment2}) - E_{starting molecule}
 
-    :param fragment: indices of the atoms in the fragment that was dissociated (1-indexed)
+    :param fragment_idxs: indices of the atoms in the fragment that was dissociated (1-indexed)
     :param energy: BDE in kcal/mol
     :param fragment1_energy: energy of fragment 1
     :param fragment2_energy: energy of fragment 2
     :param calculations: list of calculation UUIDs
     """
 
-    fragment: tuple[PositiveInt, ...]
+    fragment_idxs: tuple[PositiveInt, ...]
     energy: float
     fragment1_energy: float
     fragment2_energy: float
@@ -40,10 +40,10 @@ class BDE(BaseModel):
         """
         Return a string representation of the BDE result.
 
-        >>> BDE(fragment=(1, 2), energy=1.0, fragment1_energy=50.0, fragment2_energy=50.0, calculations=[])
+        >>> BDE(fragment_idxs=(1, 2), energy=1.0, fragment1_energy=50.0, fragment2_energy=50.0, calculations=[])
         <BDE (1, 2)  1.00>
         """
-        return f"<{type(self).__name__} {self.fragment} {self.energy:>5.2f}>"
+        return f"<{type(self).__name__} {self.fragment_idxs} {self.energy:>5.2f}>"
 
 
 class BDEWorkflow(Workflow, MultiStageOptMixin):
@@ -68,7 +68,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param mode: Mode for workflow
     :param optimize_fragments: whether to optimize the fragments, or just the starting molecule (default depends on mode)
     :param atoms: atoms to dissociate (1-indexed)
-    :param fragments: fragments to dissociate (all fields feed into this, 1-indexed)
+    :param fragment_indices: fragments to dissociate (all fields feed into this, 1-indexed)
     :param all_CH: dissociate all C–H bonds
     :param all_CX: dissociate all C–X bonds (X ∈ {F, Cl, Br, I, At, Ts})
     :param opt_molecule: optimized starting molecule
@@ -80,7 +80,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     optimize_fragments: bool = None  # type: ignore [assignment]
 
     atoms: Sequence[PositiveInt] = Field(default_factory=tuple)
-    fragments: Sequence[Sequence[PositiveInt]] = Field(default_factory=tuple)
+    fragment_indices: Sequence[Sequence[PositiveInt]] = Field(default_factory=tuple)
 
     all_CH: bool = False
     all_CX: bool = False
@@ -113,7 +113,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     def validate_and_build(self) -> Self:
         """Validate atomic numbers and build the atoms field."""
         self.atoms = tuple(self.atoms)
-        self.fragments = tuple(map(tuple, self.fragments))
+        self.fragment_indices = tuple(map(tuple, self.fragment_indices))
 
         match self.mode:
             case Mode.RECKLESS | Mode.RAPID:
@@ -128,9 +128,9 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
         for atom in self.atoms:
             if atom > len(self.initial_molecule):
                 raise ValueError(f"{atom=} is out of range.")
-        for fragment in self.fragments:
-            if any(a > len(self.initial_molecule) for a in fragment):
-                raise ValueError(f"{fragment=} contains atoms that are out of range.")
+        for fragment_idxs in self.fragment_indices:
+            if any(a > len(self.initial_molecule) for a in fragment_idxs):
+                raise ValueError(f"{fragment_idxs=} contains atoms that are out of range.")
 
         if self.all_CH:
             self.atoms = self.atoms + atomic_number_indices(self.initial_molecule, 1)
@@ -139,9 +139,9 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
             self.atoms = self.atoms + atomic_number_indices(self.initial_molecule, X)
 
         # Combine atoms and fragments, remove duplicates, and sort
-        self.fragments = self.fragments + tuple((a,) for a in self.atoms)
-        assert isinstance(self.fragments, tuple)
-        self.fragments = tuple(sorted(set(self.fragments)))
+        self.fragment_indices = self.fragment_indices + tuple((a,) for a in self.atoms)
+        assert isinstance(self.fragment_indices, tuple)
+        self.fragment_indices = tuple(sorted(set(self.fragment_indices)))
 
         return self
 
