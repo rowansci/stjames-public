@@ -1,4 +1,4 @@
-from pytest import fixture, raises
+from pytest import fixture, mark, raises
 
 from stjames import Mode, Molecule
 from stjames.workflows import BDEWorkflow
@@ -43,9 +43,9 @@ def test_raises(water: Molecule) -> None:
 
 
 def test_ethane(ethane: Molecule) -> None:
-    all_Hs = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, atoms=[3, 4, 5, 6, 7, 8])
+    all_Hs = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, atoms=[3, 4, 5, 6, 7, 8], optimize_fragments=True)
     duplicated = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, atoms=[3, 4, 5, 6, 7, 8, 3, 4, 5, 6, 7, 8])
-    all_CH = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, all_CH=True)
+    all_CH = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, all_CH=True, optimize_fragments=False)
     all_CX = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, all_CX=True)
     ch3_frag_and_all_CH = BDEWorkflow(initial_molecule=ethane, mode=Mode.RAPID, fragments=[(2, 6, 7, 8)], all_CH=True)
 
@@ -53,6 +53,12 @@ def test_ethane(ethane: Molecule) -> None:
     assert all_Hs.fragments == duplicated.fragments
     assert all_CX.fragments == ()
     assert ch3_frag_and_all_CH.fragments == ((2, 6, 7, 8), (3,), (4,), (5,), (6,), (7,), (8,))
+
+    assert all_Hs.optimize_fragments
+    assert not duplicated.optimize_fragments
+    assert not all_CH.optimize_fragments
+    assert not all_CX.optimize_fragments
+    assert not ch3_frag_and_all_CH.optimize_fragments
 
 
 def test_chloroethane(chloroethane: Molecule) -> None:
@@ -66,3 +72,19 @@ def test_chloroethane(chloroethane: Molecule) -> None:
     assert all_CX.fragments == ((3,),)
     assert duplicated.fragments == ((3,),)
     assert ch3_frag_and_all_CH.fragments == ((2, 6, 7, 8), (4,), (5,), (6,), (7,), (8,))
+
+
+@mark.parametrize(
+    "mode, opt_frag",
+    [
+        (Mode.RECKLESS, False),
+        (Mode.RAPID, False),
+        (Mode.CAREFUL, True),
+        (Mode.METICULOUS, True),
+    ],
+)
+def test_mode_defaults(chloroethane: Molecule, mode: Mode, opt_frag: bool) -> None:
+    wf = BDEWorkflow(initial_molecule=chloroethane, mode=mode, atoms=[4, 5, 6, 7, 8])
+
+    assert wf.fragments == ((4,), (5,), (6,), (7,), (8,))
+    assert wf.optimize_fragments == opt_frag
