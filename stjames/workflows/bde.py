@@ -1,6 +1,6 @@
 """Bond Dissociation Energy (BDE) workflow."""
 
-from typing import Any, Self, Sequence
+from typing import Any, Self
 
 from pydantic import BaseModel, Field, PositiveInt, field_validator, model_validator
 
@@ -79,8 +79,8 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     mso_mode: Mode = _sentinel_mso_mode  # type: ignore [assignment]
     optimize_fragments: bool = None  # type: ignore [assignment]
 
-    atoms: Sequence[PositiveInt] = Field(default_factory=tuple)
-    fragment_indices: Sequence[Sequence[PositiveInt]] = Field(default_factory=tuple)
+    atoms: tuple[PositiveInt, ...] = Field(default_factory=tuple)
+    fragment_indices: tuple[tuple[PositiveInt, ...], ...] = Field(default_factory=tuple)
 
     all_CH: bool = False
     all_CX: bool = False
