@@ -114,6 +114,14 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     def energies(self) -> tuple[float, ...]:
         return tuple(bde.energy for bde in self.bdes)
 
+    @field_validator("mode")
+    @classmethod
+    def set_mode_auto(cls, mode: Mode) -> Mode:
+        if mode == Mode.AUTO:
+            return Mode.RAPID
+
+        return mode
+
     @field_validator("initial_molecule", mode="before")
     @classmethod
     def no_charge_or_spin(cls, mol: Molecule) -> Molecule:

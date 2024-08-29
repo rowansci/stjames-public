@@ -42,6 +42,12 @@ def test_raises(water: Molecule) -> None:
         BDEWorkflow(initial_molecule=water, mode=Mode.RAPID, atoms=[5])
 
 
+def test_auto(water: Molecule) -> None:
+    wf = BDEWorkflow(initial_molecule=water, mode=Mode.AUTO, atoms=[1, 2])
+
+    assert wf.mode == Mode.RAPID
+
+
 def test_water(water: Molecule) -> None:
     all_Hs = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, atoms=[1, 2], optimize_fragments=True)
     duplicated = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, atoms=[1, 2, 1, 2])
