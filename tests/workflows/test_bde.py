@@ -48,6 +48,16 @@ def test_auto(water: Molecule) -> None:
     assert wf.mode == Mode.RAPID
 
 
+def test_frequencies(water: Molecule) -> None:
+    wf = BDEWorkflow(initial_molecule=water, mode=Mode.RAPID, atoms=[1, 2], frequencies=True)
+    wf2 = BDEWorkflow(initial_molecule=water, mode=Mode.RAPID, atoms=[1, 2])
+    wf3 = BDEWorkflow(initial_molecule=water, mode=Mode.RAPID, atoms=[1, 2], frequencies=False)
+
+    assert wf.multistage_opt_settings.frequencies
+    assert not wf2.multistage_opt_settings.frequencies
+    assert not wf3.multistage_opt_settings.frequencies
+
+
 def test_water(water: Molecule) -> None:
     all_Hs = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, atoms=[1, 2], optimize_fragments=True)
     duplicated = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, atoms=[1, 2, 1, 2])

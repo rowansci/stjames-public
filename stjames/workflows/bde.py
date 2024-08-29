@@ -58,10 +58,10 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
     :param constraints: constraints to add
     :param transition_state: whether this is a transition state
-    :param frequencies: whether to calculate frequencies
 
     Overridden:
     :param mso_mode: Mode for MultiStageOptSettings
+    :param frequencies: whether to calculate frequencies
 
     New:
     :param mode: Mode for workflow
@@ -76,6 +76,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
 
     mode: Mode
     mso_mode: Mode = _sentinel_mso_mode  # type: ignore [assignment]
+    frequencies: bool = False
     optimize_fragments: bool = None  # type: ignore [assignment]
 
     atoms: tuple[PositiveInt, ...] = Field(default_factory=tuple)
