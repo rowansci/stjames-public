@@ -3,7 +3,7 @@ from typing import Self
 from pydantic import PositiveFloat, PositiveInt, model_validator
 
 from ..base import Base, LowercaseStrEnum
-from ..constraint import PairwiseHarmonicConstraint
+from ..constraint import PairwiseHarmonicConstraint, SphericalHarmonicConstraint
 from ..settings import Settings
 from ..types import UUID
 from .workflow import Workflow
@@ -31,8 +31,7 @@ class MolecularDynamicsSettings(Base):
     timestep: PositiveFloat = 1.0  # fs
     num_steps: PositiveInt = 500
 
-    confining_radius: PositiveFloat | None = None  # Å
-    confining_force_constant: PositiveFloat = 10  # kcal/mol / Å**2
+    confining_constraint: SphericalHarmonicConstraint | None = None
 
     temperature: PositiveFloat | None = 300  # K
     pressure: PositiveFloat | None = None  # atm
