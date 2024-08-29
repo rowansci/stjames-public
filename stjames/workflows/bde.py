@@ -23,16 +23,14 @@ class BDE(BaseModel):
 
     :param fragment_idxs: indices of the atoms in the fragment that was dissociated (1-indexed)
     :param energy: BDE in kcal/mol
-    :param fragment1_energy: energy of fragment 1
-    :param fragment2_energy: energy of fragment 2
+    :param fragment_energies: energy of fragments
     :param calculations_uuids: calculation UUIDs
     """
 
     fragment_idxs: tuple[PositiveInt, ...]
     energy: float
-    fragment1_energy: float
-    fragment2_energy: float
-    calculation_uuids: tuple[UUID | None, ...]
+    fragment_energies: tuple[float, float]
+    calculation_uuids: tuple[list[UUID | None], list[UUID | None]]
 
     def __str__(self) -> str:
         return repr(self)
@@ -41,7 +39,7 @@ class BDE(BaseModel):
         """
         Return a string representation of the BDE result.
 
-        >>> BDE(fragment_idxs=(1, 2), energy=1.0, fragment1_energy=50.0, fragment2_energy=50.0, calculation_uuids=[])
+        >>> BDE(fragment_idxs=(1, 2), energy=1.0, fragment_energies=(4, 2), calculation_uuids=([], []))
         <BDE (1, 2)  1.00>
         """
         return f"<{type(self).__name__} {self.fragment_idxs} {self.energy:>5.2f}>"
