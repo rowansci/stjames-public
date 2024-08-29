@@ -1,6 +1,6 @@
 from typing import Self, Sequence
 
-from pydantic import BaseModel, model_validator
+from pydantic import BaseModel, Field, model_validator
 
 from ..constraint import Constraint
 from ..method import XTB_METHODS, Method
@@ -210,7 +210,7 @@ class MultiStageOptWorkflow(Workflow, MultiStageOptSettings):
     """
 
     # Populated while running the workflow
-    calculations: list[UUID] | None = None
+    calculations: list[UUID | None] = Field(default_factory=list)
 
 
 # the id of a mutable object may change, thus using object()

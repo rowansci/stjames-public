@@ -14,7 +14,7 @@ class SpinState(BaseModel):
 
     :param multiplicity: multiplicity of the SpinState
     :param energy: energy of the optimized Molecule
-    :param calculations: the UUIDs of the Calculations that produced this SpinState
+    :param calculation: the UUIDs of the Calculations that produced this SpinState
 
     >>> from stjames.molecule import Atom, Molecule
     >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
@@ -24,7 +24,7 @@ class SpinState(BaseModel):
 
     multiplicity: PositiveInt
     energy: float
-    calculation: list[UUID]
+    calculation: list[UUID | None]
 
     def __str__(self) -> str:
         return repr(self)
