@@ -31,14 +31,14 @@ class MolecularDynamicsSettings(Base):
     timestep: PositiveFloat = 1.0  # fs
     num_steps: PositiveInt = 500
 
-    confining_radius: PositiveFloat | None = None
+    confining_radius: PositiveFloat | None = None  # Å
     confining_force_constant: PositiveFloat = 10  # kcal/mol / Å**2
 
     temperature: PositiveFloat | None = 300  # K
     pressure: PositiveFloat | None = None  # atm
 
-    langevin_thermostat_timescale: PositiveFloat = 100  # fs
-    berendsen_barostat_timescale: PositiveFloat = 1000  # fs
+    langevin_thermostat_timescale_fs: PositiveFloat = 100  # fs
+    berendsen_barostat_timescale_fs: PositiveFloat = 1000  # fs
 
     constraints: list[PairwiseHarmonicConstraint] = []
 
