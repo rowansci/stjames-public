@@ -4,6 +4,7 @@ from .bde import *
 from .conformer import *
 from .descriptors import *
 from .fukui import *
+from .molecular_dynamics import *
 from .multistage_opt import *
 from .pka import *
 from .redox_potential import *
