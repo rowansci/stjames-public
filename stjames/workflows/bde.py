@@ -92,7 +92,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     # Results
     optimization_calculation_uuids: list[UUID | None] | None = None
     optimization_energy: float | None = None
-    bdes: tuple[BDE, ...] = Field(default_factory=tuple)
+    bdes: list[BDE] = Field(default_factory=list)
 
     def __str__(self) -> str:
         r"""
