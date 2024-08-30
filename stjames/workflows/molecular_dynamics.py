@@ -36,8 +36,8 @@ class MolecularDynamicsSettings(Base):
     temperature: PositiveFloat | None = 300  # K
     pressure: PositiveFloat | None = None  # atm
 
-    langevin_thermostat_timescale_fs: PositiveFloat = 100  # fs
-    berendsen_barostat_timescale_fs: PositiveFloat = 1000  # fs
+    langevin_thermostat_timescale: PositiveFloat = 100  # fs
+    berendsen_barostat_timescale: PositiveFloat = 1000  # fs
 
     constraints: list[PairwiseHarmonicConstraint] = []
 
