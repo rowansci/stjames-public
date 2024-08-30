@@ -63,8 +63,8 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param frequencies: whether to calculate frequencies
 
     Turned off:
-    :param constraints: constraints to add
-    :param transition_state: whether this is a transition state
+    :param constraints: constraints to add (not supported)
+    :param transition_state: whether this is a transition state (not supported)
 
     New:
     :param mode: Mode for workflow
@@ -74,6 +74,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param all_CH: dissociate all C–H bonds
     :param all_CX: dissociate all C–X bonds (X ∈ {F, Cl, Br, I, At, Ts})
     :param optimization_calculation_uuids: UUIDs of initial optimization calculations
+    :param optimization_energy: energy of optimized initial molecule
     :param bdes: BDE results
     """
 
@@ -90,6 +91,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
 
     # Results
     optimization_calculation_uuids: list[UUID | None] | None = None
+    optimization_energy: float | None = None
     bdes: tuple[BDE, ...] = Field(default_factory=tuple)
 
     def __str__(self) -> str:
