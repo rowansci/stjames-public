@@ -96,7 +96,8 @@ class Molecule(Base):
 
     homo_lumo_gap: Optional[float] = None  # in eV
 
-    gradient: Optional[Vector3DPerAtom] = None  # Hartree/Bohr
+    gradient: Optional[Vector3DPerAtom] = None  # Hartree/Å
+    stress: Optional[PeriodicCell] = None  # Hartree/Å
 
     velocities: Optional[Vector3DPerAtom] = None  # Å/fs
 
