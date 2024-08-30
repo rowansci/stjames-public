@@ -1,9 +1,9 @@
 """Bond Dissociation Energy (BDE) workflow."""
 
 import itertools
-from typing import Any, Iterable, Self
+from typing import Any, Iterable, Self, TypeVar
 
-from pydantic import BaseModel, Field, PositiveInt, field_validator, model_validator
+from pydantic import BaseModel, Field, PositiveInt, ValidationInfo, field_validator, model_validator
 
 from ..mode import Mode
 from ..molecule import Molecule
@@ -13,6 +13,7 @@ from .workflow import Workflow
 
 # the id of a mutable object may change, thus using object()
 _sentinel_mso_mode = object()
+_T = TypeVar("_T")
 
 
 class BDE(BaseModel):
@@ -56,12 +57,14 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
     :param solvent: solvent to use
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
-    :param constraints: constraints to add
-    :param transition_state: whether this is a transition state
 
     Overridden:
     :param mso_mode: Mode for MultiStageOptSettings
     :param frequencies: whether to calculate frequencies
+
+    Turned off:
+    :param constraints: constraints to add
+    :param transition_state: whether this is a transition state
 
     New:
     :param mode: Mode for workflow
@@ -112,6 +115,14 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     @property
     def energies(self) -> tuple[float, ...]:
         return tuple(bde.energy for bde in self.bdes)
+
+    @field_validator("constraints", "transition_state")
+    @classmethod
+    def turned_off(cls, value: _T, info: ValidationInfo) -> _T:
+        if value:
+            raise ValueError(f"{info.field_name} not supported in BDE workflows.")
+
+        return value
 
     @field_validator("mode")
     @classmethod
