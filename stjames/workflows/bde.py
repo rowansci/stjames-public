@@ -73,7 +73,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param fragment_indices: fragments to dissociate (all fields feed into this, 1-indexed)
     :param all_CH: dissociate all C–H bonds
     :param all_CX: dissociate all C–X bonds (X ∈ {F, Cl, Br, I, At, Ts})
-    :param opt_molecule: optimized starting molecule
+    :param optimization_calculation_uuids: UUIDs of initial optimization calculations
     :param bdes: BDE results
     """
 
@@ -89,7 +89,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     all_CX: bool = False
 
     # Results
-    opt_molecule: Molecule | None = None
+    optimization_calculation_uuids: list[UUID | None] | None = None
     bdes: tuple[BDE, ...] = Field(default_factory=tuple)
 
     def __str__(self) -> str:
