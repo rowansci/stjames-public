@@ -13,18 +13,18 @@ def test_molecule_pbc() -> None:
     mol_nopbc = glomar_explorer()
     assert mol_nopbc.cell is None
 
-    valid_input = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0))
+    valid_input = ((1, 0, 0), (0, 1, 0), (0, 0, 1))
     mol = glomar_explorer(cell=valid_input)
     assert mol.cell == valid_input
 
-    invalid_input = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0))
     with raises(ValidationError):
-        glomar_explorer(cell=invalid_input)
+        # Missing value
+        glomar_explorer(cell=((1, 0, 0), (0, 1, 0), (0, 0)))
 
-    invalid_input2 = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, "invalid"))
     with raises(ValidationError):
-        glomar_explorer(cell=invalid_input2)
+        # Bad type
+        glomar_explorer(cell=((1, 0, 0), (0, 1, 0), (0, 0, "invalid")))
 
-    invalid_input3 = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0), (1.0, 1.0, 1.0))
     with raises(ValidationError):
-        glomar_explorer(cell=invalid_input3)
+        # Too long
+        glomar_explorer(cell=((1, 0, 0), (0, 1, 0), (0, 0, 1), (1, 1, 1)))
