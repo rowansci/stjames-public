@@ -11,3 +11,4 @@ class Task(LowercaseStrEnum):
     DIPOLE = "dipole"
     HESSIAN = "hessian"
     FREQUENCIES = "frequencies"
+    STRESS = "stress"
