@@ -1,3 +1,4 @@
+from pathlib import Path
 from typing import Iterable, Optional, Self, Sequence, TypeAlias
 
 import pydantic
@@ -180,6 +181,33 @@ class Molecule(Base):
         return v
 
     @classmethod
+    def from_file(cls: type[Self], filename: Path | str, format: str | None = None, charge: int = 0, multiplicity: PositiveInt = 1) -> Self:
+        r"""
+        Read a molecule from a file.
+
+        >>> import tempfile
+        >>> with tempfile.NamedTemporaryFile("w+", suffix=".xyz") as f:
+        ...    _ = f.write("2\nComment\nH 0 0 0\nF 0 0 1")
+        ...    _ = f.seek(0)
+        ...    mol = Molecule.from_file(f.name)
+        >>> print(mol.to_xyz())
+        2
+        <BLANKLINE>
+        H     0.0000000000    0.0000000000    0.0000000000
+        F     0.0000000000    0.0000000000    1.0000000000
+        """
+        filename = Path(filename)
+        if not format:
+            format = filename.suffix[1:]
+
+        with open(filename) as f:
+            match format:
+                case "xyz":
+                    return cls.from_xyz_lines(f.readlines(), charge=charge, multiplicity=multiplicity)
+                case _:
+                    raise ValueError(f"Unsupported {format=}")
+
+    @classmethod
     def from_xyz(cls: type[Self], xyz: str, charge: int = 0, multiplicity: PositiveInt = 1) -> Self:
         r"""
         Generate a Molecule from an XYZ string.
@@ -204,3 +232,30 @@ class Molecule(Base):
             return cls(atoms=[Atom.from_xyz(line) for line in lines], charge=charge, multiplicity=multiplicity)
         except Exception as e:
             raise MoleculeReadError("Error reading molecule from xyz") from e
+
+    def to_xyz(self, comment: str = "", out_file: Path | str | None = None) -> str:
+        r"""
+        Generate an XYZ string.
+
+        >>> mol = Molecule.from_xyz("2\nComment\nH 0 1 2\nF 1 2 3")
+        >>> print(mol.to_xyz(comment="HF"))
+        2
+        HF
+        H     0.0000000000    1.0000000000    2.0000000000
+        F     1.0000000000    2.0000000000    3.0000000000
+        >>> import tempfile
+        >>> with tempfile.TemporaryDirectory() as directory:
+        ...     file = Path(directory) / "mol.xyz"
+        ...     out = mol.to_xyz(comment="HF", out_file=file)
+        ...     with file.open() as f:
+        ...         Molecule.from_xyz(f.read()).to_xyz("HF") == out
+        True
+        """
+        geom = "\n".join(map(str, self.atoms))
+        out = f"{len(self)}\n{comment}\n{geom}"
+
+        if out_file:
+            with Path(out_file).open("w") as f:
+                f.write(out)
+
+        return out
