@@ -218,7 +218,7 @@ class Molecule(Base):
 
         #ensure second line contains key-value pairs
         if '=' in lines[0]:
-            cell = cls.parse_key_value_pairs(lines[0])
+            cell = parse_key_value_pairs(lines[0])
             lines = lines[1:]
         else:
             raise MoleculeReadError(f"Invalid property line, got {lines[0]}")
@@ -229,33 +229,33 @@ class Molecule(Base):
             raise MoleculeReadError("Error reading molecule from xyz") from e
 
 
-    def parse_key_value_pairs(line: str) -> PeriodicCell:
-        cell = PeriodicCell
-        # Regular expression to match key="value", key='value', or key=value
-        pattern = r'(\S+?=(?:\".*?\"|\'.*?\'|\S+))'
-        pairs = re.findall(pattern, line)
+def parse_key_value_pairs(line: str) -> PeriodicCell:
+    cell = PeriodicCell
+    # Regular expression to match key="value", key='value', or key=value
+    pattern = r'(\S+?=(?:\".*?\"|\'.*?\'|\S+))'
+    pairs = re.findall(pattern, line)
 
-        prop_dict = {}
-        for pair in pairs:
-            key, value = pair.split('=',1)
-            if key.lower() == "lattice":
-                value=value.strip('\'"').split()
-                if len(value) != 9:
-                    raise MoleculeReadError(f'Lattice should have 9 entries got {len(value)}')
+    prop_dict = {}
+    for pair in pairs:
+        key, value = pair.split('=',1)
+        if key.lower() == "lattice":
+            value=value.strip('\'"').split()
+            if len(value) != 9:
+                raise MoleculeReadError(f'Lattice should have 9 entries got {len(value)}')
 
-                print(f"{value=}")
-                # Convert the value to a 3x3 tuple of tuples of floats
-                value = tuple(tuple(map(float, value[i:i+3])) for i in range(0, 9, 3))
-                print(f"{value=}")
-                cell = value
-                prop_dict[key]=value
+            print(f"{value=}")
+            # Convert the value to a 3x3 tuple of tuples of floats
+            value = tuple(tuple(map(float, value[i:i+3])) for i in range(0, 9, 3))
+            print(f"{value=}")
+            cell = value
+            prop_dict[key]=value
 
-            elif key.lower() == "properties":
-                if value.lower() != "species:s:1:pos:r:3":
-                    raise MoleculeReadError(f'Only accepting properties of form species:S:1:pos:R:3, got {value}')
-                prop_dict[key]=value
-            else:
-                raise MoleculeReadError(f'Currently only accepting lattice and propery keys. Got {key}')
-        if 'properties' not in [str(key).lower() for key in prop_dict.keys()]:
-            raise MoleculeReadError(f'Property field is required, got keys {prop_dict.keys()}')
-        return cell
+        elif key.lower() == "properties":
+            if value.lower() != "species:s:1:pos:r:3":
+                raise MoleculeReadError(f'Only accepting properties of form species:S:1:pos:R:3, got {value}')
+            prop_dict[key]=value
+        else:
+            raise MoleculeReadError(f'Currently only accepting lattice and propery keys. Got {key}')
+    if 'properties' not in [str(key).lower() for key in prop_dict.keys()]:
+        raise MoleculeReadError(f'Property field is required, got keys {prop_dict.keys()}')
+    return cell
