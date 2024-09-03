@@ -4,6 +4,8 @@ from typing import Iterable, Optional, Self
 import pydantic
 from pydantic import NonNegativeInt, PositiveInt
 
+import re
+
 from .atom import Atom
 from .base import Base
 from .periodic_cell import PeriodicCell
@@ -190,3 +192,70 @@ class Molecule(Base):
                 f.write(out)
 
         return out
+
+
+    @classmethod
+    def from_extxyz(cls: type[Self], extxyz: str, charge=0, multiplicity=1) -> Self:
+        r"""
+        Generate a Molecule from a EXTXYZ string. Currently only supporting Lattice and Properties fields.
+
+        >>> len(Molecule.from_xyz("2\nLattice="R1x R1y R1z R2x R2y R2z R3x R3y R3z" Properties=species:S:1:pos:R:3\nH 0 0 0\nH 0 0 1"))
+        """
+
+        return cls.from_extxyz_lines(extxyz.strip().splitlines(), charge=charge, multiplicity=multiplicity)
+
+
+    @classmethod
+    def from_extxyz_lines(cls: type[Self], lines: Iterable[str], charge: int, multiplicity: PositiveInt) -> Self:
+
+        #ensure first line is number of atoms
+        lines = list(lines)
+        if len(lines[0].split()) == 1:
+            natoms = lines[0].strip()
+            if not natoms.isdigit() or (int(lines[0]) != len(lines) - 2):
+                raise MoleculeReadError(f"First line of XYZ file should be the number of atoms, got: {lines[0]} != {len(lines) - 2}")
+            lines = lines[1:]
+
+        #ensure second line contains key-value pairs
+        if '=' in lines[0]:
+            cell = cls.parse_key_value_pairs(lines[0])
+            lines = lines[1:]
+        else:
+            raise MoleculeReadError(f"Invalid property line, got {lines[0]}")
+
+        try:
+            return cls(atoms=[Atom.from_xyz(line) for line in lines], cell=cell, charge=charge, multiplicity=multiplicity)
+        except Exception as e:
+            raise MoleculeReadError("Error reading molecule from xyz") from e
+
+
+    def parse_key_value_pairs(line: str) -> PeriodicCell:
+        cell = PeriodicCell
+        # Regular expression to match key="value", key='value', or key=value
+        pattern = r'(\S+?=(?:\".*?\"|\'.*?\'|\S+))'
+        pairs = re.findall(pattern, line)
+
+        prop_dict = {}
+        for pair in pairs:
+            key, value = pair.split('=',1)
+            if key.lower() == "lattice":
+                value=value.strip('\'"').split()
+                if len(value) != 9:
+                    raise MoleculeReadError(f'Lattice should have 9 entries got {len(value)}')
+
+                print(f"{value=}")
+                # Convert the value to a 3x3 tuple of tuples of floats
+                value = tuple(tuple(map(float, value[i:i+3])) for i in range(0, 9, 3))
+                print(f"{value=}")
+                cell = value
+                prop_dict[key]=value
+
+            elif key.lower() == "properties":
+                if value.lower() != "species:s:1:pos:r:3":
+                    raise MoleculeReadError(f'Only accepting properties of form species:S:1:pos:R:3, got {value}')
+                prop_dict[key]=value
+            else:
+                raise MoleculeReadError(f'Currently only accepting lattice and propery keys. Got {key}')
+        if 'properties' not in [str(key).lower() for key in prop_dict.keys()]:
+            raise MoleculeReadError(f'Property field is required, got keys {prop_dict.keys()}')
+        return cell
