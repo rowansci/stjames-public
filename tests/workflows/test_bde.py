@@ -1,7 +1,7 @@
 from pytest import fixture, mark, raises
 
 from stjames import Mode, Molecule
-from stjames.workflows import BDEWorkflow
+from stjames.workflows import BDE, BDEWorkflow
 
 
 @fixture
@@ -130,3 +130,11 @@ def test_mode_defaults(chloroethane: Molecule, mode: Mode, opt_frag: bool) -> No
 
     assert wf.fragment_indices == ((4,), (5,), (6,), (7,), (8,))
     assert wf.optimize_fragments == opt_frag
+
+
+def test_BDE_none() -> None:
+    """Test that a BDE with None for an energy is fine."""
+
+    BDE(fragment_idxs=(1, 2), energy=None, fragment_energies=(1, None), calculation_uuids=(["1", "2"], ["2", "3"]))
+    BDE(fragment_idxs=(1, 2), energy=None, fragment_energies=(None, 2), calculation_uuids=(["1", "2"], ["2", "3"]))
+    BDE(fragment_idxs=(1, 2), energy=None, fragment_energies=(1, 2), calculation_uuids=(["1", "2"], ["2", "3"]))

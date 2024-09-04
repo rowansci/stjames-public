@@ -29,8 +29,8 @@ class BDE(BaseModel):
     """
 
     fragment_idxs: tuple[PositiveInt, ...]
-    energy: float
-    fragment_energies: tuple[float, float]
+    energy: float | None
+    fragment_energies: tuple[float | None, float | None]
     calculation_uuids: tuple[list[UUID | None], list[UUID | None]]
 
     def __str__(self) -> str:
@@ -43,7 +43,9 @@ class BDE(BaseModel):
         >>> BDE(fragment_idxs=(1, 2), energy=1.0, fragment_energies=(4, 2), calculation_uuids=([], []))
         <BDE (1, 2)  1.00>
         """
-        return f"<{type(self).__name__} {self.fragment_idxs} {self.energy:>5.2f}>"
+        energy = "None" if self.energy is None else f"{self.energy:>5.2f}"
+
+        return f"<{type(self).__name__} {self.fragment_idxs} {energy}>"
 
 
 class BDEWorkflow(Workflow, MultiStageOptMixin):
@@ -115,7 +117,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
         return f"<{type(self).__name__} {self.mode.name}>"
 
     @property
-    def energies(self) -> tuple[float, ...]:
+    def energies(self) -> tuple[float | None, ...]:
         return tuple(bde.energy for bde in self.bdes)
 
     @field_validator("constraints", "transition_state")
