@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Iterable, Optional, Self, Sequence, TypeAlias
+from typing import Iterable, Optional, Self
 
 import pydantic
 from pydantic import NonNegativeInt, PositiveInt
