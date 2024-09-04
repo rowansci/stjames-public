@@ -14,17 +14,26 @@ def test_molecule_pbc() -> None:
     assert mol_nopbc.cell is None
 
     valid_input = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0))
-    mol = glomar_explorer(cell=valid_input)
-    assert mol.cell == valid_input
+    mol = glomar_explorer(cell={"lattice_vectors": valid_input})
+    assert mol.cell is not None
+    assert mol.cell.lattice_vectors == valid_input
+
+    mol2 = glomar_explorer(cell={"lattice_vectors": valid_input, "is_periodic": (True, False, True)})
+    assert mol2.cell is not None
+    assert mol2.cell.lattice_vectors == valid_input
+    assert mol2.cell.is_periodic == (True, False, True)
+
+    with raises(ValidationError):
+        glomar_explorer(cell={"lattice_vectors": valid_input, "is_periodic": (False, False, False)})
 
     invalid_input = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0))
     with raises(ValidationError):
-        glomar_explorer(cell=invalid_input)
+        glomar_explorer(cell={"lattice_vectors": invalid_input})
 
     invalid_input2 = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, "invalid"))
     with raises(ValidationError):
-        glomar_explorer(cell=invalid_input2)
+        glomar_explorer(cell={"lattice_vectors": invalid_input2})
 
     invalid_input3 = ((1.0, 0.0, 0.0), (0.0, 1.0, 0.0), (0.0, 0.0, 1.0), (1.0, 1.0, 1.0))
     with raises(ValidationError):
-        glomar_explorer(cell=invalid_input3)
+        glomar_explorer(cell={"lattice_vectors": invalid_input3})

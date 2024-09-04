@@ -1,6 +1,8 @@
 # ruff: noqa: I001
 
 from .calculation import *
+from .atom import *
+from .periodic_cell import *
 from .molecule import *
 from .workflows import *
 
