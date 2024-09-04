@@ -137,6 +137,8 @@ class Molecule(Base):
             match format:
                 case "xyz":
                     return cls.from_xyz_lines(f.readlines(), charge=charge, multiplicity=multiplicity)
+                case "extxyz":
+                    return cls.from_extxyz_lines(f.readlines(), charge=charge, multiplicity=multiplicity)
                 case _:
                     raise ValueError(f"Unsupported {format=}")
 
@@ -158,7 +160,7 @@ class Molecule(Base):
         if len(lines[0].split()) == 1:
             natoms = lines[0].strip()
             if not natoms.isdigit() or (int(lines[0]) != len(lines) - 2):
-                raise MoleculeReadError(f"First line of XYZ file should be the number of atoms, got: {lines[0]} != {len(lines) - 2}")
+                raise MoleculeReadError(f"First line of EXTXYZ file should be the number of atoms, got: {lines[0]} != {len(lines) - 2}")
             lines = lines[2:]
 
         try:
@@ -199,7 +201,13 @@ class Molecule(Base):
         r"""
         Generate a Molecule from a EXTXYZ string. Currently only supporting Lattice and Properties fields.
 
-        >>> len(Molecule.from_xyz("2\nLattice="R1x R1y R1z R2x R2y R2z R3x R3y R3z" Properties=species:S:1:pos:R:3\nH 0 0 0\nH 0 0 1"))
+        >>> Molecule.from_extxyz('''
+        ... 2
+        ... Lattice="6.0 0.0 0.0 6.0 0.0 0.0 6.0 0.0 0.0"Properties=species:S:1:pos:R:3
+        ... H 0 0 0
+        ... H 0 0 1
+        ... ''').cell == ((6.0, 0.0, 0.0), (6.0, 0.0, 0.0), (6.0, 0.0, 0.0))
+        True
         """
 
         return cls.from_extxyz_lines(extxyz.strip().splitlines(), charge=charge, multiplicity=multiplicity)
@@ -243,10 +251,12 @@ def parse_key_value_pairs(line: str) -> PeriodicCell:
             if len(value) != 9:
                 raise MoleculeReadError(f'Lattice should have 9 entries got {len(value)}')
 
-            print(f"{value=}")
             # Convert the value to a 3x3 tuple of tuples of floats
-            value = tuple(tuple(map(float, value[i:i+3])) for i in range(0, 9, 3))
-            print(f"{value=}")
+            try:
+                value = tuple(tuple(map(float, value[i:i+3])) for i in range(0, 9, 3))
+            except ValueError:
+                raise MoleculeReadError(f'Lattice should be floats, got {value}')
+
             cell = value
             prop_dict[key]=value
 

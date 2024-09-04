@@ -195,7 +195,6 @@ def test_molecule_from_extxyz() -> None:
     ]
 
     for name, extxyz, should_pass, expected in test_cases:
-        print(f"========= TESTING {name}")
         if should_pass:
             molecule = Molecule.from_extxyz(extxyz)
             assert molecule == expected_molecule, f"Test {name} failed: molecule mismatch. Got {molecule} expected {expected}"
