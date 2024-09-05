@@ -16,7 +16,9 @@ class MoleculeReadError(RuntimeError):
 
 class VibrationalMode(Base):
     frequency: float  # in cm-1
-    reduced_mass: float
+    reduced_mass: float  # amu
+
+    # todo - check units here?
     force_constant: float
     displacements: Vector3DPerAtom
 
