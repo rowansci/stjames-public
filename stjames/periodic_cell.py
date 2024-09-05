@@ -28,6 +28,7 @@ class PeriodicCell(Base):
             raise ValueError("For periodic boundary conditions, at least one dimension must be periodic!")
         return v
 
-    @pydantic.computed_field
+    @pydantic.computed_field  # type: ignore[misc, prop-decorator, unused-ignore]
+    @property
     def volume(self) -> float:
         return float(np.abs(np.linalg.det(np.array(self.lattice_vectors))))
