@@ -10,9 +10,12 @@ class OptimizationSettings(Base):
     max_steps: PositiveInt = 250
     transition_state: bool = False
 
-    # when are we converged?
-    max_gradient_threshold: PositiveFloat = 4.5e-4
-    rms_gradient_threshold: PositiveFloat = 3.0e-4
+    # when are we converged? (Hartree and Hartree/Å)
+    max_gradient_threshold: PositiveFloat = 7e-4
+    rms_gradient_threshold: PositiveFloat = 6e-4
     energy_threshold: PositiveFloat = 1e-6
+
+    # for periodic systems only
+    optimize_cell: bool = False
 
     constraints: Sequence[Constraint] = tuple()
