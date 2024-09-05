@@ -1,5 +1,6 @@
 from typing import TypeAlias
 
+import numpy as np
 import pydantic
 
 from .base import Base
@@ -26,3 +27,7 @@ class PeriodicCell(Base):
         if not any(v):
             raise ValueError("For periodic boundary conditions, at least one dimension must be periodic!")
         return v
+
+    @pydantic.computed_field
+    def volume(self) -> float:
+        return float(np.abs(np.linalg.det(np.array(self.lattice_vectors))))
