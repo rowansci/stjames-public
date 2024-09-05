@@ -7,7 +7,7 @@ from pydantic import NonNegativeInt, PositiveInt
 from .atom import Atom
 from .base import Base
 from .periodic_cell import PeriodicCell
-from .types import Vector3D, Vector3DPerAtom
+from .types import Matrix3x3, Vector3D, Vector3DPerAtom
 
 
 class MoleculeReadError(RuntimeError):
@@ -39,7 +39,7 @@ class Molecule(Base):
     homo_lumo_gap: Optional[float] = None  # in eV
 
     gradient: Optional[Vector3DPerAtom] = None  # Hartree/Å
-    stress: Optional[PeriodicCell] = None  # Hartree/Å
+    stress: Optional[Matrix3x3] = None  # Hartree/Å
 
     velocities: Optional[Vector3DPerAtom] = None  # Å/fs
 
