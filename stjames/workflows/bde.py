@@ -148,7 +148,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     @model_validator(mode="before")
     @classmethod
     def set_mso_mode(cls, values: dict[str, Any]) -> dict[str, Any]:
-        """Set the MultiStageOptSettings mode to match current SpinStates mode."""
+        """Set the MultiStageOptSettings mode to match current BDE mode."""
         values["mso_mode"] = values["mode"]
         return values
 
