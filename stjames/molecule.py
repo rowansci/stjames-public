@@ -204,8 +204,8 @@ class Molecule(Base):
         ... Lattice="6.0 0.0 0.0 6.0 0.0 0.0 6.0 0.0 0.0"Properties=species:S:1:pos:R:3
         ... H 0 0 0
         ... H 0 0 1
-        ... ''').cell.lattice_vectors == ((6.0, 0.0, 0.0), (6.0, 0.0, 0.0), (6.0, 0.0, 0.0))
-        True
+        ... ''').cell.lattice_vectors
+        ((6.0, 0.0, 0.0), (6.0, 0.0, 0.0), (6.0, 0.0, 0.0))
         """
 
         return cls.from_extxyz_lines(extxyz.strip().splitlines(), charge=charge, multiplicity=multiplicity)
@@ -235,10 +235,12 @@ class Molecule(Base):
             raise MoleculeReadError("Error reading molecule from extxyz") from e
 
 
-# currently only supporting lattice and porperites fields from comment line
-# modify in future to support other fields from comment from_xyz_lines
-# ex: name, mulitplicity, charge, etc.
 def parse_comment_line(line: str) -> PeriodicCell:
+    """
+    currently only supporting lattice and porperites fields from comment line
+    modify in future to support other fields from comment from_xyz_lines
+    ex: name, mulitplicity, charge, etc.
+    """
     cell = None
     # Regular expression to match key="value", key='value', or key=value
     pattern = r"(\S+?=(?:\".*?\"|\'.*?\'|\S+))"
