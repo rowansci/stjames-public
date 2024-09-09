@@ -1,5 +1,6 @@
-from stjames import Atom, Molecule, MoleculeReadError
 import pytest
+from stjames import Atom, Molecule, MoleculeReadError
+from pytest import mark, raises
 
 
 valid_extxyz = '''
@@ -14,6 +15,26 @@ H        1.0        1.0        1.0
 
 incorrect_num_atoms = '''
 6
+Lattice="6.0 0.0 0.0 0.0 6.0 0.0 0.0 0.0 6.0" Properties=species:S:1:pos:R:3
+C        0.0        0.0        0.0
+H        0.0        0.0        1.0
+H        1.0        0.0        0.0
+H        0.0        1.0        0.0
+H        1.0        1.0        1.0
+'''
+
+not_digit_num_atoms = '''
+v
+Lattice="6.0 0.0 0.0 0.0 6.0 0.0 0.0 0.0 6.0" Properties=species:S:1:pos:R:3
+C        0.0        0.0        0.0
+H        0.0        0.0        1.0
+H        1.0        0.0        0.0
+H        0.0        1.0        0.0
+H        1.0        1.0        1.0
+'''
+
+many_num_atoms = '''
+6 9
 Lattice="6.0 0.0 0.0 0.0 6.0 0.0 0.0 0.0 6.0" Properties=species:S:1:pos:R:3
 C        0.0        0.0        0.0
 H        0.0        0.0        1.0
@@ -175,33 +196,38 @@ expected_molecule = Molecule(
 )
 
 
-def test_molecule_from_extxyz() -> None:
+def test_molecule_from_extxyz_valid() -> None:
+    """
+    Test case for valid extxyz string.
+    """
+    molecule = Molecule.from_extxyz(valid_extxyz)
+    assert molecule == expected_molecule, f"Valid case failed: got {molecule}, expected {expected_molecule}"
 
-    test_cases = [
-        ("valid_extxyz", valid_extxyz, True, expected_molecule),
-        ("incorrect_num_atoms", incorrect_num_atoms, False, None),
-        ("no_num_atoms", no_num_atoms, True, None),
-        ("xyz_style", xyz_style, False, None),
-        ("missing_lattice", missing_lattice, False, None),
-        ("missing_properties", missing_properties, False, None),
-        ("incorrect_properties", incorrect_properites, False, None),
-        ("incorrect_lattice_extra", incorrect_lattice_extra, False, None),
-        ("incorrect_lattice_equals", incorrect_lattice_equals, False, None),
-        ("incorrect_lattice_str", incorrect_lattice_str, False, None),
-        ("incorrect_lattice_extra_string", incorrect_lattice_extra_string, False, None),
-        ("incorrect_lattice_single_quote", incorrect_lattice_single_quote, False, None),
-        ("incorrect_lattice_double_quote", incorrect_lattice_double_quote, False, None),
-        ("incorrect_lattice_double_single_quote", incorrect_lattice_double_single_quote, False, None),
+
+@pytest.mark.parametrize(
+    "invalid_extxyz",
+    [
+        incorrect_num_atoms,
+        no_num_atoms,
+        not_digit_num_atoms,
+        many_num_atoms,
+        xyz_style,
+        missing_lattice,
+        missing_properties,
+        incorrect_properites,
+        incorrect_lattice_extra,
+        incorrect_lattice_equals,
+        incorrect_lattice_str,
+        incorrect_lattice_extra_string,
+        incorrect_lattice_single_quote,
+        incorrect_lattice_double_quote,
+        incorrect_lattice_double_single_quote,
+        incorrect_lattice_double_double_quote,
     ]
-
-    for name, extxyz, should_pass, expected in test_cases:
-        if should_pass:
-            molecule = Molecule.from_extxyz(extxyz)
-            assert molecule == expected_molecule, f"Test {name} failed: molecule mismatch. Got {molecule} expected {expected}"
-        else:
-            try:
-                with pytest.raises(MoleculeReadError):
-                    Molecule.from_extxyz(extxyz)
-            except AssertionError:
-                pytest.fail(f"Test {name} failed: MoleculeReadError was not raised")
-
+)
+def test_molecule_from_extxyz_invalid(invalid_extxyz: str) -> None:
+    """
+    Test case for invalid extxyz strings, ensuring they raise MoleculeReadError.
+    """
+    with pytest.raises(MoleculeReadError):
+        Molecule.from_extxyz(invalid_extxyz)

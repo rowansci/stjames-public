@@ -2,7 +2,7 @@ from pathlib import Path
 from typing import Iterable, Optional, Self
 
 import pydantic
-from pydantic import NonNegativeInt, PositiveInt
+from pydantic import NonNegativeInt, PositiveInt, ValidationError
 
 import re
 
@@ -160,12 +160,12 @@ class Molecule(Base):
         if len(lines[0].split()) == 1:
             natoms = lines[0].strip()
             if not natoms.isdigit() or (int(lines[0]) != len(lines) - 2):
-                raise MoleculeReadError(f"First line of EXTXYZ file should be the number of atoms, got: {lines[0]} != {len(lines) - 2}")
+                raise MoleculeReadError(f"First line of XYZ file should be the number of atoms, got: {lines[0]} != {len(lines) - 2}")
             lines = lines[2:]
 
         try:
             return cls(atoms=[Atom.from_xyz(line) for line in lines], charge=charge, multiplicity=multiplicity)
-        except Exception as e:
+        except (ValueError, ValidationError) as e:
             raise MoleculeReadError("Error reading molecule from xyz") from e
 
     def to_xyz(self, comment: str = "", out_file: Path | str | None = None) -> str:
@@ -197,7 +197,7 @@ class Molecule(Base):
 
 
     @classmethod
-    def from_extxyz(cls: type[Self], extxyz: str, charge=0, multiplicity=1) -> Self:
+    def from_extxyz(cls: type[Self], extxyz: str, charge: int = 0, multiplicity: PositiveInt = 1) -> Self:
         r"""
         Generate a Molecule from a EXTXYZ string. Currently only supporting Lattice and Properties fields.
 
@@ -214,30 +214,35 @@ class Molecule(Base):
 
 
     @classmethod
-    def from_extxyz_lines(cls: type[Self], lines: Iterable[str], charge: int, multiplicity: PositiveInt) -> Self:
+    def from_extxyz_lines(cls: type[Self], lines: Iterable[str], charge: int = 0, multiplicity: PositiveInt = 1) -> Self:
 
         #ensure first line is number of atoms
         lines = list(lines)
         if len(lines[0].split()) == 1:
             natoms = lines[0].strip()
             if not natoms.isdigit() or (int(lines[0]) != len(lines) - 2):
-                raise MoleculeReadError(f"First line of XYZ file should be the number of atoms, got: {lines[0]} != {len(lines) - 2}")
-            lines = lines[1:]
-
-        #ensure second line contains key-value pairs
-        if '=' in lines[0]:
-            cell = parse_key_value_pairs(lines[0])
+                raise MoleculeReadError(f"First line of EXTXYZ file should be the number of atoms, got: {lines[0]} != {len(lines) - 2}")
             lines = lines[1:]
         else:
+            raise MoleculeReadError(f"First line of EXTXYZ should be only an int denoting number of atoms. Got {lines[0].split()}")
+
+        #ensure second line contains key-value pairs
+        if '=' not in lines[0]:
             raise MoleculeReadError(f"Invalid property line, got {lines[0]}")
+
+        cell = parse_comment_line(lines[0])
+        lines = lines[1:]
 
         try:
             return cls(atoms=[Atom.from_xyz(line) for line in lines], cell=cell, charge=charge, multiplicity=multiplicity)
-        except Exception as e:
-            raise MoleculeReadError("Error reading molecule from xyz") from e
+        except (ValueError, ValidationError) as e:
+            raise MoleculeReadError("Error reading molecule from extxyz") from e
 
 
-def parse_key_value_pairs(line: str) -> PeriodicCell:
+#currently only supporting lattice and porperites fields from comment line
+#modify in future to support other fields from comment from_xyz_lines
+#ex: name, mulitplicity, charge, etc.
+def parse_comment_line(line: str) -> PeriodicCell:
     cell = PeriodicCell
     # Regular expression to match key="value", key='value', or key=value
     pattern = r'(\S+?=(?:\".*?\"|\'.*?\'|\S+))'
@@ -253,11 +258,10 @@ def parse_key_value_pairs(line: str) -> PeriodicCell:
 
             # Convert the value to a 3x3 tuple of tuples of floats
             try:
-                value = tuple(tuple(map(float, value[i:i+3])) for i in range(0, 9, 3))
+                cell = tuple(tuple(map(float, value[i:i+3])) for i in range(0, 9, 3))
             except ValueError:
                 raise MoleculeReadError(f'Lattice should be floats, got {value}')
 
-            cell = value
             prop_dict[key]=value
 
         elif key.lower() == "properties":
@@ -266,6 +270,6 @@ def parse_key_value_pairs(line: str) -> PeriodicCell:
             prop_dict[key]=value
         else:
             raise MoleculeReadError(f'Currently only accepting lattice and propery keys. Got {key}')
-    if 'properties' not in [str(key).lower() for key in prop_dict.keys()]:
+    if 'properties' not in [key.lower() for key in prop_dict.keys()]:
         raise MoleculeReadError(f'Property field is required, got keys {prop_dict.keys()}')
     return cell

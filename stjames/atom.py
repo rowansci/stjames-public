@@ -60,7 +60,7 @@ class Atom(Base):
         Atom(1, [0.00000, 0.00000, 0.00000])
         """
         name, *xyz = xyz_line.split()
-        symbol = int(name) if name.isdigit() else SYMBOL_ELEMENT[name]
+        symbol = int(name) if name.isdigit() else SYMBOL_ELEMENT[name.title()]
         if not len(xyz) == 3:
             raise ValueError("XYZ file should have 3 coordinates per atom")
         return cls(atomic_number=symbol, position=xyz)
