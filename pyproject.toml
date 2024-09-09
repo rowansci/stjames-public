@@ -1,6 +1,6 @@
 [project]
 name = "stjames"
-version = "0.0.41"
+version = "0.0.42"
 description = "standardized JSON atom/molecule encoding scheme"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -27,6 +27,9 @@ where = ["."]  # list of folders that contain the packages (["."] by default)
 include = ["stjames", "stjames.*"]  # package names should match these glob patterns (["*"] by default)
 exclude = []  # exclude packages matching these glob patterns (empty by default)
 namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
+
+[tool.setuptools.package-data]
+"*" = ["*.json"]
 
 [tool.ruff]
 line-length = 160
