@@ -1,10 +1,9 @@
+import re
 from pathlib import Path
 from typing import Iterable, Optional, Self
 
 import pydantic
 from pydantic import NonNegativeInt, PositiveInt, ValidationError
-
-import re
 
 from .atom import Atom
 from .base import Base
@@ -195,7 +194,6 @@ class Molecule(Base):
 
         return out
 
-
     @classmethod
     def from_extxyz(cls: type[Self], extxyz: str, charge: int = 0, multiplicity: PositiveInt = 1) -> Self:
         r"""
@@ -206,17 +204,15 @@ class Molecule(Base):
         ... Lattice="6.0 0.0 0.0 6.0 0.0 0.0 6.0 0.0 0.0"Properties=species:S:1:pos:R:3
         ... H 0 0 0
         ... H 0 0 1
-        ... ''').cell == ((6.0, 0.0, 0.0), (6.0, 0.0, 0.0), (6.0, 0.0, 0.0))
+        ... ''').cell.lattice_vectors == ((6.0, 0.0, 0.0), (6.0, 0.0, 0.0), (6.0, 0.0, 0.0))
         True
         """
 
         return cls.from_extxyz_lines(extxyz.strip().splitlines(), charge=charge, multiplicity=multiplicity)
 
-
     @classmethod
     def from_extxyz_lines(cls: type[Self], lines: Iterable[str], charge: int = 0, multiplicity: PositiveInt = 1) -> Self:
-
-        #ensure first line is number of atoms
+        # ensure first line is number of atoms
         lines = list(lines)
         if len(lines[0].split()) == 1:
             natoms = lines[0].strip()
@@ -226,8 +222,8 @@ class Molecule(Base):
         else:
             raise MoleculeReadError(f"First line of EXTXYZ should be only an int denoting number of atoms. Got {lines[0].split()}")
 
-        #ensure second line contains key-value pairs
-        if '=' not in lines[0]:
+        # ensure second line contains key-value pairs
+        if "=" not in lines[0]:
             raise MoleculeReadError(f"Invalid property line, got {lines[0]}")
 
         cell = parse_comment_line(lines[0])
@@ -239,37 +235,41 @@ class Molecule(Base):
             raise MoleculeReadError("Error reading molecule from extxyz") from e
 
 
-#currently only supporting lattice and porperites fields from comment line
-#modify in future to support other fields from comment from_xyz_lines
-#ex: name, mulitplicity, charge, etc.
+# currently only supporting lattice and porperites fields from comment line
+# modify in future to support other fields from comment from_xyz_lines
+# ex: name, mulitplicity, charge, etc.
 def parse_comment_line(line: str) -> PeriodicCell:
-    cell = PeriodicCell
+    cell = None
     # Regular expression to match key="value", key='value', or key=value
-    pattern = r'(\S+?=(?:\".*?\"|\'.*?\'|\S+))'
+    pattern = r"(\S+?=(?:\".*?\"|\'.*?\'|\S+))"
     pairs = re.findall(pattern, line)
 
     prop_dict = {}
     for pair in pairs:
-        key, value = pair.split('=',1)
+        key, value = pair.split("=", 1)
         if key.lower() == "lattice":
-            value=value.strip('\'"').split()
+            value = value.strip("'\"").split()
             if len(value) != 9:
-                raise MoleculeReadError(f'Lattice should have 9 entries got {len(value)}')
+                raise MoleculeReadError(f"Lattice should have 9 entries got {len(value)}")
 
             # Convert the value to a 3x3 tuple of tuples of floats
             try:
-                cell = tuple(tuple(map(float, value[i:i+3])) for i in range(0, 9, 3))
+                cell = tuple(tuple(map(float, value[i : i + 3])) for i in range(0, 9, 3))
             except ValueError:
-                raise MoleculeReadError(f'Lattice should be floats, got {value}')
+                raise MoleculeReadError(f"Lattice should be floats, got {value}")
 
-            prop_dict[key]=value
+            prop_dict[key] = value
 
         elif key.lower() == "properties":
             if value.lower() != "species:s:1:pos:r:3":
-                raise MoleculeReadError(f'Only accepting properties of form species:S:1:pos:R:3, got {value}')
-            prop_dict[key]=value
+                raise MoleculeReadError(f"Only accepting properties of form species:S:1:pos:R:3, got {value}")
+            prop_dict[key] = value
         else:
-            raise MoleculeReadError(f'Currently only accepting lattice and propery keys. Got {key}')
-    if 'properties' not in [key.lower() for key in prop_dict.keys()]:
-        raise MoleculeReadError(f'Property field is required, got keys {prop_dict.keys()}')
-    return cell
+            raise MoleculeReadError(f"Currently only accepting lattice and propery keys. Got {key}")
+
+    if cell is None:
+        raise MoleculeReadError("Lattice field is required but missing.")
+
+    if "properties" not in [key.lower() for key in prop_dict.keys()]:
+        raise MoleculeReadError(f"Property field is required, got keys {prop_dict.keys()}")
+    return PeriodicCell(lattice_vectors=cell)
