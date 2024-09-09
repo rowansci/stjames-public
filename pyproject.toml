@@ -28,6 +28,9 @@ include = ["stjames", "stjames.*"]  # package names should match these glob patt
 exclude = []  # exclude packages matching these glob patterns (empty by default)
 namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
+[tool.setuptools.package-data]
+"*" = ["*.json"]
+
 [tool.ruff]
 line-length = 160
 
