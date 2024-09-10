@@ -41,10 +41,6 @@ def test_auto(He: Molecule) -> None:
 def test_raises(He: Molecule) -> None:
     with raises(ValueError):
         # mypy is correct, but needs to be silenced to test pydantic error
-        MultiStageOptWorkflow(initial_molecule=He)  # type: ignore [call-arg]
-
-    with raises(ValueError):
-        # mypy is correct, but needs to be silenced to test pydantic error
         MultiStageOptWorkflow(mode=Mode.RAPID)  # type: ignore [call-arg]
 
     singlepoint_settings = Settings(method=Method.B973C)

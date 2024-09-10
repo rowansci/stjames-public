@@ -56,6 +56,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
 
     Inherited:
     :param initial_molecule: Molecule of interest
+    :param mode: Mode for workflow
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
     :param solvent: solvent to use
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
@@ -69,7 +70,6 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param transition_state: whether this is a transition state (not supported)
 
     New:
-    :param mode: Mode for workflow
     :param optimize_fragments: whether to optimize the fragments, or just the starting molecule (default depends on mode)
     :param atoms: atoms to dissociate (1-indexed)
     :param fragment_indices: fragments to dissociate (all fields feed into this, 1-indexed)
@@ -80,7 +80,6 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param bdes: BDE results
     """
 
-    mode: Mode
     mso_mode: Mode = _sentinel_mso_mode  # type: ignore [assignment]
     frequencies: bool = False
     optimize_fragments: bool = None  # type: ignore [assignment]
@@ -107,15 +106,6 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
         """
         return f"{type(self).__name__} {self.mode.name}\n" + "\n".join(map(str, self.fragment_indices))
 
-    def __repr__(self) -> str:
-        """
-        Return a string representation of the BDE workflow.
-
-        >>> BDEWorkflow(initial_molecule=Molecule.from_xyz("He 0 0 0"), mode=Mode.METICULOUS, atoms=[])
-        <BDEWorkflow METICULOUS>
-        """
-        return f"<{type(self).__name__} {self.mode.name}>"
-
     @property
     def energies(self) -> tuple[float | None, ...]:
         return tuple(bde.energy for bde in self.bdes)
@@ -127,14 +117,6 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
             raise ValueError(f"{info.field_name} not supported in BDE workflows.")
 
         return value
-
-    @field_validator("mode")
-    @classmethod
-    def set_mode_auto(cls, mode: Mode) -> Mode:
-        if mode == Mode.AUTO:
-            return Mode.RAPID
-
-        return mode
 
     @field_validator("initial_molecule", mode="before")
     @classmethod

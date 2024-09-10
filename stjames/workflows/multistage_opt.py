@@ -212,6 +212,12 @@ class MultiStageOptWorkflow(Workflow, MultiStageOptSettings):
     # Populated while running the workflow
     calculations: list[UUID | None] = Field(default_factory=list)
 
+    def __repr__(self) -> str:
+        if self.mode != Mode.MANUAL:
+            return f"<{type(self).__name__} {self.mode.name}>"
+
+        return f"<{type(self).__name__} {self.level_of_theory}>"
+
 
 # the id of a mutable object may change, thus using object()
 _sentinel_msos = object()
