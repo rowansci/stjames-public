@@ -94,10 +94,10 @@ def test_ethane(ethane: Molecule) -> None:
     assert ch3_frag_and_all_CH.fragment_indices == ((2, 6, 7, 8), (3,), (4,), (5,), (6,), (7,), (8,))
 
     assert all_Hs.optimize_fragments
-    assert not duplicated.optimize_fragments
+    assert duplicated.optimize_fragments
     assert not all_CH.optimize_fragments
-    assert not all_CX.optimize_fragments
-    assert not ch3_frag_and_all_CH.optimize_fragments
+    assert all_CX.optimize_fragments
+    assert ch3_frag_and_all_CH.optimize_fragments
 
 
 def test_chloroethane(chloroethane: Molecule) -> None:
@@ -120,7 +120,7 @@ def test_chloroethane(chloroethane: Molecule) -> None:
     "mode, opt_frag",
     [
         (Mode.RECKLESS, False),
-        (Mode.RAPID, False),
+        (Mode.RAPID, True),
         (Mode.CAREFUL, True),
         (Mode.METICULOUS, True),
     ],
