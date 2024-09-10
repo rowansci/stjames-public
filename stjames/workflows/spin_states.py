@@ -49,6 +49,7 @@ class SpinStatesWorkflow(Workflow, MultiStageOptMixin):
 
     Inherited
     :param initial_molecule: Molecule of interest
+    :param mode: Mode for workflow
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
     :param solvent: solvent to use
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
@@ -60,7 +61,6 @@ class SpinStatesWorkflow(Workflow, MultiStageOptMixin):
     :param mso_mode: Mode for MultiStageOptSettings
 
     New:
-    :param mode: Mode for workflow
     :param states: multiplicities of the spin state targetted
     :param spin_states: resulting spin states data
 
@@ -72,15 +72,11 @@ class SpinStatesWorkflow(Workflow, MultiStageOptMixin):
     '<SpinStatesWorkflow [1, 3, 5] RAPID>'
     """
 
-    mode: Mode
     mso_mode: Mode = _sentinel_mso_mode  # type: ignore [assignment]
     states: list[PositiveInt]
 
     # Results
     spin_states: list[SpinState] = Field(default_factory=list)
-
-    def __str__(self) -> str:
-        return repr(self)
 
     def __repr__(self) -> str:
         if self.mode != Mode.MANUAL:
@@ -120,14 +116,6 @@ class SpinStatesWorkflow(Workflow, MultiStageOptMixin):
         """Set the MultiStageOptSettings mode to match current SpinStates mode."""
         values["mso_mode"] = values["mode"]
         return values
-
-    @field_validator("mode")
-    @classmethod
-    def set_mode_auto(cls, mode: Mode) -> Mode:
-        if mode == Mode.AUTO:
-            return Mode.RAPID
-
-        return mode
 
     @field_validator("spin_states")
     @classmethod
