@@ -159,10 +159,10 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
         self.fragment_indices = tuple(map(tuple, self.fragment_indices))
 
         match self.mode:
-            case Mode.RECKLESS | Mode.RAPID:
-                # Default off
-                self.optimize_fragments = self.optimize_fragments or False
-            case Mode.CAREFUL | Mode.METICULOUS:
+            case Mode.RECKLESS:
+                # GFN-FF doesn't support open-shell species
+                self.optimize_fragments = False
+            case Mode.RAPID | Mode.CAREFUL | Mode.METICULOUS:
                 # Default on
                 self.optimize_fragments = self.optimize_fragments or self.optimize_fragments is None
             case _:
