@@ -19,8 +19,8 @@ def Fe() -> Molecule:
     [
         (Mode.RECKLESS, "gfn2_xtb//gfn_ff"),
         (Mode.RAPID, "r2scan_3c//gfn2_xtb"),
-        (Mode.CAREFUL, "wb97x_3c//b97_3c//gfn2_xtb"),
-        (Mode.METICULOUS, "wb97m_d3bj/def2-tzvppd//wb97x_3c//b97_3c//gfn2_xtb"),
+        (Mode.CAREFUL, "wb97x_3c//r2scan_3c//gfn2_xtb"),
+        (Mode.METICULOUS, "wb97m_d3bj/def2-tzvppd//wb97x_3c//r2scan_3c//gfn2_xtb"),
     ],
 )
 def test_spin_states_basic(mode: Mode, level_of_theory: str, Mn: Molecule) -> None:
@@ -195,13 +195,13 @@ def test_careful(Fe: Molecule) -> None:
     assert msos_opt0.solvent_settings is None
     assert msos_opt0.opt_settings.transition_state
 
-    assert msos_opt1.method == Method.B973C
+    assert msos_opt1.method == Method.R2SCAN3C
     assert msos_opt1.tasks == [Task.FREQUENCIES, Task.OPTIMIZE]
     assert msos_opt1.corrections == []
     assert msos_opt1.mode == Mode.AUTO
     assert msos_opt1.solvent_settings is None
     assert msos_opt1.basis_set
-    assert msos_opt1.basis_set.name == "def2-mTZVP"
+    assert msos_opt1.basis_set.name == "def2-mTZVPP"
     assert msos_opt1.opt_settings.transition_state
 
 
@@ -237,13 +237,13 @@ def test_meticulous(Mn: Molecule) -> None:
     assert msos_opt0.solvent_settings is None
     assert not msos_opt0.opt_settings.transition_state
 
-    assert msos_opt1.method == Method.B973C
+    assert msos_opt1.method == Method.R2SCAN3C
     assert msos_opt1.tasks == [Task.OPTIMIZE]
     assert msos_opt1.corrections == []
     assert msos_opt1.mode == Mode.AUTO
     assert msos_opt1.solvent_settings is None
     assert msos_opt1.basis_set
-    assert msos_opt1.basis_set.name == "def2-mTZVP"
+    assert msos_opt1.basis_set.name == "def2-mTZVPP"
     assert not msos_opt1.opt_settings.transition_state
 
     assert msos_opt2.method == Method.WB97X3C

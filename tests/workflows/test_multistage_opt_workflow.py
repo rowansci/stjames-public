@@ -14,8 +14,8 @@ def He() -> Molecule:
     [
         (Mode.RECKLESS, "gfn2_xtb/cpcmx(water)//gfn_ff/alpb(water)"),
         (Mode.RAPID, "r2scan_3c/cpcm(water)//gfn2_xtb/alpb(water)"),
-        (Mode.CAREFUL, "wb97x_3c/cpcm(water)//b97_3c/cpcm(water)//gfn2_xtb"),
-        (Mode.METICULOUS, "wb97m_d3bj/def2-tzvppd/cpcm(water)//wb97x_3c/cpcm(water)//b97_3c/cpcm(water)//gfn2_xtb"),
+        (Mode.CAREFUL, "wb97x_3c/cpcm(water)//r2scan_3c/cpcm(water)//gfn2_xtb"),
+        (Mode.METICULOUS, "wb97m_d3bj/def2-tzvppd/cpcm(water)//wb97x_3c/cpcm(water)//r2scan_3c/cpcm(water)//gfn2_xtb"),
     ],
 )
 def test_multistage_opt_basic(mode: Mode, level_of_theory: str, He: Molecule) -> None:
@@ -47,7 +47,7 @@ def test_raises(He: Molecule) -> None:
         # mypy is correct, but needs to be silenced to test pydantic error
         MultiStageOptWorkflow(mode=Mode.RAPID)  # type: ignore [call-arg]
 
-    singlepoint_settings = Settings(method=Method.B973C)
+    singlepoint_settings = Settings(method=Method.R2SCAN3C)
     with raises(ValueError):
         MultiStageOptWorkflow(initial_molecule=He, mode=Mode.RAPID, singlepoint_settings=singlepoint_settings)
 
@@ -143,9 +143,9 @@ def test_careful(He: Molecule) -> None:
     assert msow_opt0.solvent_settings is None
     assert msow_opt0.opt_settings.transition_state
 
-    assert msow_opt1.method == Method.B973C
+    assert msow_opt1.method == Method.R2SCAN3C
     assert msow_opt1.basis_set
-    assert msow_opt1.basis_set.name == "def2-mTZVP"
+    assert msow_opt1.basis_set.name == "def2-mTZVPP"
     assert msow_opt1.tasks == [Task.FREQUENCIES, Task.OPTIMIZE]
     assert msow_opt1.corrections == []
     assert msow_opt1.mode == Mode.AUTO
@@ -173,9 +173,9 @@ def test_meticulous(He: Molecule) -> None:
 
     msow_opt0, msow_opt1 = msow.optimization_settings
 
-    assert msow_opt0.method == Method.B973C
+    assert msow_opt0.method == Method.R2SCAN3C
     assert msow_opt0.basis_set
-    assert msow_opt0.basis_set.name == "def2-mTZVP"
+    assert msow_opt0.basis_set.name == "def2-mTZVPP"
     assert msow_opt0.tasks == [Task.OPTIMIZE]
     assert msow_opt0.corrections == []
     assert msow_opt0.mode == Mode.AUTO
