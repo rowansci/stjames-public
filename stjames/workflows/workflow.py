@@ -1,4 +1,4 @@
-from pydantic import BaseModel, ConfigDict
+from pydantic import field_validator
 
 from ..base import Base
 from ..message import Message
@@ -8,30 +8,17 @@ from ..types import UUID
 
 
 class Workflow(Base):
-    """All workflows should have these properties."""
-
-    initial_molecule: Molecule
-    messages: list[Message] = []
-
-
-class DBCalculation(Base):
-    """Encodes a calculation that's in the database. This isn't terribly useful by itself."""
-
-    uuid: UUID
-
-
-class WorkflowInput(BaseModel):
     """
-    Input for a workflow.
+    Base class for Workflows.
 
     :param initial_molecule: Molecule of interest
-    :param mode: Mode for workflow
+    :param mode: Mode to use
+    :param messages: messages to display
     """
 
-    model_config = ConfigDict(extra="forbid")
-
     initial_molecule: Molecule
-    mode: Mode
+    mode: Mode = Mode.AUTO
+    messages: list[Message] = []
 
     def __str__(self) -> str:
         return repr(self)
@@ -39,8 +26,17 @@ class WorkflowInput(BaseModel):
     def __repr__(self) -> str:
         return f"<{type(self).__name__} {self.mode.name}>"
 
+    @field_validator("mode")
+    @classmethod
+    def set_mode_auto(cls, mode: Mode) -> Mode:
+        """Set the mode to RAPID if AUTO is selected."""
+        if mode == Mode.AUTO:
+            return Mode.RAPID
 
-class WorkflowResults(BaseModel):
-    """Results of a workflow."""
+        return mode
 
-    model_config = ConfigDict(extra="forbid", frozen=True)
+
+class DBCalculation(Base):
+    """Encodes a calculation that's in the database. This isn't terribly useful by itself."""
+
+    uuid: UUID
