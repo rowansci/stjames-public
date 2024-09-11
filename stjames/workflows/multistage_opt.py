@@ -22,9 +22,9 @@ class MultiStageOptSettings(BaseModel):
     RAPID *default
         r²SCAN-3c//GFN2-xTB with GFN0-xTB pre-opt (off by default)
     CAREFUL
-        wB97X-3c//B97-3c with GFN2-xTB pre-opt
+        wB97X-3c//r²SCAN-3c with GFN2-xTB pre-opt
     METICULOUS
-        wB97M-D3BJ/def2-TZVPPD//wB97X-3c//B97-3c with GFN2-xTB pre-opt
+        wB97M-D3BJ/def2-TZVPPD//wB97X-3c//r²SCAN-3c with GFN2-xTB pre-opt
 
     Notes:
     - No solvent in pre-opt
@@ -163,7 +163,7 @@ class MultiStageOptSettings(BaseModel):
                 self.xtb_preopt = (self.xtb_preopt is None) or self.xtb_preopt
                 self.optimization_settings = [
                     *gfn2_pre_opt * self.xtb_preopt,
-                    opt(Method.B973C, solvent=self.solvent, freq=self.frequencies),
+                    opt(Method.R2SCAN3C, solvent=self.solvent, freq=self.frequencies),
                 ]
                 self.singlepoint_settings = sp(Method.WB97X3C, solvent=self.solvent)
 
@@ -171,7 +171,7 @@ class MultiStageOptSettings(BaseModel):
                 self.xtb_preopt = (self.xtb_preopt is None) or self.xtb_preopt
                 self.optimization_settings = [
                     *gfn2_pre_opt * self.xtb_preopt,
-                    opt(Method.B973C, solvent=self.solvent),
+                    opt(Method.R2SCAN3C, solvent=self.solvent),
                     opt(Method.WB97X3C, solvent=self.solvent, freq=self.frequencies),
                 ]
                 self.singlepoint_settings = sp(Method.WB97MD3BJ, "def2-TZVPPD", solvent=self.solvent)
