@@ -69,7 +69,7 @@ def test_reckless(He: Molecule) -> None:
     assert msow_opt0.basis_set is None
     assert msow_opt0.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
     assert msow_opt0.corrections == []
-    assert msow_opt0.mode == Mode.AUTO
+    assert msow_opt0.mode == Mode.RAPID
     assert msow_opt0.solvent_settings
     assert msow_opt0.solvent_settings.solvent == "acetonitrile"
     assert not msow_opt0.opt_settings.transition_state
@@ -106,7 +106,7 @@ def test_rapid(He: Molecule) -> None:
     assert msow_opt1.basis_set is None
     assert msow_opt1.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
     assert msow_opt1.corrections == []
-    assert msow_opt1.mode == Mode.AUTO
+    assert msow_opt1.mode == Mode.RAPID
     assert msow_opt1.solvent_settings
     assert msow_opt1.solvent_settings.solvent == "hexane"
     assert not msow_opt1.opt_settings.transition_state
@@ -144,7 +144,7 @@ def test_careful(He: Molecule) -> None:
     assert msow_opt1.basis_set.name == "def2-mTZVP"
     assert msow_opt1.tasks == [Task.FREQUENCIES, Task.OPTIMIZE]
     assert msow_opt1.corrections == []
-    assert msow_opt1.mode == Mode.AUTO
+    assert msow_opt1.mode == Mode.RAPID
     assert msow_opt1.solvent_settings == SolventSettings(solvent="acetone", model="cpcm")
     assert msow_opt1.opt_settings.transition_state
 
@@ -174,7 +174,7 @@ def test_meticulous(He: Molecule) -> None:
     assert msow_opt0.basis_set.name == "def2-mTZVP"
     assert msow_opt0.tasks == [Task.OPTIMIZE]
     assert msow_opt0.corrections == []
-    assert msow_opt0.mode == Mode.AUTO
+    assert msow_opt0.mode == Mode.RAPID
     assert msow_opt0.solvent_settings is None
     assert not msow_opt0.opt_settings.transition_state
 
@@ -183,7 +183,7 @@ def test_meticulous(He: Molecule) -> None:
     assert msow_opt1.basis_set.name == "vDZP"
     assert msow_opt1.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
     assert msow_opt1.corrections == []
-    assert msow_opt1.mode == Mode.AUTO
+    assert msow_opt1.mode == Mode.RAPID
     assert msow_opt1.solvent_settings is None
     assert not msow_opt1.opt_settings.transition_state
 
@@ -224,7 +224,7 @@ def test_manual(He: Molecule) -> None:
     assert msow_opt0.basis_set is None
     assert msow_opt0.tasks == [Task.OPTIMIZE]
     assert msow_opt0.corrections == []
-    assert msow_opt0.mode == Mode.AUTO
+    assert msow_opt0.mode == Mode.RAPID
     assert msow_opt0.solvent_settings is None
     assert not msow_opt0.opt_settings.transition_state
 
@@ -233,6 +233,6 @@ def test_manual(He: Molecule) -> None:
     assert msow_opt1.basis_set.name == "def2-SVP"
     assert msow_opt1.tasks == [Task.OPTIMIZE]
     assert msow_opt1.corrections == []
-    assert msow_opt1.mode == Mode.AUTO
+    assert msow_opt1.mode == Mode.RAPID
     assert msow_opt1.solvent_settings is None
     assert not msow_opt1.opt_settings.transition_state
