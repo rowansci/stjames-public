@@ -199,25 +199,23 @@ def _assign_opt_settings_by_mode(mode: Mode, opt_settings: OptimizationSettings)
 
     Note: thresholds here are in units of Hartree/Å, not Hartree/Bohr as listed in many places.
     """
-    has_constraints = len(opt_settings.constraints) > 0
-
     opt_settings.energy_threshold = 1e-6
-    match mode, has_constraints:
-        case (Mode.RECKLESS, _) | (Mode.RAPID, True):
+    match mode:
+        case Mode.RECKLESS:
             opt_settings.energy_threshold = 2e-5
             opt_settings.max_gradient_threshold = 7e-3
             opt_settings.rms_gradient_threshold = 6e-3
-        case (Mode.RAPID, False) | (Mode.CAREFUL, True):
+        case Mode.RAPID:
             opt_settings.energy_threshold = 5e-5
             opt_settings.max_gradient_threshold = 5e-3
             opt_settings.rms_gradient_threshold = 3.5e-3
-        case (Mode.CAREFUL, False) | (Mode.METICULOUS, True):
+        case Mode.CAREFUL:
             opt_settings.max_gradient_threshold = 9e-4
             opt_settings.rms_gradient_threshold = 6e-4
-        case Mode.METICULOUS, False:
+        case Mode.METICULOUS:
             opt_settings.max_gradient_threshold = 3e-5
             opt_settings.rms_gradient_threshold = 2e-5
-        case Mode.DEBUG, _:
+        case Mode.DEBUG:
             opt_settings.max_gradient_threshold = 4e-6
             opt_settings.rms_gradient_threshold = 2e-6
         case _:
