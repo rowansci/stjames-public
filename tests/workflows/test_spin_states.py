@@ -107,7 +107,7 @@ def test_reckless(Mn: Molecule) -> None:
     assert msos_opt0.basis_set is None
     assert msos_opt0.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
     assert msos_opt0.corrections == []
-    assert msos_opt0.mode == Mode.AUTO
+    assert msos_opt0.mode == Mode.RAPID
     assert msos_opt0.solvent_settings
     assert msos_opt0.solvent_settings.solvent == "acetonitrile"
     assert not msos_opt0.opt_settings.transition_state
@@ -152,7 +152,7 @@ def test_rapid(Mn: Molecule) -> None:
     assert msos_opt1.basis_set is None
     assert msos_opt1.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
     assert msos_opt1.corrections == []
-    assert msos_opt1.mode == Mode.AUTO
+    assert msos_opt1.mode == Mode.RAPID
     assert msos_opt1.solvent_settings
     assert msos_opt1.solvent_settings.solvent == "hexane"
     assert not msos_opt1.opt_settings.transition_state
@@ -194,7 +194,7 @@ def test_careful(Fe: Molecule) -> None:
     assert msos_opt1.method == Method.B973C
     assert msos_opt1.tasks == [Task.FREQUENCIES, Task.OPTIMIZE]
     assert msos_opt1.corrections == []
-    assert msos_opt1.mode == Mode.AUTO
+    assert msos_opt1.mode == Mode.RAPID
     assert msos_opt1.solvent_settings is None
     assert msos_opt1.basis_set
     assert msos_opt1.basis_set.name == "def2-mTZVP"
@@ -236,7 +236,7 @@ def test_meticulous(Mn: Molecule) -> None:
     assert msos_opt1.method == Method.B973C
     assert msos_opt1.tasks == [Task.OPTIMIZE]
     assert msos_opt1.corrections == []
-    assert msos_opt1.mode == Mode.AUTO
+    assert msos_opt1.mode == Mode.RAPID
     assert msos_opt1.solvent_settings is None
     assert msos_opt1.basis_set
     assert msos_opt1.basis_set.name == "def2-mTZVP"
@@ -245,7 +245,7 @@ def test_meticulous(Mn: Molecule) -> None:
     assert msos_opt2.method == Method.WB97X3C
     assert msos_opt2.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
     assert msos_opt2.corrections == []
-    assert msos_opt2.mode == Mode.AUTO
+    assert msos_opt2.mode == Mode.RAPID
     assert msos_opt2.solvent_settings is None
     assert msos_opt2.basis_set
     assert msos_opt2.basis_set.name == "vDZP"
@@ -295,14 +295,14 @@ def test_manual(Fe: Molecule) -> None:
     assert msos_opt0.method == Method.GFN0_XTB
     assert msos_opt0.tasks == [Task.OPTIMIZE]
     assert msos_opt0.corrections == []
-    assert msos_opt0.mode == Mode.AUTO
+    assert msos_opt0.mode == Mode.RAPID
     assert msos_opt0.solvent_settings is None
     assert not msos_opt0.opt_settings.transition_state
 
     assert msos_opt1.method == Method.B3LYP
     assert msos_opt1.tasks == [Task.OPTIMIZE]
     assert msos_opt1.corrections == []
-    assert msos_opt1.mode == Mode.AUTO
+    assert msos_opt1.mode == Mode.RAPID
     assert msos_opt1.solvent_settings is None
 
     assert msos_opt1.basis_set
