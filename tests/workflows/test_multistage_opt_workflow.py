@@ -1,7 +1,7 @@
 from pytest import fixture, mark, raises
 
-from stjames import Atom, Method, Mode, Molecule, Settings, SolventSettings, Task
-from stjames.workflows import MultiStageOptWorkflow
+from stjames import Atom, Method, Mode, Molecule, Settings, Solvent, SolventSettings, Task
+from stjames.workflows import MultiStageOptWorkflow, build_mso_settings
 
 
 @fixture
@@ -236,3 +236,54 @@ def test_manual(He: Molecule) -> None:
     assert msow_opt1.mode == Mode.RAPID
     assert msow_opt1.solvent_settings is None
     assert not msow_opt1.opt_settings.transition_state
+
+
+def test_manual_from_factory(He: Molecule) -> None:
+    """
+    Builds a manual MultiStageOptWorkflow w/ new factory method
+    """
+    msos = build_mso_settings(
+        sp_method=Method.PBE,
+        sp_basis_set="def2-TZVP",
+        opt_methods=[Method.GFN0_XTB, Method.B3LYP],
+        opt_basis_sets=[None, "def2-SVP"],
+        solvent=Solvent.OCTANE,
+        use_solvent_for_opt=False,
+        frequencies=False,
+    )
+
+    level_of_theory = "pbe/def2-tzvp/cpcm(octane)//b3lyp/def2-svp//gfn0_xtb"
+
+    assert not msos.constraints
+    assert not msos.transition_state
+    assert str(msos) == f"<MultiStageOptSettings {level_of_theory}>"
+    assert msos.level_of_theory == level_of_theory
+
+    assert msos.optimization_settings
+    assert len(msos.optimization_settings) == 2
+
+    assert msos.singlepoint_settings
+    assert msos.singlepoint_settings.method == Method.PBE
+    assert msos.singlepoint_settings.basis_set
+    assert msos.singlepoint_settings.basis_set.name == "def2-TZVP"
+    assert msos.singlepoint_settings.solvent_settings
+    assert msos.singlepoint_settings.solvent_settings.solvent == "octane"
+
+    msos_opt0, msos_opt1 = msos.optimization_settings
+
+    assert msos_opt0.method == Method.GFN0_XTB
+    assert msos_opt0.basis_set is None
+    assert msos_opt0.tasks == [Task.OPTIMIZE]
+    assert msos_opt0.corrections == []
+    assert msos_opt0.mode == Mode.RAPID
+    assert msos_opt0.solvent_settings is None
+    assert not msos_opt0.opt_settings.transition_state
+
+    assert msos_opt1.method == Method.B3LYP
+    assert msos_opt1.basis_set
+    assert msos_opt1.basis_set.name == "def2-SVP"
+    assert msos_opt1.tasks == [Task.OPTIMIZE]
+    assert msos_opt1.corrections == []
+    assert msos_opt1.mode == Mode.RAPID
+    assert msos_opt1.solvent_settings is None
+    assert not msos_opt1.opt_settings.transition_state
