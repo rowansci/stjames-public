@@ -12,10 +12,10 @@ def He() -> Molecule:
 @mark.parametrize(
     "mode, level_of_theory",
     [
-        (Mode.RECKLESS, "gfn2_xtb/cpcmx(water)//gfn_ff/alpb(water)"),
-        (Mode.RAPID, "r2scan_3c/cpcm(water)//gfn2_xtb/alpb(water)"),
-        (Mode.CAREFUL, "wb97x_3c/cpcm(water)//r2scan_3c/cpcm(water)//gfn2_xtb"),
-        (Mode.METICULOUS, "wb97m_d3bj/def2-tzvppd/cpcm(water)//wb97x_3c/cpcm(water)//r2scan_3c/cpcm(water)//gfn2_xtb"),
+        (Mode.RECKLESS, "gfn2_xtb/cpcmx(water)//gfn_ff"),
+        (Mode.RAPID, "r2scan_3c/cpcm(water)//gfn2_xtb"),
+        (Mode.CAREFUL, "wb97x_3c/cpcm(water)//r2scan_3c//gfn2_xtb"),
+        (Mode.METICULOUS, "wb97m_d3bj/def2-tzvppd/cpcm(water)//wb97x_3c//r2scan_3c//gfn2_xtb"),
     ],
 )
 def test_multistage_opt_basic(mode: Mode, level_of_theory: str, He: Molecule) -> None:
@@ -70,8 +70,7 @@ def test_reckless(He: Molecule) -> None:
     assert msow_opt0.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
     assert msow_opt0.corrections == []
     assert msow_opt0.mode == Mode.RAPID
-    assert msow_opt0.solvent_settings
-    assert msow_opt0.solvent_settings.solvent == "acetonitrile"
+    assert msow_opt0.solvent_settings is None
     assert not msow_opt0.opt_settings.transition_state
 
 
@@ -107,8 +106,7 @@ def test_rapid(He: Molecule) -> None:
     assert msow_opt1.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
     assert msow_opt1.corrections == []
     assert msow_opt1.mode == Mode.RAPID
-    assert msow_opt1.solvent_settings
-    assert msow_opt1.solvent_settings.solvent == "hexane"
+    assert msow_opt1.solvent_settings is None
     assert not msow_opt1.opt_settings.transition_state
 
 
@@ -145,7 +143,7 @@ def test_careful(He: Molecule) -> None:
     assert msow_opt1.tasks == [Task.FREQUENCIES, Task.OPTIMIZE]
     assert msow_opt1.corrections == []
     assert msow_opt1.mode == Mode.RAPID
-    assert msow_opt1.solvent_settings == SolventSettings(solvent="acetone", model="cpcm")
+    assert msow_opt1.solvent_settings is None
     assert msow_opt1.opt_settings.transition_state
 
 
