@@ -120,12 +120,19 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
 
     @field_validator("initial_molecule", mode="before")
     @classmethod
-    def no_charge_or_spin(cls, mol: Molecule) -> Molecule:
+    def no_charge_or_spin(cls, val: Molecule | dict[str, Any]) -> Molecule | dict[str, Any]:
         """Ensure the molecule has no charge or spin."""
+        if isinstance(val, dict):
+            mol = Molecule(**val)
+        elif isinstance(val, Molecule):
+            mol = val
+        else:
+            raise ValueError(f"{val=} is not a Molecule.")
+
         if mol.charge != 0 or mol.multiplicity != 1:
             raise ValueError("Charge and spin partitioning undefined for BDE, only neutral singlet molecules supported.")
 
-        return mol
+        return val
 
     @model_validator(mode="before")
     @classmethod
