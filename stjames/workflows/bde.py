@@ -58,7 +58,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param initial_molecule: Molecule of interest
     :param mode: Mode for workflow
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
-    :param solvent: solvent to use
+    :param solvent: solvent to use for singlepoint
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
 
     Overridden:
