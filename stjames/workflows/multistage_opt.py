@@ -325,9 +325,9 @@ def build_mso_settings(
         )
 
     return MultiStageOptSettings(
-        mode=Mode.MANUAL,
+        mode=mode,
         optimization_settings=[
-            opt(method=method, basis_set=basis_set, solvent=solvent, freq=frequencies) for method, basis_set in zip(opt_methods, opt_basis_sets)
+            opt(method=method, basis_set=basis_set, solvent=solvent, freq=frequencies) for method, basis_set in zip(opt_methods, opt_basis_sets, strict=True)
         ],
         singlepoint_settings=sp(method=sp_method, basis_set=sp_basis_set, solvent=solvent),
         solvent=solvent,
