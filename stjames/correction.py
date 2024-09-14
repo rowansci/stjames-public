@@ -10,5 +10,8 @@ class Correction(LowercaseStrEnum):
     # Grimme's D3 dispersion correction, *without* Becke–Johnson damping
     D3 = "d3"
 
+    # Grimme's D3 dispersion correction
+    D4 = "d4"
+
     # Grimme's geometric counterpoise correction
     GCP = "gcp"
