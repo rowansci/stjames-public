@@ -265,3 +265,74 @@ class MultiStageOptMixin(BaseModel):
                 )
 
         return self
+
+
+def build_mso_settings(
+    sp_method: Method,
+    sp_basis_set: str | None,
+    opt_methods: list[Method],
+    opt_basis_sets: list[str | None],
+    mode: Mode = Mode.MANUAL,
+    solvent: Solvent | None = None,
+    use_solvent_for_opt: bool = False,
+    constraints: list[Constraint] | None = None,
+    transition_state: bool = False,
+    frequencies: bool = True,
+) -> MultiStageOptSettings:
+    """
+    Helper function to construct multi-stage opt settings objects manually.
+
+    There's no xTB pre-optimization here - add that yourself!
+
+    :param optimization_settings: list of opt settings to apply successively
+    :param singlepoint_settings: final single point settings
+    :param mode: Mode for settings, defaults to `MANUAL`
+    :param solvent: solvent to use
+    :param use_solvent_for_opt: whether to conduct opts with solvent
+    :param constraints: constraints for optimization
+    :param transition_state: whether this is a transition state
+    :param frequencies: whether to calculate frequencies
+    :returns: the final multistage opt settings
+    """
+    if constraints is None:
+        constraints = []
+
+    opt_settings = OptimizationSettings(constraints=constraints, transition_state=transition_state)
+
+    OPT = [Task.OPTIMIZE if not transition_state else Task.OPTIMIZE_TS]
+
+    def opt(method: Method, basis_set: str | None = None, solvent: Solvent | None = None, freq: bool = False) -> Settings:
+        """Generates optimization settings."""
+        model = "alpb" if method in XTB_METHODS else "cpcm"
+
+        return Settings(
+            method=method,
+            basis_set=basis_set,
+            tasks=OPT + [Task.FREQUENCIES] * freq,
+            solvent_settings=SolventSettings(solvent=solvent, model=model) if (solvent and use_solvent_for_opt) else None,
+            opt_settings=opt_settings,
+        )
+
+    def sp(method: Method, basis_set: str | None = None, solvent: Solvent | None = None) -> Settings:
+        """Generate singlepoint settings."""
+        model = "cpcmx" if method in XTB_METHODS else "cpcm"
+
+        return Settings(
+            method=method,
+            basis_set=basis_set,
+            tasks=[Task.ENERGY],
+            solvent_settings=SolventSettings(solvent=solvent, model=model) if solvent else None,
+        )
+
+    return MultiStageOptSettings(
+        mode=mode,
+        optimization_settings=[
+            opt(method=method, basis_set=basis_set, solvent=solvent, freq=frequencies) for method, basis_set in zip(opt_methods, opt_basis_sets, strict=True)
+        ],
+        singlepoint_settings=sp(method=sp_method, basis_set=sp_basis_set, solvent=solvent),
+        solvent=solvent,
+        xtb_preopt=False,
+        constraints=constraints,
+        transition_state=transition_state,
+        frequencies=frequencies,
+    )
