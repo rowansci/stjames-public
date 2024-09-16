@@ -58,7 +58,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param initial_molecule: Molecule of interest
     :param mode: Mode for workflow
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
-    :param solvent: solvent to use
+    :param solvent: solvent to use for singlepoint
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
 
     Overridden:
@@ -120,12 +120,19 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
 
     @field_validator("initial_molecule", mode="before")
     @classmethod
-    def no_charge_or_spin(cls, mol: Molecule) -> Molecule:
+    def no_charge_or_spin(cls, val: Molecule | dict[str, Any]) -> Molecule | dict[str, Any]:
         """Ensure the molecule has no charge or spin."""
+        if isinstance(val, dict):
+            mol = Molecule(**val)
+        elif isinstance(val, Molecule):
+            mol = val
+        else:
+            raise ValueError(f"{val=} is not a Molecule.")
+
         if mol.charge != 0 or mol.multiplicity != 1:
             raise ValueError("Charge and spin partitioning undefined for BDE, only neutral singlet molecules supported.")
 
-        return mol
+        return val
 
     @model_validator(mode="before")
     @classmethod

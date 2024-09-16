@@ -56,5 +56,7 @@ class MolecularDynamicsWorkflow(Workflow):
     calc_settings: Settings
     calc_engine: str | None = None
 
+    save_interval: PositiveInt = 10
+
     # uuids of scan points
     frames: list[Frame] = []
