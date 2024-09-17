@@ -46,7 +46,7 @@ class MolecularDynamicsSettings(Base):
         """Check that NVT ensemble always has temperature defined, and that NPT has temp and pressure defined."""
         if self.ensemble == ThermodynamicEnsemble.NVT and self.temperature is None:
             raise ValueError("NVT ensemble must have a temperature defined")
-        if self.ensemble == ThermodynamicEnsemble.NPT and (self.temperature is None or self.pressure is None):
+        elif self.ensemble == ThermodynamicEnsemble.NPT and (self.temperature is None or self.pressure is None):
             raise ValueError("NPT ensemble must have both temperature and pressure defined")
         return self
 
