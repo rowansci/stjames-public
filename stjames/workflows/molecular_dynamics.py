@@ -34,7 +34,7 @@ class MolecularDynamicsSettings(Base):
 
     confining_constraint: SphericalHarmonicConstraint | None = None
 
-    temperature: PositiveFloat | None = 300  # K
+    temperature: PositiveFloat = 300  # K
     pressure: PositiveFloat | None = None  # atm
 
     langevin_thermostat_timescale: PositiveFloat = 100  # fs
