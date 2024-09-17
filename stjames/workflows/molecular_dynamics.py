@@ -18,10 +18,11 @@ class ThermodynamicEnsemble(LowercaseStrEnum):
 class Frame(Base):
     index: int  # what number frame this is within the MD simulation
 
-    uuid: UUID | None = None  # UUID of molecule
+    calculation_uuid: UUID | None = None  # UUID of calculation
 
     pressure: float
     temperature: float
+    volume: float
     energy: float
 
 
