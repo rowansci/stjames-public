@@ -21,10 +21,15 @@ class Constraint(Base):
 class PairwiseHarmonicConstraint(Base):
     """
     Represents a harmonic constraint, with a characteristic spring constant.
+
+    :param atoms: whch atoms to apply to
+    :force_constant: the strength of the attraction
+    :equilibrium: the distance at which force is zero
     """
 
     atoms: tuple[PositiveInt, PositiveInt]  # 1-indexed
-    spring_constant: PositiveFloat  # kcal/mol / Å**2
+    force_constant: PositiveFloat  # kcal/mol / Å**2
+    equilibrium: PositiveFloat  # Å
 
 
 class SphericalHarmonicConstraint(Base):
@@ -33,4 +38,4 @@ class SphericalHarmonicConstraint(Base):
     """
 
     confining_radius: PositiveFloat
-    confining_force_constant: PositiveFloat = 10  # kcal/mol / Å**2
+    force_constant: PositiveFloat = 10  # kcal/mol / Å**2
