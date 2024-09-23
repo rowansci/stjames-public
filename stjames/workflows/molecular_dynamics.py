@@ -9,6 +9,11 @@ from ..types import UUID
 from .workflow import Workflow
 
 
+class MolecularDynamicsInitialization(LowercaseStrEnum):
+    RANDOM = "random"
+    QUASICLASSICAL = "quasiclassical"
+
+
 class ThermodynamicEnsemble(LowercaseStrEnum):
     NPT = "npt"
     NVT = "nvt"
