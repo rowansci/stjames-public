@@ -33,6 +33,7 @@ class Frame(Base):
 
 class MolecularDynamicsSettings(Base):
     ensemble: ThermodynamicEnsemble = ThermodynamicEnsemble.NVT
+    initialization: MolecularDynamicsInitialization = MolecularDynamicsInitialization.RANDOM
 
     timestep: PositiveFloat = 1.0  # fs
     num_steps: PositiveInt = 500
