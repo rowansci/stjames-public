@@ -1,8 +1,8 @@
-from pydantic import NonNegativeInt
+from pydantic import NonNegativeFloat, NonNegativeInt
 
 from ..base import Base
 from ..settings import Settings
-from ..types import UUID, ListPerAtom, Matrix3x3, Vector3D
+from ..types import UUID, FloatPerAtom, Matrix3x3, Vector3D
 from .workflow import Workflow
 
 
@@ -19,15 +19,6 @@ class PropertyCube(Base):
     """
 
     points: list[PropertyCubePoint]
-
-
-class BondOrder(Base):
-    """
-    Represents the bond order between two atoms.
-    """
-
-    atoms: tuple[NonNegativeInt, NonNegativeInt]
-    bond_order: float
 
 
 class ElectronicPropertiesWorkflow(Workflow):
@@ -50,8 +41,8 @@ class ElectronicPropertiesWorkflow(Workflow):
     :param quadrupole: the quadrupole moment
     :param mulliken_charges: the Mulliken charges
     :param lowdin_charges: the Lowdin charges
-    :param wiberg_bond_orders: the Wiberg bond orders
-    :param mayer_bond_orders: the Mayer bond orders
+    :param wiberg_bond_orders: the Wiberg bond orders (`atom1`, `atom2`, `order`)
+    :param mayer_bond_orders: the Mayer bond orders (`atom1`, `atom2`, `order`)
     :param density_cube: the electron density, as a cube
     :param electrostatic_potential_cube: the electrostatic potential, as a cube
     :param orbital_cubes: a dict mapping orbital number to corresponding cube file.
@@ -67,11 +58,11 @@ class ElectronicPropertiesWorkflow(Workflow):
     dipole: Vector3D | None = None
     quadrupole: Matrix3x3 | None = None
 
-    mulliken_charges: ListPerAtom | None = None
-    lowdin_charges: ListPerAtom | None = None
+    mulliken_charges: FloatPerAtom | None = None
+    lowdin_charges: FloatPerAtom | None = None
 
-    wiberg_bond_orders: list[BondOrder] = []
-    mayer_bond_orders: list[BondOrder] = []
+    wiberg_bond_orders: list[tuple[NonNegativeInt, NonNegativeInt, NonNegativeFloat]] = []
+    mayer_bond_orders: list[tuple[NonNegativeInt, NonNegativeInt, NonNegativeFloat]] = []
 
     density_cube: PropertyCube | None = None
     electrostatic_potential_cube: PropertyCube | None = None
