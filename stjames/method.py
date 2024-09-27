@@ -11,6 +11,7 @@ class Method(LowercaseStrEnum):
     R2SCAN3C = "r2scan_3c"
     TPSS = "tpss"
     M06L = "m06l"
+    B97D3BJ = "b97_d3bj"
 
     PBE0 = "pbe0"
     B3LYP = "b3lyp"
@@ -62,10 +63,4 @@ PREPACKAGED_METHODS = [
     *COMPOSITE_METHODS,
 ]
 
-METHODS_WITH_CORRECTION = [
-    Method.WB97XD3,
-    Method.WB97XV,
-    Method.WB97MV,
-    Method.WB97MD3BJ,
-    Method.DSDBLYPD3BJ,
-]
+METHODS_WITH_CORRECTION = [Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ, Method.B97D3BJ]
