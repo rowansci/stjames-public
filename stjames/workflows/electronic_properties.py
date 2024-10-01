@@ -55,8 +55,11 @@ class ElectronicPropertiesWorkflow(Workflow):
     :param density_cube: the electron density, as a cube
     :param electrostatic_potential_cube: the electrostatic potential, as a cube
     :param molecular_orbitals_alpha: for open-shell species (UHF/ROHF), a dict containing the alpha MOs
+        (The key is the absolute orbital index.)
     :param molecular_orbitals_beta: for open-shell species (UHF/ROHF), a dict containing the beta MOs
+        (The key is the absolute orbital index.)
     :param molecular_orbitals: for closed-shell species (RHF), a dict containing the MOs
+        (The key is the absolute orbital index.)
     """
 
     settings: Settings
