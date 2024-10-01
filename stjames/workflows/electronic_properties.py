@@ -18,7 +18,16 @@ class PropertyCube(Base):
     Represents a "cubefile" of some property.
     """
 
-    points: list[PropertyCubePoint]
+    cube_data: list[PropertyCubePoint]
+
+
+class MolecularOrbitalCube(PropertyCube):
+    """
+    Inherits `cube_data`.
+    """
+
+    occupation: NonNegativeInt
+    energy: float
 
 
 class ElectronicPropertiesWorkflow(Workflow):
@@ -32,8 +41,8 @@ class ElectronicPropertiesWorkflow(Workflow):
     :param settings: the level of theory to use
     :param compute_density_cube: whether or not to compute the density on a cube
     :param compute_electrostatic_potential_cube: whether or not to compute the electrostatic potential on a cube
-    :param compute_orbital_cubes: which orbitals to compute as cubes. 0 is the lowest energy orbital, 1 is the next lowest in energy, etc.
-        For instance, `5` would be water's HOMO, while `6` would be water's LUMO.
+    :param compute_num_occupied_orbitals: how many occupied orbitals to save
+    :param compute_num_virtual_orbitals: how many virtual orbitals to save
 
     Populated while running:
     :param calculation: the UUID of the calculation
@@ -45,13 +54,16 @@ class ElectronicPropertiesWorkflow(Workflow):
     :param mayer_bond_orders: the Mayer bond orders (`atom1`, `atom2`, `order`)
     :param density_cube: the electron density, as a cube
     :param electrostatic_potential_cube: the electrostatic potential, as a cube
-    :param orbital_cubes: a dict mapping orbital number to corresponding cube file.
+    :param molecular_orbitals_alpha: for open-shell species (UHF/ROHF), a dict containing the alpha MOs
+    :param molecular_orbitals_beta: for open-shell species (UHF/ROHF), a dict containing the beta MOs
+    :param molecular_orbitals: for closed-shell species (RHF), a dict containing the MOs
     """
 
     settings: Settings
     compute_density_cube: bool = True
     compute_electrostatic_potential_cube: bool = True
-    compute_orbital_cubes: list[int] = []
+    compute_num_occupied_orbitals: NonNegativeInt = 1
+    compute_num_virtual_orbitals: NonNegativeInt = 1
 
     calculation: UUID | None = None
 
@@ -66,4 +78,6 @@ class ElectronicPropertiesWorkflow(Workflow):
 
     density_cube: PropertyCube | None = None
     electrostatic_potential_cube: PropertyCube | None = None
-    orbital_cubes: dict[int, PropertyCube] = {}
+    molecular_orbitals_alpha: dict[NonNegativeInt, MolecularOrbitalCube] = {}
+    molecular_orbitals_beta: dict[NonNegativeInt, MolecularOrbitalCube] = {}
+    molecular_orbitals: dict[NonNegativeInt, MolecularOrbitalCube] = {}
