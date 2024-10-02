@@ -7,11 +7,11 @@ class Method(LowercaseStrEnum):
 
     PBE = "pbe"
     B973C = "b97_3c"
+    B97D3BJ = "b97_d3bj"
     R2SCAN = "r2scan"
     R2SCAN3C = "r2scan_3c"
     TPSS = "tpss"
     M06L = "m06l"
-    B97D3BJ = "b97_d3bj"
 
     PBE0 = "pbe0"
     B3LYP = "b3lyp"
