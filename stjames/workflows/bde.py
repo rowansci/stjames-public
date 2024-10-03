@@ -107,6 +107,10 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
         return f"{type(self).__name__} {self.mode.name}\n" + "\n".join(map(str, self.fragment_indices))
 
     @property
+    def level_of_theory(self) -> str:
+        return self.multistage_opt_settings.level_of_theory
+
+    @property
     def energies(self) -> tuple[float | None, ...]:
         return tuple(bde.energy for bde in self.bdes)
 

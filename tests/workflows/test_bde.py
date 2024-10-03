@@ -67,6 +67,8 @@ def test_water(water: Molecule) -> None:
     assert repr(all_Hs) == "<BDEWorkflow METICULOUS>"
     assert str(all_Hs) == "BDEWorkflow METICULOUS\n(1,)\n(2,)"
 
+    assert all_Hs.level_of_theory == "wb97m_d3bj/def2-tzvppd//wb97x_3c//r2scan_3c//gfn2_xtb"
+
     assert all_Hs.fragment_indices == ((1,), (2,))
     assert duplicated.fragment_indices == ((1,), (2,))
     assert all_CH.fragment_indices == ()
