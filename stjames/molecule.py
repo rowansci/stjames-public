@@ -55,6 +55,8 @@ class Molecule(Base):
     thermal_enthalpy_corr: Optional[float] = None
     thermal_free_energy_corr: Optional[float] = None
 
+    smiles: Optional[str] = None
+
     def __len__(self) -> int:
         return len(self.atoms)
 
