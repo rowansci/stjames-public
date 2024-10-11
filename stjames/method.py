@@ -1,3 +1,5 @@
+from typing import Literal
+
 from .base import LowercaseStrEnum
 
 
@@ -39,28 +41,17 @@ class Method(LowercaseStrEnum):
     BP86 = "bp86"
 
 
-MLFF = [
-    Method.AIMNET2_WB97MD3,
-]
+NNPMethod = Literal[Method.AIMNET2_WB97MD3]
+NNP_METHODS = [Method.AIMNET2_WB97MD3]
 
-XTB_METHODS = [
-    Method.GFN_FF,
-    Method.GFN0_XTB,
-    Method.GFN1_XTB,
-    Method.GFN2_XTB,
-]
+XTBMethod = Literal[Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB]
+XTB_METHODS = [Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB]
 
-COMPOSITE_METHODS = [
-    Method.HF3C,
-    Method.B973C,
-    Method.R2SCAN3C,
-    Method.WB97X3C,
-]
+CompositeMethod = Literal[Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
+COMPOSITE_METHODS = [Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
 
-PREPACKAGED_METHODS = [
-    *MLFF,
-    *XTB_METHODS,
-    *COMPOSITE_METHODS,
-]
+PrepackagedMethod = XTBMethod | CompositeMethod | NNPMethod
+PREPACKAGED_METHODS = [*XTB_METHODS, *COMPOSITE_METHODS]
 
+MethodWithCorrection = Literal[Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ]
 METHODS_WITH_CORRECTION = [Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ, Method.B97D3BJ]
