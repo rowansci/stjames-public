@@ -27,15 +27,20 @@ class Constraint(Base):
     value: Optional[float] = None
 
     @model_validator(mode="after")
-    def check_atom_length(self) -> Self:
-        if (self.constraint_type == ConstraintType.BOND) and (len(self.atoms) != 2):
-            raise ValueError("Bond constraint needs two atom indices!")
-        elif (self.constraint_type == ConstraintType.ANGLE) and (len(self.atoms) != 3):
-            raise ValueError("Angle constraint needs three atom indices!")
-        elif (self.constraint_type == ConstraintType.DIHEDRAL) and (len(self.atoms) != 4):
-            raise ValueError("Dihedral constraint needs four atom indices!")
+    def check_atom_list_length(self) -> Self:
+        if self.constraint_type == ConstraintType.BOND:
+            if len(self.atoms) != 2:
+                raise ValueError("Bond constraint needs two atom indices!")
+        elif self.constraint_type == ConstraintType.ANGLE:
+            if len(self.atoms) != 3:
+                raise ValueError("Angle constraint needs three atom indices!")
+        elif self.constraint_type == ConstraintType.DIHEDRAL:
+            if len(self.atoms) != 4:
+                raise ValueError("Dihedral constraint needs four atom indices!")
         else:
             raise ValueError("Unknown constraint_type!")
+
+        return self
 
 
 class PairwiseHarmonicConstraint(Base):
