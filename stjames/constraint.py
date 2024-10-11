@@ -1,4 +1,6 @@
-from pydantic import PositiveFloat, PositiveInt
+from typing import Optional, Self
+
+from pydantic import PositiveFloat, PositiveInt, model_validator
 
 from .base import Base, LowercaseStrEnum
 
@@ -12,10 +14,28 @@ class ConstraintType(LowercaseStrEnum):
 
 
 class Constraint(Base):
-    """Represents a single (absolute) constraint."""
+    """
+    Represents a single (absolute) constraint.
+
+    :param constraint_type: which type
+    :param atoms: the atoms in question
+    :param value: the value to constrain this to, leaving this blank sets the current value
+    """
 
     constraint_type: ConstraintType
     atoms: list[PositiveInt]  # 1-indexed
+    value: Optional[float] = None
+
+    @model_validator(mode="after")
+    def check_atom_length(self) -> Self:
+        if (self.constraint_type == ConstraintType.BOND) and (len(self.atoms) != 2):
+            raise ValueError("Bond constraint needs two atom indices!")
+        elif (self.constraint_type == ConstraintType.ANGLE) and (len(self.atoms) != 3):
+            raise ValueError("Angle constraint needs three atom indices!")
+        elif (self.constraint_type == ConstraintType.DIHEDRAL) and (len(self.atoms) != 4):
+            raise ValueError("Dihedral constraint needs four atom indices!")
+        else:
+            raise ValueError("Unknown constraint_type!")
 
 
 class PairwiseHarmonicConstraint(Base):
