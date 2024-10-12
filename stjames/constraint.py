@@ -28,17 +28,17 @@ class Constraint(Base):
 
     @model_validator(mode="after")
     def check_atom_list_length(self) -> Self:
-        if self.constraint_type == ConstraintType.BOND:
-            if len(self.atoms) != 2:
-                raise ValueError("Bond constraint needs two atom indices!")
-        elif self.constraint_type == ConstraintType.ANGLE:
-            if len(self.atoms) != 3:
-                raise ValueError("Angle constraint needs three atom indices!")
-        elif self.constraint_type == ConstraintType.DIHEDRAL:
-            if len(self.atoms) != 4:
-                raise ValueError("Dihedral constraint needs four atom indices!")
-        else:
-            raise ValueError("Unknown constraint_type!")
+        match self.constraint_type:
+            case ConstraintType.BOND:
+                if len(self.atoms) != 2:
+                    raise ValueError("Bond constraint needs two atom indices!")
+            case ConstraintType.ANGLE:
+                if len(self.atoms) != 3:
+                    raise ValueError("Angle constraint needs three atom indices!")
+            case ConstraintType.DIHEDRAL:
+                if len(self.atoms) != 4:
+                    raise ValueError("Dihedral constraint needs four atom indices!")
+        raise ValueError("Unknown constraint_type!")
 
         return self
 
