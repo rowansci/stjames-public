@@ -30,6 +30,8 @@ class Method(LowercaseStrEnum):
 
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
 
+    MACE_MP_0 = "mace_mp_0"
+
     GFN_FF = "gfn_ff"
     GFN0_XTB = "gfn0_xtb"
     GFN1_XTB = "gfn1_xtb"
