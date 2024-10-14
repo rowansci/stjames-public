@@ -228,7 +228,7 @@ class MultiStageOptMixin(BaseModel):
     Mixin for workflows that use MultiStageOptSettings.
     """
 
-    mso_mode: Mode
+    mso_mode: Mode = Mode.AUTO
     # Need to use a sentinel object to make both mypy and pydantic happy
     multistage_opt_settings: MultiStageOptSettings = _sentinel_msos  # type: ignore [assignment]
     solvent: Solvent | None = None
