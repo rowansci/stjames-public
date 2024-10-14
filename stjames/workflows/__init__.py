@@ -2,6 +2,7 @@ from .admet import *
 from .basic_calculation import *
 from .bde import *
 from .conformer import *
+from .conformer_search import *
 from .descriptors import *
 from .fukui import *
 from .molecular_dynamics import *
