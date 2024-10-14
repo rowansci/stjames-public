@@ -28,8 +28,6 @@ class Constraint(Base):
 
     @model_validator(mode="after")
     def check_atom_list_length(self) -> Self:
-        print(self.constraint_type)
-        print(self.constraint_type is ConstraintType.BOND)
         match self.constraint_type:
             case ConstraintType.BOND:
                 if len(self.atoms) != 2:
