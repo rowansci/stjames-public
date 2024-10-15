@@ -1,4 +1,4 @@
-from pytest import fixture
+from pytest import fixture, raises
 
 from stjames import Mode, Molecule, Solvent
 from stjames.workflows import RedoxPotentialWorkflow
@@ -13,8 +13,8 @@ def test_only_mecn(water: Molecule) -> None:
     wf = RedoxPotentialWorkflow(initial_molecule=water, mode=Mode.RAPID, solvent=Solvent.ACETONITRILE)
     assert wf.solvent == Solvent.ACETONITRILE
 
-    wf = RedoxPotentialWorkflow(initial_molecule=water, mode=Mode.RAPID, solvent=None)
-    assert wf.solvent == Solvent.ACETONITRILE
+    with raises(ValueError):
+        wf = RedoxPotentialWorkflow(initial_molecule=water, mode=Mode.RAPID, solvent=None)
 
-    wf = RedoxPotentialWorkflow(initial_molecule=water, mode=Mode.RAPID, solvent=Solvent.WATER)
-    assert wf.solvent == Solvent.ACETONITRILE
+    with raises(ValueError):
+        wf = RedoxPotentialWorkflow(initial_molecule=water, mode=Mode.RAPID, solvent=Solvent.WATER)
