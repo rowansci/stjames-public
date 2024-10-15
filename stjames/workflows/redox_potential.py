@@ -2,6 +2,7 @@ from typing import Any, TypeVar
 
 from pydantic import ValidationInfo, field_validator, model_validator
 
+from ..mode import Mode
 from ..solvent import Solvent
 from ..types import UUID
 from .multistage_opt import MultiStageOptMixin
@@ -79,8 +80,11 @@ class RedoxPotentialWorkflow(Workflow, MultiStageOptMixin):
 
     @model_validator(mode="before")
     @classmethod
-    def set_mso_mode(cls, values: dict[str, Any]) -> dict[str, Any]:
-        """Set the MultiStageOptSettings mode to match current BDE mode."""
+    def set_mode_and_mso_mode(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Set the MultiStageOptSettings mode to match current BDE mode, and select mode if `Auto`."""
+        if values["mode"] == Mode.AUTO:
+            values["mode"] = Mode.RAPID
+
         values["mso_mode"] = values["mode"]
         return values
 
