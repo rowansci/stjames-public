@@ -1,8 +1,13 @@
-from typing import Any
+from typing import Any, TypeVar
 
+from pydantic import ValidationInfo, field_validator, model_validator
+
+from ..solvent import Solvent
 from ..types import UUID
 from .multistage_opt import MultiStageOptMixin
 from .workflow import Workflow
+
+_T = TypeVar("_T")
 
 
 class RedoxPotentialWorkflow(Workflow, MultiStageOptMixin):
@@ -57,6 +62,27 @@ class RedoxPotentialWorkflow(Workflow, MultiStageOptMixin):
 
     reduction_potential: float | None = None
     oxidation_potential: float | None = None
+
+    @field_validator("solvent", mode="before")
+    @classmethod
+    def only_mecn_please(cls, val: Solvent | None) -> Solvent:
+        """Only MeCN please!"""
+        return Solvent.ACETONITRILE
+
+    @field_validator("constraints", "transition_state")
+    @classmethod
+    def turned_off(cls, value: _T, info: ValidationInfo) -> _T:
+        if value:
+            raise ValueError(f"{info.field_name} not supported in BDE workflows.")
+
+        return value
+
+    @model_validator(mode="before")
+    @classmethod
+    def set_mso_mode(cls, values: dict[str, Any]) -> dict[str, Any]:
+        """Set the MultiStageOptSettings mode to match current BDE mode."""
+        values["mso_mode"] = values["mode"]
+        return values
 
     def model_post_init(self, __context: Any) -> None:
         """Keep back-compatible with old schema."""
