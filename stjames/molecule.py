@@ -8,7 +8,7 @@ from pydantic import NonNegativeInt, PositiveInt, ValidationError
 from .atom import Atom
 from .base import Base
 from .periodic_cell import PeriodicCell
-from .types import Matrix3x3, Vector3D, Vector3DPerAtom
+from .types import FloatPerAtom, Matrix3x3, Vector3D, Vector3DPerAtom
 
 
 class MoleculeReadError(RuntimeError):
@@ -18,10 +18,8 @@ class MoleculeReadError(RuntimeError):
 class VibrationalMode(Base):
     frequency: float  # in cm-1
     reduced_mass: float  # amu
-
-    # todo - check units here?
-    force_constant: float
-    displacements: Vector3DPerAtom
+    force_constant: float  # mDyne/Å
+    displacements: Vector3DPerAtom  # Å
 
 
 class Molecule(Base):
@@ -44,8 +42,8 @@ class Molecule(Base):
 
     velocities: Optional[Vector3DPerAtom] = None  # Å/fs
 
-    mulliken_charges: Optional[list[float]] = None
-    mulliken_spin_densities: Optional[list[float]] = None
+    mulliken_charges: FloatPerAtom | None = None
+    mulliken_spin_densities: FloatPerAtom | None = None
     dipole: Optional[Vector3D] = None  # in Debye
 
     vibrational_modes: Optional[list[VibrationalMode]] = None

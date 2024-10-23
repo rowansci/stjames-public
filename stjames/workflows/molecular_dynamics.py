@@ -9,6 +9,11 @@ from ..types import UUID
 from .workflow import Workflow
 
 
+class MolecularDynamicsInitialization(LowercaseStrEnum):
+    RANDOM = "random"
+    QUASICLASSICAL = "quasiclassical"
+
+
 class ThermodynamicEnsemble(LowercaseStrEnum):
     NPT = "npt"
     NVT = "nvt"
@@ -18,22 +23,24 @@ class ThermodynamicEnsemble(LowercaseStrEnum):
 class Frame(Base):
     index: int  # what number frame this is within the MD simulation
 
-    uuid: UUID | None = None  # UUID of molecule
+    calculation_uuid: UUID | None = None  # UUID of calculation
 
     pressure: float
     temperature: float
+    volume: float
     energy: float
 
 
 class MolecularDynamicsSettings(Base):
     ensemble: ThermodynamicEnsemble = ThermodynamicEnsemble.NVT
+    initialization: MolecularDynamicsInitialization = MolecularDynamicsInitialization.RANDOM
 
     timestep: PositiveFloat = 1.0  # fs
     num_steps: PositiveInt = 500
 
     confining_constraint: SphericalHarmonicConstraint | None = None
 
-    temperature: PositiveFloat | None = 300  # K
+    temperature: PositiveFloat = 300  # K
     pressure: PositiveFloat | None = None  # atm
 
     langevin_thermostat_timescale: PositiveFloat = 100  # fs
@@ -46,7 +53,7 @@ class MolecularDynamicsSettings(Base):
         """Check that NVT ensemble always has temperature defined, and that NPT has temp and pressure defined."""
         if self.ensemble == ThermodynamicEnsemble.NVT and self.temperature is None:
             raise ValueError("NVT ensemble must have a temperature defined")
-        if self.ensemble == ThermodynamicEnsemble.NPT and (self.temperature is None or self.pressure is None):
+        elif self.ensemble == ThermodynamicEnsemble.NPT and (self.temperature is None or self.pressure is None):
             raise ValueError("NPT ensemble must have both temperature and pressure defined")
         return self
 

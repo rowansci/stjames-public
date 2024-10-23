@@ -27,14 +27,14 @@ class MultiStageOptSettings(BaseModel):
         wB97M-D3BJ/def2-TZVPPD//wB97X-3c//r²SCAN-3c with GFN2-xTB pre-opt
 
     Notes:
-    - No solvent in pre-opt
+    - No solvent in any optimizations when using Modes
     - If solvent: xTB singlepoints use CPCMX, xTB optimizations use ALBP, all else use CPCM
     - Allows a single point to be called with no optimization
 
     :param mode: Mode for settings
     :param optimization_settings: list of opt settings to apply successively
     :param singlepoint_settings: final single point settings
-    :param solvent: solvent to use
+    :param solvent: solvent to use for singlepoint
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
     :param constraints: constraints for optimization
     :param transition_state: whether this is a transition state
@@ -44,7 +44,7 @@ class MultiStageOptSettings(BaseModel):
     >>> msos
     <MultiStageOptSettings RAPID>
     >>> msos.level_of_theory
-    'r2scan_3c/cpcm(water)//gfn2_xtb/alpb(water)'
+    'r2scan_3c/cpcm(water)//gfn2_xtb'
     """
 
     mode: Mode
@@ -78,7 +78,7 @@ class MultiStageOptSettings(BaseModel):
 
         >>> msos = MultiStageOptSettings(mode=Mode.RAPID, solvent="hexane")
         >>> msos.level_of_theory
-        'r2scan_3c/cpcm(hexane)//gfn2_xtb/alpb(hexane)'
+        'r2scan_3c/cpcm(hexane)//gfn2_xtb'
         """
         methods = [self.singlepoint_settings] if self.singlepoint_settings else []
         methods += reversed(self.optimization_settings)
@@ -148,14 +148,14 @@ class MultiStageOptSettings(BaseModel):
         match mode:
             case Mode.RECKLESS:
                 self.xtb_preopt = False
-                self.optimization_settings = [opt(Method.GFN_FF, solvent=self.solvent, freq=self.frequencies)]
+                self.optimization_settings = [opt(Method.GFN_FF, freq=self.frequencies)]
                 self.singlepoint_settings = sp(Method.GFN2_XTB, solvent=self.solvent)
 
             case Mode.RAPID:
                 self.xtb_preopt = bool(self.xtb_preopt)
                 self.optimization_settings = [
                     *gfn0_pre_opt * self.xtb_preopt,
-                    opt(Method.GFN2_XTB, solvent=self.solvent, freq=self.frequencies),
+                    opt(Method.GFN2_XTB, freq=self.frequencies),
                 ]
                 self.singlepoint_settings = sp(Method.R2SCAN3C, solvent=self.solvent)
 
@@ -163,7 +163,7 @@ class MultiStageOptSettings(BaseModel):
                 self.xtb_preopt = (self.xtb_preopt is None) or self.xtb_preopt
                 self.optimization_settings = [
                     *gfn2_pre_opt * self.xtb_preopt,
-                    opt(Method.R2SCAN3C, solvent=self.solvent, freq=self.frequencies),
+                    opt(Method.R2SCAN3C, freq=self.frequencies),
                 ]
                 self.singlepoint_settings = sp(Method.WB97X3C, solvent=self.solvent)
 
@@ -171,8 +171,8 @@ class MultiStageOptSettings(BaseModel):
                 self.xtb_preopt = (self.xtb_preopt is None) or self.xtb_preopt
                 self.optimization_settings = [
                     *gfn2_pre_opt * self.xtb_preopt,
-                    opt(Method.R2SCAN3C, solvent=self.solvent),
-                    opt(Method.WB97X3C, solvent=self.solvent, freq=self.frequencies),
+                    opt(Method.R2SCAN3C),
+                    opt(Method.WB97X3C, freq=self.frequencies),
                 ]
                 self.singlepoint_settings = sp(Method.WB97MD3BJ, "def2-TZVPPD", solvent=self.solvent)
 
@@ -191,7 +191,7 @@ class MultiStageOptWorkflow(Workflow, MultiStageOptSettings):
     :param mode: Mode for workflow
     :param optimization_settings: list of opt settings to apply successively
     :param singlepoint_settings: final single point settings
-    :param solvent: solvent to use
+    :param solvent: solvent to use for singlepoint
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
     :param constraints: constraints for optimization
     :param transition_state: whether this is a transition state
@@ -206,7 +206,7 @@ class MultiStageOptWorkflow(Workflow, MultiStageOptSettings):
     >>> msow
     <MultiStageOptWorkflow RAPID>
     >>> msow.level_of_theory
-    'r2scan_3c/cpcm(water)//gfn2_xtb/alpb(water)'
+    'r2scan_3c/cpcm(water)//gfn2_xtb'
     """
 
     # Populated while running the workflow
@@ -228,7 +228,7 @@ class MultiStageOptMixin(BaseModel):
     Mixin for workflows that use MultiStageOptSettings.
     """
 
-    mso_mode: Mode
+    mso_mode: Mode = Mode.AUTO
     # Need to use a sentinel object to make both mypy and pydantic happy
     multistage_opt_settings: MultiStageOptSettings = _sentinel_msos  # type: ignore [assignment]
     solvent: Solvent | None = None
@@ -265,3 +265,74 @@ class MultiStageOptMixin(BaseModel):
                 )
 
         return self
+
+
+def build_mso_settings(
+    sp_method: Method,
+    sp_basis_set: str | None,
+    opt_methods: list[Method],
+    opt_basis_sets: list[str | None],
+    mode: Mode = Mode.MANUAL,
+    solvent: Solvent | None = None,
+    use_solvent_for_opt: bool = False,
+    constraints: list[Constraint] | None = None,
+    transition_state: bool = False,
+    frequencies: bool = True,
+) -> MultiStageOptSettings:
+    """
+    Helper function to construct multi-stage opt settings objects manually.
+
+    There's no xTB pre-optimization here - add that yourself!
+
+    :param optimization_settings: list of opt settings to apply successively
+    :param singlepoint_settings: final single point settings
+    :param mode: Mode for settings, defaults to `MANUAL`
+    :param solvent: solvent to use
+    :param use_solvent_for_opt: whether to conduct opts with solvent
+    :param constraints: constraints for optimization
+    :param transition_state: whether this is a transition state
+    :param frequencies: whether to calculate frequencies
+    :returns: the final multistage opt settings
+    """
+    if constraints is None:
+        constraints = []
+
+    opt_settings = OptimizationSettings(constraints=constraints, transition_state=transition_state)
+
+    OPT = [Task.OPTIMIZE if not transition_state else Task.OPTIMIZE_TS]
+
+    def opt(method: Method, basis_set: str | None = None, solvent: Solvent | None = None, freq: bool = False) -> Settings:
+        """Generates optimization settings."""
+        model = "alpb" if method in XTB_METHODS else "cpcm"
+
+        return Settings(
+            method=method,
+            basis_set=basis_set,
+            tasks=OPT + [Task.FREQUENCIES] * freq,
+            solvent_settings=SolventSettings(solvent=solvent, model=model) if (solvent and use_solvent_for_opt) else None,
+            opt_settings=opt_settings,
+        )
+
+    def sp(method: Method, basis_set: str | None = None, solvent: Solvent | None = None) -> Settings:
+        """Generate singlepoint settings."""
+        model = "cpcmx" if method in XTB_METHODS else "cpcm"
+
+        return Settings(
+            method=method,
+            basis_set=basis_set,
+            tasks=[Task.ENERGY],
+            solvent_settings=SolventSettings(solvent=solvent, model=model) if solvent else None,
+        )
+
+    return MultiStageOptSettings(
+        mode=mode,
+        optimization_settings=[
+            opt(method=method, basis_set=basis_set, solvent=solvent, freq=frequencies) for method, basis_set in zip(opt_methods, opt_basis_sets, strict=True)
+        ],
+        singlepoint_settings=sp(method=sp_method, basis_set=sp_basis_set, solvent=solvent),
+        solvent=solvent,
+        xtb_preopt=False,
+        constraints=constraints,
+        transition_state=transition_state,
+        frequencies=frequencies,
+    )

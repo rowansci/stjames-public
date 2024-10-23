@@ -58,7 +58,7 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param initial_molecule: Molecule of interest
     :param mode: Mode for workflow
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
-    :param solvent: solvent to use
+    :param solvent: solvent to use for singlepoint
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
 
     Overridden:
@@ -105,6 +105,10 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
         (2,)
         """
         return f"{type(self).__name__} {self.mode.name}\n" + "\n".join(map(str, self.fragment_indices))
+
+    @property
+    def level_of_theory(self) -> str:
+        return self.multistage_opt_settings.level_of_theory
 
     @property
     def energies(self) -> tuple[float | None, ...]:
