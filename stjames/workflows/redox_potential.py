@@ -82,7 +82,7 @@ class RedoxPotentialWorkflow(Workflow, MultiStageOptMixin):
     @classmethod
     def set_mode_and_mso_mode(cls, values: dict[str, Any]) -> dict[str, Any]:
         """Set the MultiStageOptSettings mode to match current redox potential mode, and select mode if `Auto`."""
-        if values["mode"] == Mode.AUTO:
+        if ("mode" not in values) or (values["mode"] == Mode.AUTO):
             values["mode"] = Mode.RAPID
 
         values["mso_mode"] = values["mode"]
