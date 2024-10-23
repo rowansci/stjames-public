@@ -33,6 +33,7 @@ class Method(LowercaseStrEnum):
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
     MACE_MP_0 = "mace_mp_0"
     OCP24_S = "ocp24_s"
+    OCP24_L = "ocp24_l"
 
     GFN_FF = "gfn_ff"
     GFN0_XTB = "gfn0_xtb"
