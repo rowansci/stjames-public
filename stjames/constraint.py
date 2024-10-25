@@ -11,6 +11,7 @@ class ConstraintType(LowercaseStrEnum):
     BOND = "bond"
     ANGLE = "angle"
     DIHEDRAL = "dihedral"
+    FREEZEATOMS = "freezeatoms"
 
 
 class Constraint(Base):
@@ -38,6 +39,9 @@ class Constraint(Base):
             case ConstraintType.DIHEDRAL:
                 if len(self.atoms) != 4:
                     raise ValueError("Dihedral constraint needs four atom indices!")
+            case ConstraintType.FREEZEATOMS:
+                if len(self.atoms) == 0:
+                    raise ValueError("Can't freeze atoms without any atoms to freeze!")
             case _:
                 raise ValueError("Unknown constraint_type!")
 
