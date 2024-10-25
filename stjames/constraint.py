@@ -11,7 +11,7 @@ class ConstraintType(LowercaseStrEnum):
     BOND = "bond"
     ANGLE = "angle"
     DIHEDRAL = "dihedral"
-    FREEZE_ATOMS = "freezeatoms"
+    FREEZE_ATOMS = "freeze_atoms"
 
 
 class Constraint(Base):
@@ -19,7 +19,7 @@ class Constraint(Base):
     Represents a single (absolute) constraint.
 
     :param constraint_type: which type
-    :param atoms: the atoms in question
+    :param atoms: the atoms in question. n.b. - these are 1-indexed!
     :param value: the value to constrain this to, leaving this blank sets the current value
     """
 
