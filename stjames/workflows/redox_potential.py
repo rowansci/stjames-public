@@ -24,11 +24,11 @@ class RedoxPotentialWorkflow(Workflow, MultiStageOptMixin):
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
     :param constraints: constraints to add
     :param transition_state: whether this is a transition state
-    :param frequencies: whether to calculate frequencies
 
     Overridden:
     :param mso_mode: Mode for MultiStageOptSettings
     :param solvent: solvent to use for optimization
+    :param frequencies: whether to calculate frequencies
 
     New:
     :param reduction: whether or not to calculate the reduction half-reaction
@@ -45,6 +45,7 @@ class RedoxPotentialWorkflow(Workflow, MultiStageOptMixin):
     """
 
     solvent: Solvent = Solvent.ACETONITRILE
+    frequencies: bool = False
 
     reduction: bool = True
     oxidation: bool = True
