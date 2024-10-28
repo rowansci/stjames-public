@@ -62,6 +62,12 @@ def test_etkdg() -> None:
     with raises(NotImplementedError):
         ETKDGSettings(mode=Mode.METICULOUS)
 
+    with raises(ValidationError, match="ETKDG does not support NCI"):
+        ETKDGSettings(nci=True)
+
+    with raises(ValidationError, match="ETKDG does not support constraints"):
+        ETKDGSettings(constraints=[Constraint(constraint_type="bond", atoms=[1, 2])])
+
 
 def test_imtdgc() -> None:
     reckless = iMTDSettings(mode=Mode.RECKLESS)
@@ -151,11 +157,18 @@ def test_conformer_search_workflow(water: Molecule) -> None:
         constraints=[Constraint(constraint_type="bond", atoms=[1, 2])],
     )
 
-    with raises(ValidationError):
+    with raises(ValidationError, match="ETKDG does not support constraints"):
         ConformerSearchWorkflow(
             initial_molecule=water,
             conf_gen_mode=Mode.RECKLESS,
             constraints=[Constraint(constraint_type="bond", atoms=[1, 2])],
+        )
+
+    with raises(ValidationError, match="ETKDG does not support NCI"):
+        ConformerSearchWorkflow(
+            initial_molecule=water,
+            conf_gen_mode=Mode.RECKLESS,
+            nci=True,
         )
 
     assert reckless_rapid.conf_gen_mode == Mode.RECKLESS

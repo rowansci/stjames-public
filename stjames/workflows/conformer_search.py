@@ -76,10 +76,11 @@ class ETKDGSettings(ConformerGenSettings):
 
     Inherited:
     :param mode: Mode for calculations
+    :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings
     :param constraints: constraints for conformer generation
     :param nci: add a constraining potential for non-covalent interactions (not supported in ETKDG)
-    :param conf_opt_method: method for the optimization
+    :param max_confs: maximum number of conformers to keep
 
     New:
     :param num_initial_confs: number of initial conformers to generate
@@ -87,7 +88,6 @@ class ETKDGSettings(ConformerGenSettings):
     :param num_confs_taken: number of final conformers to take
     :param max_mmff_energy: MMFF energy cutoff
     :param max_mmff_iterations: MMFF optimization iterations
-    :param max_confs: maximum number of conformers to keep
     """
 
     num_initial_confs: int = 300
@@ -117,10 +117,10 @@ class ETKDGSettings(ConformerGenSettings):
             case Mode.RECKLESS:
                 self.num_initial_confs = 200
                 self.num_confs_considered = 50
-                self.max_confs = 20 if self.max_confs is _sentinel else self.max_confs
+                self.max_confs = 20 if self.max_confs is None else self.max_confs
                 self.max_mmff_energy = 20
             case Mode.RAPID:
-                self.max_confs = 50 if self.max_confs is _sentinel else self.max_confs
+                self.max_confs = 50 if self.max_confs is None else self.max_confs
                 self.conf_opt_method = Method.GFN0_XTB
             case _:
                 raise NotImplementedError(f"Unsupported mode: {self.mode}")
@@ -194,6 +194,7 @@ class iMTDSettings(ConformerGenSettings, ABC):
     :param screening: post-generation screening settings (not used)
     :param constraints: constraints to add
     :param nci: add an ellipsoide potential around the input structure
+    :param max_confs: maximum number of conformers to keep
 
     New:
     :param mtd_method: method for the metadynamics
@@ -216,11 +217,11 @@ class iMTDSettings(ConformerGenSettings, ABC):
                 if self.reopt is _sentinel:
                     raise ValueError("Must specify reopt with MANUAL mode")
             case Mode.RECKLESS:  # GFN-FF//MTD(GFN-FF)
-                self.max_confs = 20 if self.max_confs is _sentinel else self.max_confs
+                self.max_confs = 20 if self.max_confs is None else self.max_confs
                 self.speed = iMTDSpeeds.MEGAQUICK
                 self.reopt = check_sentinel(self.reopt, True)
             case Mode.RAPID:  # GFN0//MTD(GFN-FF)
-                self.max_confs = 50 if self.max_confs is _sentinel else self.max_confs
+                self.max_confs = 50 if self.max_confs is None else self.max_confs
                 self.speed = iMTDSpeeds.SUPERQUICK
                 self.conf_opt_method = Method.GFN0_XTB
                 self.reopt = check_sentinel(self.reopt, True)
@@ -258,11 +259,16 @@ class ConformerGenMixin(BaseModel):
 
     :param conf_gen_mode: Mode for calculations
     :param conf_gen_settings: settings for conformer generation
+    :param constraints: constraints to add
+    :param nci: add a constraining potential for non-covalent interactions
+    :param max_confs: maximum number of conformers to keep
     """
 
     conf_gen_mode: Mode = Mode.RAPID
     conf_gen_settings: ConformerGenSettings = _sentinel  # type: ignore [assignment]
     constraints: Sequence[Constraint] = tuple()
+    nci: bool = False
+    max_confs: int | None = None
 
     @model_validator(mode="after")
     def validate_and_build_conf_gen_settings(self) -> Self:
@@ -276,10 +282,10 @@ class ConformerGenMixin(BaseModel):
                     raise ValueError("Must specify conf_gen_settings with MANUAL mode")
 
             case Mode.RECKLESS | Mode.RAPID:
-                # ETKDGSettings will error if constraints added
-                self.conf_gen_settings = ETKDGSettings(mode=self.conf_gen_mode, constraints=self.constraints)
+                # ETKDGSettings will error if constraints or nci are set
+                self.conf_gen_settings = ETKDGSettings(mode=self.conf_gen_mode, constraints=self.constraints, nci=self.nci, max_confs=self.max_confs)
             case Mode.CAREFUL | Mode.METICULOUS:
-                self.conf_gen_settings = iMTDSettings(mode=self.conf_gen_mode, constraints=self.constraints)
+                self.conf_gen_settings = iMTDSettings(mode=self.conf_gen_mode, constraints=self.constraints, nci=self.nci, max_confs=self.max_confs)
 
             case _:
                 raise NotImplementedError(f"Unsupported mode: {self.conf_gen_mode}")
@@ -291,16 +297,21 @@ class ConformerSearchMixin(ConformerGenMixin, MultiStageOptMixin):
     """
     Mixin for workflows that need conformer search—a combination of conformer generation and optimization.
 
-    Inherited:
+    Inherited (ConformerGenMixin):
     :param conf_gen_mode: Mode for conformer generation
     :param mso_mode: Mode for MultiStageOptSettings
     :param conf_gen_settings: settings for conformer generation
+    :param nci: add a constraining potential for non-covalent interactions
+
+    Inherited (MultiStageOptMixin):
     :param multistage_opt_settings: set by mso_mode unless mode=MANUAL (ignores additional settings if set)
     :param solvent: solvent to use
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
-    :param constraints: constraints to add (diamond inheritance, works as expected)
     :param transition_state: whether this is a transition state
     :param frequencies: whether to calculate frequencies
+
+    Inherited (Both):
+    :param constraints: constraints to add (diamond inheritance, works as expected)
     """
 
     def __str__(self) -> str:
