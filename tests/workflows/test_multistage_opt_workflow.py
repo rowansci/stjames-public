@@ -49,7 +49,7 @@ def test_raises(He: Molecule) -> None:
 
 
 def test_reckless(He: Molecule) -> None:
-    msow = MultiStageOptWorkflow(initial_molecule=He, mode="reckless", solvent="acetonitrile")
+    msow = MultiStageOptWorkflow(initial_molecule=He, mode="reckless", solvent="acetonitrile", frequencies=True)
 
     assert msow.optimization_settings
     assert len(msow.optimization_settings) == 1
@@ -103,7 +103,7 @@ def test_rapid(He: Molecule) -> None:
 
     assert msow_opt1.method == Method.GFN2_XTB
     assert msow_opt1.basis_set is None
-    assert msow_opt1.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
+    assert msow_opt1.tasks == [Task.OPTIMIZE]
     assert msow_opt1.corrections == []
     assert msow_opt1.mode == Mode.RAPID
     assert msow_opt1.solvent_settings is None
@@ -140,7 +140,7 @@ def test_careful(He: Molecule) -> None:
     assert msow_opt1.method == Method.R2SCAN3C
     assert msow_opt1.basis_set
     assert msow_opt1.basis_set.name == "def2-mTZVPP"
-    assert msow_opt1.tasks == [Task.FREQUENCIES, Task.OPTIMIZE]
+    assert msow_opt1.tasks == [Task.OPTIMIZE]
     assert msow_opt1.corrections == []
     assert msow_opt1.mode == Mode.RAPID
     assert msow_opt1.solvent_settings is None
@@ -179,7 +179,7 @@ def test_meticulous(He: Molecule) -> None:
     assert msow_opt1.method == Method.WB97X3C
     assert msow_opt1.basis_set
     assert msow_opt1.basis_set.name == "vDZP"
-    assert msow_opt1.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
+    assert msow_opt1.tasks == [Task.OPTIMIZE]
     assert msow_opt1.corrections == []
     assert msow_opt1.mode == Mode.RAPID
     assert msow_opt1.solvent_settings is None
@@ -247,7 +247,6 @@ def test_manual_from_factory(He: Molecule) -> None:
         opt_basis_sets=[None, "def2-SVP"],
         solvent=Solvent.OCTANE,
         use_solvent_for_opt=False,
-        frequencies=False,
     )
 
     level_of_theory = "pbe/def2-tzvp/cpcm(octane)//b3lyp/def2-svp//gfn0_xtb"

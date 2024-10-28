@@ -300,12 +300,8 @@ class ConformerSearchMixin(ConformerGenMixin, MultiStageOptMixin):
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
     :param constraints: constraints to add (diamond inheritance, works as expected)
     :param transition_state: whether this is a transition state
-
-    Overridden:
-    :param frequencies: whether to calculate frequencies (turned off)
+    :param frequencies: whether to calculate frequencies
     """
-
-    frequencies: bool = False
 
     def __str__(self) -> str:
         """Return a string representation of the ConformerSearch workflow."""
@@ -330,7 +326,7 @@ class ConformerSearchWorkflow(ConformerSearchMixin, Workflow):
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
     :param constraints: constraints to add
     :param transition_state: whether this is a transition state
-    :param frequencies: whether to calculate frequencies (turned off)
+    :param frequencies: whether to calculate frequencies
 
     Ignored:
     :param mode: Mode to use (not used)

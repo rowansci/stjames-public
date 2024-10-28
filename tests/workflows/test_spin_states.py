@@ -84,6 +84,7 @@ def test_reckless(Mn: Molecule) -> None:
         states=[2, 4, 6],
         mode=Mode.RECKLESS,
         solvent="acetonitrile",
+        frequencies=True,
     )
 
     assert spin_states.states == [2, 4, 6]
@@ -149,7 +150,7 @@ def test_rapid(Mn: Molecule) -> None:
 
     assert msos_opt1.method == Method.GFN2_XTB
     assert msos_opt1.basis_set is None
-    assert msos_opt1.tasks == [Task.OPTIMIZE, Task.FREQUENCIES]
+    assert msos_opt1.tasks == [Task.OPTIMIZE]
     assert msos_opt1.corrections == []
     assert msos_opt1.mode == Mode.RAPID
     assert msos_opt1.solvent_settings is None
@@ -162,6 +163,7 @@ def test_careful(Fe: Molecule) -> None:
         states=[1, 3, 5],
         mode=Mode.CAREFUL,
         transition_state=True,
+        frequencies=True,
     )
 
     assert spin_states.states == [1, 3, 5]
@@ -204,6 +206,7 @@ def test_meticulous(Mn: Molecule) -> None:
         initial_molecule=Mn,
         states=[2, 4, 6],
         mode=Mode.METICULOUS,
+        frequencies=True,
     )
 
     assert spin_states.states == [2, 4, 6]

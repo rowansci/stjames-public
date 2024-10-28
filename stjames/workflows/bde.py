@@ -60,10 +60,10 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
     :param solvent: solvent to use for singlepoint
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
+    :param frequencies: whether to calculate frequencies
 
     Overridden:
     :param mso_mode: Mode for MultiStageOptSettings
-    :param frequencies: whether to calculate frequencies
 
     Turned off:
     :param constraints: constraints to add (not supported)
@@ -81,7 +81,6 @@ class BDEWorkflow(Workflow, MultiStageOptMixin):
     """
 
     mso_mode: Mode = _sentinel_mso_mode  # type: ignore [assignment]
-    frequencies: bool = False
     optimize_fragments: bool = None  # type: ignore [assignment]
 
     atoms: tuple[PositiveInt, ...] = Field(default_factory=tuple)

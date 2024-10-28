@@ -54,7 +54,7 @@ class MultiStageOptSettings(BaseModel):
     xtb_preopt: bool | None = None
     constraints: Sequence[Constraint] = tuple()
     transition_state: bool = False
-    frequencies: bool = True
+    frequencies: bool = False
 
     def __str__(self) -> str:
         return repr(self)
@@ -235,7 +235,7 @@ class MultiStageOptMixin(BaseModel):
     xtb_preopt: bool | None = None
     constraints: Sequence[Constraint] = tuple()
     transition_state: bool = False
-    frequencies: bool = True
+    frequencies: bool = False
 
     @model_validator(mode="after")
     def set_mso_settings(self) -> Self:
@@ -277,14 +277,14 @@ def build_mso_settings(
     use_solvent_for_opt: bool = False,
     constraints: list[Constraint] | None = None,
     transition_state: bool = False,
-    frequencies: bool = True,
+    frequencies: bool = False,
 ) -> MultiStageOptSettings:
     """
     Helper function to construct multi-stage opt settings objects manually.
 
     There's no xTB pre-optimization here - add that yourself!
 
-    :param optimization_settings: list of opt settings to apply successively
+    :param optimization_settings: optimization settings to apply successively
     :param singlepoint_settings: final single point settings
     :param mode: Mode for settings, defaults to `MANUAL`
     :param solvent: solvent to use
@@ -292,7 +292,7 @@ def build_mso_settings(
     :param constraints: constraints for optimization
     :param transition_state: whether this is a transition state
     :param frequencies: whether to calculate frequencies
-    :returns: the final multistage opt settings
+    :returns: MultiStageOptSettings
     """
     if constraints is None:
         constraints = []
