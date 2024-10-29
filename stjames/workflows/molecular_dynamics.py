@@ -12,6 +12,7 @@ from .workflow import Workflow
 class MolecularDynamicsInitialization(LowercaseStrEnum):
     RANDOM = "random"
     QUASICLASSICAL = "quasiclassical"
+    READ = "read"
 
 
 class ThermodynamicEnsemble(LowercaseStrEnum):
@@ -37,6 +38,7 @@ class MolecularDynamicsSettings(Base):
 
     timestep: PositiveFloat = 1.0  # fs
     num_steps: PositiveInt = 500
+    save_interval: PositiveInt = 10
 
     confining_constraint: SphericalHarmonicConstraint | None = None
 
@@ -62,8 +64,6 @@ class MolecularDynamicsWorkflow(Workflow):
     settings: MolecularDynamicsSettings
     calc_settings: Settings
     calc_engine: str | None = None
-
-    save_interval: PositiveInt = 10
 
     # uuids of scan points
     frames: list[Frame] = []
