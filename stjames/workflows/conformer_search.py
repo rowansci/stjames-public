@@ -28,14 +28,14 @@ class ScreeningSettings(BaseModel):
     """
     Settings for determing unique and useful conformers.
 
-    :param energy_threshhold: maximum relative energy for screening
-    :param rotational_constants_threshhold: maximum difference in rotational constants for screening
+    :param energy_threshold: maximum relative energy for screening
+    :param rotational_constants_threshold: maximum difference in rotational constants for screening
     :param rmsd: cartesian RMSD for screening
     :param max_confs: maximum number of conformers to keep
     """
 
-    energy_threshhold: float | None = None  # kcal/mol
-    rotational_constants_threshhold: float | None = 0.02
+    energy_threshold: float | None = None  # kcal/mol
+    rotational_constants_threshold: float | None = 0.02
     rmsd: float | None = 0.25
     max_confs: int | None = None
 
