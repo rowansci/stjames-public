@@ -114,10 +114,10 @@ def test_conformer_gen_mixin() -> None:
 
 
 def test_screening_settings() -> None:
-    settings = ScreeningSettings(energy_threshhold=10)
+    settings = ScreeningSettings(energy_threshold=10)
 
-    assert settings.energy_threshhold == 10
-    assert settings.rotational_constants_threshhold == 0.02
+    assert settings.energy_threshold == 10
+    assert settings.rotational_constants_threshold == 0.02
     assert settings.max_confs is None
 
 
