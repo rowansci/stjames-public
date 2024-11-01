@@ -19,7 +19,7 @@ def He() -> Molecule:
     ],
 )
 def test_multistage_opt_basic(mode: Mode, level_of_theory: str, He: Molecule) -> None:
-    msow = MultiStageOptWorkflow(initial_molecule=He, mode=mode, solvent="water")
+    msow = MultiStageOptWorkflow(initial_molecule=He, mode=mode, solvent="water", xtb_preopt=mode in {Mode.CAREFUL, Mode.METICULOUS})
 
     assert str(msow) == f"<MultiStageOptWorkflow {mode.name}>"
     assert msow.level_of_theory == level_of_theory
@@ -111,7 +111,7 @@ def test_rapid(He: Molecule) -> None:
 
 
 def test_careful(He: Molecule) -> None:
-    msow = MultiStageOptWorkflow(initial_molecule=He, mode="careful", solvent="acetone", transition_state=True)
+    msow = MultiStageOptWorkflow(initial_molecule=He, mode="careful", solvent="acetone", transition_state=True, xtb_preopt=True)
 
     assert msow.solvent == "acetone"
     assert not msow.constraints

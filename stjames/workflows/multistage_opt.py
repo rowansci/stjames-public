@@ -51,7 +51,7 @@ class MultiStageOptSettings(BaseModel):
     optimization_settings: Sequence[Settings] = tuple()
     singlepoint_settings: Settings | None = None
     solvent: Solvent | None = None
-    xtb_preopt: bool | None = None
+    xtb_preopt: bool = False
     constraints: Sequence[Constraint] = tuple()
     transition_state: bool = False
     frequencies: bool = False
@@ -152,7 +152,6 @@ class MultiStageOptSettings(BaseModel):
                 self.singlepoint_settings = sp(Method.GFN2_XTB, solvent=self.solvent)
 
             case Mode.RAPID:
-                self.xtb_preopt = bool(self.xtb_preopt)
                 self.optimization_settings = [
                     *gfn0_pre_opt * self.xtb_preopt,
                     opt(Method.GFN2_XTB, freq=self.frequencies),
@@ -160,7 +159,6 @@ class MultiStageOptSettings(BaseModel):
                 self.singlepoint_settings = sp(Method.R2SCAN3C, solvent=self.solvent)
 
             case Mode.CAREFUL:
-                self.xtb_preopt = (self.xtb_preopt is None) or self.xtb_preopt
                 self.optimization_settings = [
                     *gfn2_pre_opt * self.xtb_preopt,
                     opt(Method.R2SCAN3C, freq=self.frequencies),
@@ -168,7 +166,6 @@ class MultiStageOptSettings(BaseModel):
                 self.singlepoint_settings = sp(Method.WB97X3C, solvent=self.solvent)
 
             case Mode.METICULOUS:
-                self.xtb_preopt = (self.xtb_preopt is None) or self.xtb_preopt
                 self.optimization_settings = [
                     *gfn2_pre_opt * self.xtb_preopt,
                     opt(Method.R2SCAN3C),
@@ -178,8 +175,6 @@ class MultiStageOptSettings(BaseModel):
 
             case mode:
                 raise NotImplementedError(f"Cannot assign settings for {mode=}")
-
-        assert self.xtb_preopt is not None
 
 
 class MultiStageOptWorkflow(Workflow, MultiStageOptSettings):
@@ -232,7 +227,7 @@ class MultiStageOptMixin(BaseModel):
     # Need to use a sentinel object to make both mypy and pydantic happy
     multistage_opt_settings: MultiStageOptSettings = _sentinel_msos  # type: ignore [assignment]
     solvent: Solvent | None = None
-    xtb_preopt: bool | None = None
+    xtb_preopt: bool = False
     constraints: Sequence[Constraint] = tuple()
     transition_state: bool = False
     frequencies: bool = False
