@@ -59,9 +59,9 @@ def test_frequencies(water: Molecule) -> None:
 
 
 def test_water(water: Molecule) -> None:
-    all_Hs = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, atoms=[1, 2], optimize_fragments=True)
+    all_Hs = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, atoms=[1, 2], optimize_fragments=True, xtb_preopt=True)
     duplicated = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, atoms=[1, 2, 1, 2])
-    all_CH = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, all_CH=True, optimize_fragments=False)
+    all_CH = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, all_CH=True, optimize_fragments=False, xtb_preopt=True)
     all_CX = BDEWorkflow(initial_molecule=water, mode=Mode.METICULOUS, all_CX=True)
 
     assert repr(all_Hs) == "<BDEWorkflow METICULOUS>"

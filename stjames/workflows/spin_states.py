@@ -52,7 +52,7 @@ class SpinStatesWorkflow(Workflow, MultiStageOptMixin):
     :param mode: Mode for workflow
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
     :param solvent: solvent to use for optimization
-    :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
+    :param xtb_preopt: pre-optimize with xtb
     :param constraints: constraints to add
     :param transition_state: whether this is a transition state
     :param frequencies: whether to calculate frequencies

@@ -24,10 +24,12 @@ def Fe() -> Molecule:
     ],
 )
 def test_spin_states_basic(mode: Mode, level_of_theory: str, Mn: Molecule) -> None:
+    xtb_preopt = mode in {Mode.CAREFUL, Mode.METICULOUS}
     spin_states = SpinStatesWorkflow(
         initial_molecule=Mn,
         states=[2, 4, 6],
         mode=mode,
+        xtb_preopt=xtb_preopt,
     )
 
     assert str(spin_states) == f"<SpinStatesWorkflow [2, 4, 6] {mode.name}>"
@@ -42,7 +44,7 @@ def test_spin_states_basic(mode: Mode, level_of_theory: str, Mn: Molecule) -> No
     assert msos.singlepoint_settings.solvent_settings is None
     assert msos.solvent is None
     assert not msos.constraints
-    assert msos.xtb_preopt is (mode in {Mode.CAREFUL, Mode.METICULOUS})
+    assert msos.xtb_preopt is xtb_preopt
     assert not msos.transition_state
 
 
@@ -164,6 +166,7 @@ def test_careful(Fe: Molecule) -> None:
         mode=Mode.CAREFUL,
         transition_state=True,
         frequencies=True,
+        xtb_preopt=True,
     )
 
     assert spin_states.states == [1, 3, 5]
@@ -207,6 +210,7 @@ def test_meticulous(Mn: Molecule) -> None:
         states=[2, 4, 6],
         mode=Mode.METICULOUS,
         frequencies=True,
+        xtb_preopt=True,
     )
 
     assert spin_states.states == [2, 4, 6]
