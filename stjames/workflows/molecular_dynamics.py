@@ -65,5 +65,5 @@ class MolecularDynamicsWorkflow(Workflow):
     calc_settings: Settings
     calc_engine: str | None = None
 
-    # uuids of scan points
+    # UUIDs of scan points
     frames: list[Frame] = []

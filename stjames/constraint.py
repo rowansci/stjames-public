@@ -52,7 +52,7 @@ class PairwiseHarmonicConstraint(Base):
     """
     Represents a harmonic constraint, with a characteristic spring constant.
 
-    :param atoms: whch atoms to apply to
+    :param atoms: which atoms to apply to
     :param force_constant: the strength of the attraction, in kcal/mol/Å
     :param equilibrium: the distance at which force is zero
     """

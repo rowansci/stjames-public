@@ -5,7 +5,7 @@ Descriptors = dict[str, dict[str, float] | tuple[float | None, ...] | float]
 
 
 class DescriptorsWorkflow(Workflow):
-    # uuid of optimization
+    # UUID of optimization
     optimization: UUID | None = None
 
     descriptors: Descriptors | None = None

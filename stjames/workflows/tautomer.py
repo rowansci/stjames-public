@@ -10,7 +10,7 @@ class Tautomer(Base):
     weight: Optional[float] = None
     predicted_relative_energy: Optional[float] = None
 
-    # uuids, optionally
+    # UUIDs, optionally
     structures: list[DBCalculation] = []
 
 

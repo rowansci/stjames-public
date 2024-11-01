@@ -53,7 +53,7 @@ class RedoxPotentialWorkflow(Workflow, MultiStageOptMixin):
     redox_type: str | None = None
     redox_potential: float | None = None
 
-    # uuids
+    # UUIDs
     neutral_molecule: UUID | None = None
     anion_molecule: UUID | None = None
     cation_molecule: UUID | None = None

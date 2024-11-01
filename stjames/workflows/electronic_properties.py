@@ -49,7 +49,7 @@ class ElectronicPropertiesWorkflow(Workflow):
     :param dipole: the dipole moment
     :param quadrupole: the quadrupole moment
     :param mulliken_charges: the Mulliken charges
-    :param lowdin_charges: the Lowdin charges
+    :param lowdin_charges: the Löwdin charges
     :param wiberg_bond_orders: the Wiberg bond orders (`atom1`, `atom2`, `order`)
     :param mayer_bond_orders: the Mayer bond orders (`atom1`, `atom2`, `order`)
     :param density_cube: the electron density, as a cube

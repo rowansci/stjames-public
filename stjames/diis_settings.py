@@ -4,7 +4,7 @@ from .base import Base, LowercaseStrEnum
 
 
 class DIISStrategy(LowercaseStrEnum):
-    # regular pulay DIIS
+    # regular Pulay DIIS
     DIIS = "diis"
 
     # Hu/Yang JCP 2010 - ADIIS

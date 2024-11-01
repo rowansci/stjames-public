@@ -3,7 +3,7 @@ from .workflow import Workflow
 
 
 class FukuiIndexWorkflow(Workflow):
-    # uuid of optimization
+    # UUID of optimization
     optimization: UUID | None = None
 
     global_electrophilicity_index: float | None = None

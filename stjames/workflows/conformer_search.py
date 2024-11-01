@@ -26,11 +26,11 @@ def check_sentinel(value: _T, default: _U) -> _T | _U:
 
 class ScreeningSettings(BaseModel):
     """
-    Settings for determing unique and useful conformers.
+    Settings for determining unique and useful conformers.
 
     :param energy_threshold: maximum relative energy for screening
     :param rotational_constants_threshold: maximum difference in rotational constants for screening
-    :param rmsd: cartesian RMSD for screening
+    :param rmsd: Cartesian RMSD for screening
     :param max_confs: maximum number of conformers to keep
     """
 

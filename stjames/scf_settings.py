@@ -20,7 +20,7 @@ class SCFInitMethod(LowercaseStrEnum):
 class OrthonormalizationMethod(LowercaseStrEnum):
     SYMMETRIC = "symmetric"
     CANONICAL = "canonical"
-    # cholesky, in future?
+    # Cholesky, in future?
 
 
 class SCFSettings(Base):
