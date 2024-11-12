@@ -14,15 +14,15 @@ class PropertyCubePoint(Base):
 
 
 class PropertyCube(Base):
-    """
-    Represents a "cubefile" of some property.
-    """
+    """Represents a "cubefile" of some property."""
 
-    cube_data: list[PropertyCubePoint]
+    cube_points: list[PropertyCubePoint]
 
 
 class MolecularOrbitalCube(PropertyCube):
     """
+    Cube of a molecular orbital.
+
     Inherits `cube_data`.
     """
 
@@ -32,43 +32,48 @@ class MolecularOrbitalCube(PropertyCube):
 
 class ElectronicPropertiesWorkflow(Workflow):
     """
-    Workflow for computing electronic properties!
+    Workflow for computing electronic properties.
 
     Inherited
-    :param initial_molecule: molecule of interest
+    :param initial_molecule: Molecule of interest
 
     Config settings:
-    :param settings: the level of theory to use
-    :param compute_density_cube: whether or not to compute the density on a cube
-    :param compute_electrostatic_potential_cube: whether or not to compute the electrostatic potential on a cube
-    :param compute_num_occupied_orbitals: how many occupied orbitals to save
-    :param compute_num_virtual_orbitals: how many virtual orbitals to save
+    :param settings: settings for the calculation
+    :param compute_density_cube: whether to compute the density cube
+    :param compute_electrostatic_potential_cube: whether to compute the electrostatic potential cube
+    :param compute_num_occupied_orbitals: number of occupied orbitals to save
+    :param compute_num_virtual_orbitals: number of virtual orbitals to save
 
     Populated while running:
-    :param calculation: the UUID of the calculation
-    :param dipole: the dipole moment
-    :param quadrupole: the quadrupole moment
-    :param mulliken_charges: the Mulliken charges
-    :param lowdin_charges: the Löwdin charges
-    :param wiberg_bond_orders: the Wiberg bond orders (`atom1`, `atom2`, `order`)
-    :param mayer_bond_orders: the Mayer bond orders (`atom1`, `atom2`, `order`)
-    :param density_cube: the electron density, as a cube
-    :param electrostatic_potential_cube: the electrostatic potential, as a cube
-    :param molecular_orbitals_alpha: for open-shell species (UHF/ROHF), a dict containing the alpha MOs
-        (The key is the absolute orbital index.)
-    :param molecular_orbitals_beta: for open-shell species (UHF/ROHF), a dict containing the beta MOs
-        (The key is the absolute orbital index.)
-    :param molecular_orbitals: for closed-shell species (RHF), a dict containing the MOs
-        (The key is the absolute orbital index.)
+    :param calc_uuid: UUID of the calculation
+    :param dipole: dipole moment
+    :param quadrupole: quadrupole moment
+    :param lowdin_charges: Löwdin charges
+    :param mulliken_charges: Mulliken charges
+    :param wiberg_bond_orders: Wiberg bond orders (`atom1`, `atom2`, `order`)
+    :param mayer_bond_orders: Mayer bond orders (`atom1`, `atom2`, `order`)
+
+    :param density_cube: electron density, as a cube
+    :param density_cube_alpha: α electron density, as a cube
+    :param density_cube_beta: β electron density, as a cube
+    :param density_cube_difference: difference spin densities, as a cube
+
+    :param electrostatic_potential_cube: electrostatic potential, as a cube
+
+    :param molecular_orbitals: MOs, key is absolute orbital index (for closed-shell species (RHF))
+    :param molecular_orbitals_alpha: α MOs, key is absolute orbital index (for open-shell species (UHF/ROHF))
+    :param molecular_orbitals_beta: β MOs, key is absolute orbital index (for open-shell species (UHF/ROHF))
     """
 
+    # Config settings
     settings: Settings
     compute_density_cube: bool = True
     compute_electrostatic_potential_cube: bool = True
     compute_num_occupied_orbitals: NonNegativeInt = 1
     compute_num_virtual_orbitals: NonNegativeInt = 1
 
-    calculation: UUID | None = None
+    # Results
+    calc_uuid: UUID | None = None
 
     dipole: Vector3D | None = None
     quadrupole: Matrix3x3 | None = None
@@ -80,7 +85,12 @@ class ElectronicPropertiesWorkflow(Workflow):
     mayer_bond_orders: list[tuple[NonNegativeInt, NonNegativeInt, NonNegativeFloat]] = []
 
     density_cube: PropertyCube | None = None
+    density_cube_alpha: PropertyCube | None = None
+    density_cube_beta: PropertyCube | None = None
+    density_cube_difference: PropertyCube | None = None
+
     electrostatic_potential_cube: PropertyCube | None = None
+
+    molecular_orbitals: dict[NonNegativeInt, MolecularOrbitalCube] = {}
     molecular_orbitals_alpha: dict[NonNegativeInt, MolecularOrbitalCube] = {}
     molecular_orbitals_beta: dict[NonNegativeInt, MolecularOrbitalCube] = {}
-    molecular_orbitals: dict[NonNegativeInt, MolecularOrbitalCube] = {}

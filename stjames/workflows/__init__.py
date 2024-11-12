@@ -7,6 +7,7 @@ from .bde import *
 from .conformer import *
 from .conformer_search import *
 from .descriptors import *
+from .electronic_properties import *
 from .fukui import *
 from .molecular_dynamics import *
 from .multistage_opt import *
@@ -23,6 +24,7 @@ WORKFLOW_NAME = Literal[
     "conformers",
     "conformer_search",
     "descriptors",
+    "electronic_properties",
     "fukui_index",
     "molecular_dynamics",
     "multistage_opt",
@@ -40,6 +42,7 @@ WORKFLOW_MAPPING = {
     "conformers": ConformerWorkflow,
     "conformer_search": ConformerSearchWorkflow,
     "descriptors": DescriptorsWorkflow,
+    "electronic_properties": ElectronicPropertiesWorkflow,
     "fukui_index": FukuiIndexWorkflow,
     "molecular_dynamics": MolecularDynamicsWorkflow,
     "multistage_opt": MultiStageOptWorkflow,
