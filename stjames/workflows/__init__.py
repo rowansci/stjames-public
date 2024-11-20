@@ -16,6 +16,7 @@ from .redox_potential import *
 from .scan import *
 from .spin_states import *
 from .tautomer import *
+from .workflow import Workflow
 
 WORKFLOW_NAME = Literal[
     "admet",
@@ -25,7 +26,7 @@ WORKFLOW_NAME = Literal[
     "conformer_search",
     "descriptors",
     "electronic_properties",
-    "fukui_index",
+    "fukui",
     "molecular_dynamics",
     "multistage_opt",
     "pka",
@@ -35,20 +36,20 @@ WORKFLOW_NAME = Literal[
     "tautomers",
 ]
 
-WORKFLOW_MAPPING = {
-    "admet": ADMETWorkflow,
-    "basic_calculation": BasicCalculationWorkflow,
-    "bde": BDEWorkflow,
-    "conformers": ConformerWorkflow,
-    "conformer_search": ConformerSearchWorkflow,
-    "descriptors": DescriptorsWorkflow,
-    "electronic_properties": ElectronicPropertiesWorkflow,
-    "fukui_index": FukuiIndexWorkflow,
-    "molecular_dynamics": MolecularDynamicsWorkflow,
-    "multistage_opt": MultiStageOptWorkflow,
-    "pka": pKaWorkflow,
-    "redox_potential": RedoxPotentialWorkflow,
-    "scan": ScanWorkflow,
-    "spin_states": SpinStatesWorkflow,
-    "tautomers": TautomerWorkflow,
+WORKFLOW_MAPPING: dict[str, Workflow] = {
+    "admet": ADMETWorkflow,  # type: ignore [dict-item]
+    "basic_calculation": BasicCalculationWorkflow,  # type: ignore [dict-item]
+    "bde": BDEWorkflow,  # type: ignore [dict-item]
+    "conformers": ConformerWorkflow,  # type: ignore [dict-item]
+    "conformer_search": ConformerSearchWorkflow,  # type: ignore [dict-item]
+    "descriptors": DescriptorsWorkflow,  # type: ignore [dict-item]
+    "electronic_properties": ElectronicPropertiesWorkflow,  # type: ignore [dict-item]
+    "fukui": FukuiIndexWorkflow,  # type: ignore [dict-item]
+    "molecular_dynamics": MolecularDynamicsWorkflow,  # type: ignore [dict-item]
+    "multistage_opt": MultiStageOptWorkflow,  # type: ignore [dict-item]
+    "pka": pKaWorkflow,  # type: ignore [dict-item]
+    "redox_potential": RedoxPotentialWorkflow,  # type: ignore [dict-item]
+    "scan": ScanWorkflow,  # type: ignore [dict-item]
+    "spin_states": SpinStatesWorkflow,  # type: ignore [dict-item]
+    "tautomers": TautomerWorkflow,  # type: ignore [dict-item]
 }
