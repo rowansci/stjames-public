@@ -1,4 +1,6 @@
-from pydantic import NonNegativeFloat, NonNegativeInt
+from typing import Annotated, Callable
+
+from pydantic import AfterValidator, NonNegativeFloat, NonNegativeInt
 
 from ..base import Base
 from ..settings import Settings
@@ -6,11 +8,22 @@ from ..types import UUID, FloatPerAtom, Matrix3x3, Vector3D
 from .workflow import Workflow
 
 
+def round_float(round_to: int) -> Callable[[float], float]:
+    """Return a function that rounds a float to a given number of decimal places."""
+
+    def inner_round(v: float) -> float:
+        return round(v, round_to)
+
+    return inner_round
+
+
 class PropertyCubePoint(Base):
-    x: float
-    y: float
-    z: float
-    val: float
+    """A point in a cube file, all values rounded to 6 decimal places."""
+
+    x: Annotated[float, AfterValidator(round_float(3))]
+    y: Annotated[float, AfterValidator(round_float(3))]
+    z: Annotated[float, AfterValidator(round_float(3))]
+    val: Annotated[float, AfterValidator(round_float(6))]
 
 
 class PropertyCube(Base):
