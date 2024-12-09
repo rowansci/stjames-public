@@ -43,6 +43,8 @@ class Method(LowercaseStrEnum):
     # this was going to be removed, but Jonathon wrote such a nice basis set test... it's off the front end.
     BP86 = "bp86"
 
+    OFF_SAGE_2_2_1 = "off_sage_2_2_1"
+
 
 NNPMethod = Literal[Method.AIMNET2_WB97MD3]
 NNP_METHODS = [Method.AIMNET2_WB97MD3]
@@ -53,8 +55,11 @@ XTB_METHODS = [Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB]
 CompositeMethod = Literal[Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
 COMPOSITE_METHODS = [Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
 
-PrepackagedMethod = XTBMethod | CompositeMethod | NNPMethod
-PREPACKAGED_METHODS = [*XTB_METHODS, *COMPOSITE_METHODS]
+FFMethod = Literal[Method.OFF_SAGE_2_2_1]
+FF_METHODS = [Method.OFF_SAGE_2_2_1]
+
+PrepackagedMethod = XTBMethod | CompositeMethod | NNPMethod | FFMethod
+PREPACKAGED_METHODS = [*XTB_METHODS, *COMPOSITE_METHODS, *NNP_METHODS, *FF_METHODS]
 
 MethodWithCorrection = Literal[Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ]
 METHODS_WITH_CORRECTION = [Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ, Method.B97D3BJ]
