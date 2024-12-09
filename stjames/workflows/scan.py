@@ -23,7 +23,7 @@ class ScanSettings(Base):
     num: int
 
     def vals(self) -> NDArray[np.float64]:
-        return np.linspace(self.start, self.stop, self.num)
+        return np.linspace(self.start, self.stop, self.num)  # type: ignore [return-value, unused-ignore]
 
     class Config:
         from_attributes = True

@@ -12,7 +12,7 @@ class Base(pydantic.BaseModel):
     @classmethod
     def coerce_numpy(cls, val: _T) -> _T | list[Any]:
         if isinstance(val, np.ndarray):
-            return val.tolist()  # type: ignore [no-any-return, unused-ignore]
+            return val.tolist()  # type: ignore [no-any-return, unused-ignore, return-value]
 
         return val
 
