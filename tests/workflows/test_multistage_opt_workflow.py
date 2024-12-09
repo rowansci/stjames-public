@@ -1,7 +1,7 @@
 from pytest import fixture, mark, raises
 
 from stjames import Atom, Method, Mode, Molecule, Settings, Solvent, SolventSettings, Task
-from stjames.workflows import MultiStageOptWorkflow, build_mso_settings
+from stjames.workflows import MultiStageOptWorkflow, build_mso_settings, multi_stage_opt_settings_from_workflow
 
 
 @fixture
@@ -284,3 +284,42 @@ def test_manual_from_factory(He: Molecule) -> None:
     assert msos_opt1.mode == Mode.RAPID
     assert msos_opt1.solvent_settings is None
     assert not msos_opt1.opt_settings.transition_state
+
+
+def test_msos_from_msow(He: Molecule) -> None:
+    msow = MultiStageOptWorkflow(initial_molecule=He, mode="careful", solvent="acetone", transition_state=True, xtb_preopt=True)
+
+    msos = multi_stage_opt_settings_from_workflow(msow)
+
+    assert msos.solvent == "acetone"
+    assert not msos.constraints
+    assert msos.xtb_preopt
+    assert msos.transition_state
+
+    assert msos.optimization_settings
+    assert len(msos.optimization_settings) == 2
+
+    assert msos.singlepoint_settings
+    assert msos.singlepoint_settings.method == Method.WB97X3C
+    assert msos.singlepoint_settings.solvent_settings
+    assert msos.singlepoint_settings.solvent_settings.solvent == "acetone"
+    assert msos.singlepoint_settings.solvent_settings.model == "cpcm"
+
+    msos_opt0, msos_opt1 = msos.optimization_settings
+
+    assert msos_opt0.method == Method.GFN2_XTB
+    assert msos_opt0.basis_set is None
+    assert msos_opt0.tasks == [Task.OPTIMIZE]
+    assert msos_opt0.corrections == []
+    assert msos_opt0.mode == Mode.RAPID
+    assert msos_opt0.solvent_settings is None
+    assert msos_opt0.opt_settings.transition_state
+
+    assert msos_opt1.method == Method.R2SCAN3C
+    assert msos_opt1.basis_set
+    assert msos_opt1.basis_set.name == "def2-mTZVPP"
+    assert msos_opt1.tasks == [Task.OPTIMIZE]
+    assert msos_opt1.corrections == []
+    assert msos_opt1.mode == Mode.RAPID
+    assert msos_opt1.solvent_settings is None
+    assert msos_opt1.opt_settings.transition_state
