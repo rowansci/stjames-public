@@ -331,3 +331,29 @@ def build_mso_settings(
         transition_state=transition_state,
         frequencies=frequencies,
     )
+
+
+def multi_stage_opt_settings_from_workflow(msow: MultiStageOptWorkflow) -> MultiStageOptSettings:
+    """
+    Helper function to convert a MultiStageOptWorkflow to MultiStageOptSettings.
+
+    :param msow: MultiStageOptWorkflow
+    :returns: MultiStageOptSettings
+
+    >>> from stjames.molecule import Atom, Molecule
+    >>> He = Molecule(charge=0, multiplicity=1, atoms=[Atom(atomic_number=2, position=[0, 0, 0])])
+    >>> msos = multi_stage_opt_settings_from_workflow(
+    ...     MultiStageOptWorkflow(initial_molecule=He, mode=Mode.RAPID, solvent="water")
+    ... )
+    >>> print(msos)
+    <MultiStageOptSettings RAPID>
+    >>> msos.level_of_theory
+    'r2scan_3c/cpcm(water)//gfn2_xtb'
+    >>> msos.solvent
+    <Solvent.WATER: 'water'>
+    >>> msos.xtb_preopt
+    False
+    """
+    data = dict(msow)
+    del data["calculations"]
+    return MultiStageOptSettings.construct(**data)
