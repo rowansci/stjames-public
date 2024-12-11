@@ -29,7 +29,12 @@ class Frame(Base):
     pressure: float
     temperature: float
     volume: float
-    energy: float
+    potential_energy: float  # kcal/mol
+    kinetic_energy: float  # kcal/mol
+
+    @property
+    def energy(self) -> float:
+        return self.potential_energy + self.kinetic_energy
 
 
 class MolecularDynamicsSettings(Base):
