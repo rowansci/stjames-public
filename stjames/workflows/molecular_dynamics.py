@@ -1,6 +1,6 @@
 from typing import Self
 
-from pydantic import PositiveFloat, PositiveInt, model_validator
+from pydantic import PositiveFloat, PositiveInt, computed_field, model_validator
 
 from ..base import Base, LowercaseStrEnum
 from ..constraint import PairwiseHarmonicConstraint, SphericalHarmonicConstraint
@@ -29,7 +29,13 @@ class Frame(Base):
     pressure: float
     temperature: float
     volume: float
-    energy: float
+    potential_energy: float  # kcal/mol
+    kinetic_energy: float  # kcal/mol
+
+    @computed_field  # type: ignore[misc, prop-decorator, unused-ignore]
+    @property
+    def energy(self) -> float:
+        return self.potential_energy + self.kinetic_energy
 
 
 class MolecularDynamicsSettings(Base):
