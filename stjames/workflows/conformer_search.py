@@ -9,6 +9,7 @@ from ..base import LowercaseStrEnum
 from ..constraint import Constraint
 from ..method import Method, XTBMethod
 from ..mode import Mode
+from ..task import Task
 from ..types import UUID
 from .multistage_opt import MultiStageOptMixin
 from .workflow import Workflow
@@ -321,6 +322,45 @@ class ConformerSearchMixin(ConformerGenMixin, MultiStageOptMixin):
     def __repr__(self) -> str:
         """Return a string representation of the ConformerSearch workflow."""
         return f"<{type(self).__name__} {self.conf_gen_mode.name} {self.mso_mode.name}>"
+
+    @model_validator(mode="after")
+    def deduplicate(self) -> Self:
+        """
+        Deduplicate optimizations between conf_gen and multistage_opt.
+
+        Also affects Manual Mode.
+        """
+        cgs = self.conf_gen_settings
+        msos = self.multistage_opt_settings
+
+        if self.transition_state or not msos.optimization_settings:
+            return self
+
+        first_opt = msos.optimization_settings[0]
+        if cgs.conf_opt_method != first_opt.method or "optimize" not in first_opt.tasks:
+            return self
+
+        first_opt.tasks.remove(Task.OPTIMIZE)
+        if msos.singlepoint_settings or len(msos.optimization_settings) > 1:
+            if (not first_opt.tasks) or first_opt.tasks == ["singlepoint"]:
+                msos.optimization_settings = msos.optimization_settings[1:]
+
+        return self
+
+    @model_validator(mode="after")
+    def remove_ts_constraints(self) -> Self:
+        """
+        Remove constraints from optimization if a TS.
+
+        Also affects Manual Mode.
+        """
+        msos = self.multistage_opt_settings
+        if msos.transition_state and msos.constraints:
+            msos.constraints = []
+            for opt_set in msos.optimization_settings:
+                opt_set.opt_settings.constraints = []
+
+        return self
 
 
 class ConformerSearchWorkflow(ConformerSearchMixin, Workflow):
