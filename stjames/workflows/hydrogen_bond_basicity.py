@@ -5,7 +5,7 @@ from .workflow import Workflow
 
 class HydrogenBondAcceptorSite(Base):
     atom_idx: int  # zero-indexed
-    pKHBX: float
+    pkhbx: float
     position: tuple[float, float, float]
     name: str | None = None
 
