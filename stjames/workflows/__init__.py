@@ -9,6 +9,7 @@ from .conformer_search import *
 from .descriptors import *
 from .electronic_properties import *
 from .fukui import *
+from .hydrogen_bond_basicity import *
 from .molecular_dynamics import *
 from .multistage_opt import *
 from .pka import *
@@ -27,6 +28,7 @@ WORKFLOW_NAME = Literal[
     "descriptors",
     "electronic_properties",
     "fukui",
+    "hydrogen_bond_basicity",
     "molecular_dynamics",
     "multistage_opt",
     "pka",
@@ -45,6 +47,7 @@ WORKFLOW_MAPPING: dict[str, Workflow] = {
     "descriptors": DescriptorsWorkflow,  # type: ignore [dict-item]
     "electronic_properties": ElectronicPropertiesWorkflow,  # type: ignore [dict-item]
     "fukui": FukuiIndexWorkflow,  # type: ignore [dict-item]
+    "hydrogen_bond_basicity": HydrogenBondBasicityWorkflow,  # type: ignore [dict-item]
     "molecular_dynamics": MolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "multistage_opt": MultiStageOptWorkflow,  # type: ignore [dict-item]
     "pka": pKaWorkflow,  # type: ignore [dict-item]
