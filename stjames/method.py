@@ -1,4 +1,4 @@
-from typing import Literal
+from typing import Literal, Union
 
 from .base import LowercaseStrEnum
 
@@ -31,6 +31,7 @@ class Method(LowercaseStrEnum):
     DSDBLYPD3BJ = "dsd_blyp_d3bj"
 
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
+    MACE_MP_0 = "mace_mp_0"
     MACE_MP_0B2_L = "mace_mp_0b2_l"
     OCP24_S = "ocp24_s"
     OCP24_L = "ocp24_l"
@@ -52,6 +53,9 @@ PREPACKAGED_NNP_METHODS = [Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_
 
 CorrectableNNPMethod = Literal[Method.MACE_MP_0B2_L, Method.ORB_V2]
 CORRECTABLE_NNP_METHODS = [Method.MACE_MP_0B2_L, Method.ORB_V2]
+
+NNPMethod = Union[PrepackagedNNPMethod, CorrectableNNPMethod]
+NNP_METHODS = PREPACKAGED_NNP_METHODS + CORRECTABLE_NNP_METHODS
 
 XTBMethod = Literal[Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB]
 XTB_METHODS = [Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB]
