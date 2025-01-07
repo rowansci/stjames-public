@@ -5,7 +5,7 @@ from pydantic import computed_field, field_validator, model_validator
 from .base import Base, UniqueList
 from .basis_set import BasisSet
 from .correction import Correction
-from .method import METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, Method
+from .method import CORRECTABLE_NNP_METHODS, METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, Method
 from .mode import Mode
 from .opt_settings import OptimizationSettings
 from .scf_settings import SCFSettings
@@ -38,7 +38,9 @@ class Settings(Base):
     def level_of_theory(self) -> str:
         corrections = list(filter(lambda x: x not in (None, ""), self.corrections))
 
-        if self.method in PREPACKAGED_METHODS or self.basis_set is None:
+        if self.method in CORRECTABLE_NNP_METHODS:
+            method = self.method.value if len(corrections) == 0 else f"{self.method.value}-{'-'.join([c.value for c in corrections])}"
+        elif self.method in PREPACKAGED_METHODS or self.basis_set is None:
             method = self.method.value
         elif self.method in METHODS_WITH_CORRECTION or len(corrections) == 0:
             method = f"{self.method.value}/{self.basis_set.name.lower()}"
