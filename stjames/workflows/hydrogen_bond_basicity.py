@@ -11,6 +11,9 @@ class HydrogenBondAcceptorSite(Base):
 
 
 class HydrogenBondBasicityWorkflow(Workflow):
+    do_csearch: bool = True
+    do_optimization: bool = True
+
     # UUID of optimization
     optimization: UUID | None = None
 
