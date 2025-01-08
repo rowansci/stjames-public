@@ -39,13 +39,13 @@ class Settings(Base):
         corrections = list(filter(lambda x: x not in (None, ""), self.corrections))
 
         if self.method in CORRECTABLE_NNP_METHODS:
-            method = self.method.value if len(corrections) == 0 else f"{self.method.value}-{'-'.join([c.value for c in corrections])}"
+            method = self.method.value if not corrections else f"{self.method.value}-{'-'.join(c.value for c in corrections)}"
         elif self.method in PREPACKAGED_METHODS or self.basis_set is None:
             method = self.method.value
-        elif self.method in METHODS_WITH_CORRECTION or len(corrections) == 0:
+        elif self.method in METHODS_WITH_CORRECTION or not corrections:
             method = f"{self.method.value}/{self.basis_set.name.lower()}"
         else:
-            method = f"{self.method.value}-{'-'.join([c.value for c in corrections])}/{self.basis_set.name.lower()}"
+            method = f"{self.method.value}-{'-'.join(c.value for c in corrections)}/{self.basis_set.name.lower()}"
 
         if self.solvent_settings is not None:
             method += f"/{self.solvent_settings.model.value}({self.solvent_settings.solvent.value})"
