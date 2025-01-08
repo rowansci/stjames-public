@@ -32,8 +32,10 @@ class Method(LowercaseStrEnum):
 
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
     MACE_MP_0 = "mace_mp_0"
+    MACE_MP_0B2_L = "mace_mp_0b2_l"
     OCP24_S = "ocp24_s"
     OCP24_L = "ocp24_l"
+    ORB_V2 = "orb_v2"
 
     GFN_FF = "gfn_ff"
     GFN0_XTB = "gfn0_xtb"
@@ -46,8 +48,14 @@ class Method(LowercaseStrEnum):
     OFF_SAGE_2_2_1 = "off_sage_2_2_1"
 
 
-NNPMethod = Literal[Method.AIMNET2_WB97MD3]
-NNP_METHODS = [Method.AIMNET2_WB97MD3]
+PrepackagedNNPMethod = Literal[Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L]
+PREPACKAGED_NNP_METHODS = [Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L]
+
+CorrectableNNPMethod = Literal[Method.MACE_MP_0B2_L, Method.ORB_V2]
+CORRECTABLE_NNP_METHODS = [Method.MACE_MP_0B2_L, Method.ORB_V2]
+
+NNPMethod = PrepackagedNNPMethod | CorrectableNNPMethod
+NNP_METHODS = [*PREPACKAGED_NNP_METHODS, *CORRECTABLE_NNP_METHODS]
 
 XTBMethod = Literal[Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB]
 XTB_METHODS = [Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB]
@@ -58,8 +66,8 @@ COMPOSITE_METHODS = [Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
 FFMethod = Literal[Method.OFF_SAGE_2_2_1]
 FF_METHODS = [Method.OFF_SAGE_2_2_1]
 
-PrepackagedMethod = XTBMethod | CompositeMethod | NNPMethod | FFMethod
-PREPACKAGED_METHODS = [*XTB_METHODS, *COMPOSITE_METHODS, *NNP_METHODS, *FF_METHODS]
+PrepackagedMethod = XTBMethod | CompositeMethod | PrepackagedNNPMethod | FFMethod
+PREPACKAGED_METHODS = [*XTB_METHODS, *COMPOSITE_METHODS, *PREPACKAGED_NNP_METHODS, *FF_METHODS]
 
 MethodWithCorrection = Literal[Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ]
 METHODS_WITH_CORRECTION = [Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ, Method.B97D3BJ]
