@@ -1,4 +1,5 @@
 # ruff: noqa: F405
+
 from typing import Literal
 
 from .admet import *
@@ -7,6 +8,7 @@ from .bde import *
 from .conformer import *
 from .conformer_search import *
 from .descriptors import *
+from .docking import *
 from .electronic_properties import *
 from .fukui import *
 from .hydrogen_bond_basicity import *
@@ -26,6 +28,7 @@ WORKFLOW_NAME = Literal[
     "conformers",
     "conformer_search",
     "descriptors",
+    "docking",
     "electronic_properties",
     "fukui",
     "hydrogen_bond_basicity",
@@ -45,6 +48,7 @@ WORKFLOW_MAPPING: dict[str, Workflow] = {
     "conformers": ConformerWorkflow,  # type: ignore [dict-item]
     "conformer_search": ConformerSearchWorkflow,  # type: ignore [dict-item]
     "descriptors": DescriptorsWorkflow,  # type: ignore [dict-item]
+    "docking": DockingWorkflow,  # type: ignore [dict-item]
     "electronic_properties": ElectronicPropertiesWorkflow,  # type: ignore [dict-item]
     "fukui": FukuiIndexWorkflow,  # type: ignore [dict-item]
     "hydrogen_bond_basicity": HydrogenBondBasicityWorkflow,  # type: ignore [dict-item]
