@@ -1,6 +1,7 @@
 """Docking workflow."""
 
 from tempfile import NamedTemporaryFile
+from typing import Self
 
 import atomium  # type: ignore [import-untyped]
 from pydantic import BaseModel, ConfigDict, field_validator
@@ -27,11 +28,13 @@ class DockingWorkflow(Workflow):
     Docking workflow.
 
     Inherited:
-    :param initial_molecule: Molecule of interest
+    :param initial_molecule: Molecule of interest (currently unused)
     :param mode: Mode for workflow (currently unused)
 
     New:
-    :param target: pdb of the protein
+    :param molecules: Molecules to dock (optional)
+    :param smiles: SMILES strings of the ligands (optional)
+    :param target: PDB of the protein
     :param pocket: center (x, y, z) and size (x, y, z) of the pocket
 
     Results:
@@ -40,7 +43,10 @@ class DockingWorkflow(Workflow):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    target: atomium.data.File
+    molecules: list[Molecule] = []
+    smiles: list[str] = []
+
+    target: PDBMolecule
     pocket: tuple[Vector3D, Vector3D]
 
     scores: list[Score] = []
@@ -54,6 +60,17 @@ class DockingWorkflow(Workflow):
         ligand = "".join(atom.atomic_symbol for atom in self.initial_molecule.atoms)
 
         return f"<{type(self).__name__} {target} {ligand}>"
+
+    @model_validator
+    @classmethod
+    def check_molecules(self) -> Self:
+        """Check if molecules are provided."""
+        if self.molecules and self.smiles:
+            raise ValueError("Must provide only one of molecules or smiles, not both")
+        elif not self.molecules and not self.smiles:
+            raise ValueError("Must provide either molecules or smiles")
+
+        return self
 
     @field_validator("target", mode="before")
     def read_pdb(cls, v: atomium.data.File | str) -> atomium.data.File:
