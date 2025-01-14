@@ -1,12 +1,11 @@
 """Docking workflow."""
 
-from tempfile import NamedTemporaryFile
 from typing import Self
 
-import atomium  # type: ignore [import-untyped]
-from pydantic import BaseModel, ConfigDict, field_validator
+from pydantic import BaseModel, ConfigDict, field_validator, model_validator
 
 from ..molecule import Molecule
+from ..pdb import PDB
 from ..types import Vector3D
 from .workflow import Workflow
 
@@ -46,7 +45,7 @@ class DockingWorkflow(Workflow):
     molecules: list[Molecule] = []
     smiles: list[str] = []
 
-    target: PDBMolecule
+    target: PDB
     pocket: tuple[Vector3D, Vector3D]
 
     scores: list[Score] = []
@@ -56,13 +55,13 @@ class DockingWorkflow(Workflow):
 
     def __repr__(self) -> str:
         """Return a string representation of the Docking workflow."""
-        target = self.target.title or self.target.name or self.target.id
+        desc = self.target.description
+        target = desc.code or desc.title
         ligand = "".join(atom.atomic_symbol for atom in self.initial_molecule.atoms)
 
         return f"<{type(self).__name__} {target} {ligand}>"
 
-    @model_validator
-    @classmethod
+    @model_validator(mode="after")
     def check_molecules(self) -> Self:
         """Check if molecules are provided."""
         if self.molecules and self.smiles:
@@ -71,19 +70,6 @@ class DockingWorkflow(Workflow):
             raise ValueError("Must provide either molecules or smiles")
 
         return self
-
-    @field_validator("target", mode="before")
-    def read_pdb(cls, v: atomium.data.File | str) -> atomium.data.File:
-        """Read the target protein from a PDB file."""
-        if isinstance(v, str):
-            with NamedTemporaryFile("w", suffix=".pdb") as f:
-                f.write(v)
-                f.seek(0)
-                return atomium.open(f.name)
-        elif isinstance(v, atomium.data.File):
-            return v
-
-        raise ValueError("Target must be a PDB file or string of pdb")
 
     @field_validator("pocket", mode="after")
     def validate_pocket(cls, pocket: tuple[Vector3D, Vector3D]) -> tuple[Vector3D, Vector3D]:
