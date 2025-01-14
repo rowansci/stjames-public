@@ -22,6 +22,7 @@ repos:
       stages: [commit, push]
       args: ['--config-file', 'pyproject.toml']
       additional_dependencies:
+        - atomium
         - numpy
         - pydantic
         - pytest

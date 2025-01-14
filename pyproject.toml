@@ -9,6 +9,7 @@ authors = [
 ]
 
 dependencies = [
+    "atomium>=1,<2",
     "pydantic>=2.4",
     "numpy",
 ]
@@ -48,10 +49,11 @@ ignore = ["E741"]
 
 [tool.pytest.ini_options]
 testpaths = ["stjames", "tests"]
-addopts = "--doctest-modules"
+addopts = "--doctest-modules --durations=5 -m 'not regression'"
 doctest_optionflags = "NORMALIZE_WHITESPACE"
 markers = [
-  "smoke: sanity tests to reveal simple failures"
+  "smoke: sanity tests to reveal simple failures",
+  "regression: tests to make sure bugs stay closed",
 ]
 
 [tool.mypy]
