@@ -1,11 +1,19 @@
 from pytest import mark
 
-from stjames.pdb import fetch_pdb
+from stjames.pdb import fetch_pdb, pdb_from_string
 
 
 def test_1ema() -> None:
     """Green fluorescent protein."""
     fetch_pdb("1EMA")
+
+
+def test_read_pdb() -> None:
+    """Rest reading of a pdb string."""
+    with open("tests/data/1ema.pdb") as f:
+        data = f.read()
+    pdb = pdb_from_string(data)
+    assert pdb.description.code == "1EMA"
 
 
 # fmt: off

@@ -3,6 +3,7 @@ from pathlib import Path
 from typing import Any, Literal
 
 import atomium  # type: ignore [import-untyped]
+from atomium.pdb import pdb_dict_to_data_dict, pdb_string_to_pdb_dict  # type: ignore [import-untyped]
 from pydantic import BaseModel, ConfigDict, Field
 
 from stjames.types import Matrix3x3, Vector3D
@@ -189,3 +190,8 @@ def read_pdb(path: Path | str) -> PDB:
 def fetch_pdb(code: str) -> PDB:
     """Fetch a pdb from the Protein Data Bank."""
     return PDB.model_validate(atomium.fetch(code, data_dict=True))
+
+
+def pdb_from_string(pdb: str) -> PDB:
+    """Read a PDB from a string."""
+    return PDB.model_validate(pdb_dict_to_data_dict(pdb_string_to_pdb_dict(pdb)))
