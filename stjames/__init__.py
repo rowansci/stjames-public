@@ -9,6 +9,7 @@ from .workflows import *
 from .scf_settings import *
 from .int_settings import *
 from .opt_settings import *
+from .compute_settings import *
 from .diis_settings import *
 from .thermochem_settings import *
 from .grid_settings import *
