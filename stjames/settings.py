@@ -4,6 +4,7 @@ from pydantic import computed_field, field_validator, model_validator
 
 from .base import Base, UniqueList
 from .basis_set import BasisSet
+from .compute_settings import ComputeSettings
 from .correction import Correction
 from .method import CORRECTABLE_NNP_METHODS, METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, Method
 from .mode import Mode
@@ -30,6 +31,7 @@ class Settings(Base):
     scf_settings: SCFSettings = SCFSettings()
     opt_settings: OptimizationSettings = OptimizationSettings()
     thermochem_settings: ThermochemistrySettings = ThermochemistrySettings()
+    compute_settings: ComputeSettings = ComputeSettings()
 
     # mypy has this dead wrong (https://docs.pydantic.dev/2.0/usage/computed_fields/)
     # Python 3.12 narrows the reason for the ignore to prop-decorator
