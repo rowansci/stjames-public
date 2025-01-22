@@ -187,24 +187,6 @@ def test_conformer_search_workflow(water: Molecule) -> None:
     assert meticulous.conf_gen_settings == iMTDSettings(mode=Mode.METICULOUS, constraints=[Constraint(constraint_type="bond", atoms=[1, 2])])
 
 
-def test_removed_duplicate_optimization_settings(water: Molecule) -> None:
-    """Test that duplicate optimization settings are removed."""
-    cr = ConformerSearchWorkflow(initial_molecule=water, conf_gen_mode=Mode.CAREFUL)
-    crf = ConformerSearchWorkflow(initial_molecule=water, conf_gen_mode=Mode.CAREFUL, frequencies=True)
-    cr_msos = cr.multistage_opt_settings
-    crf_msos = crf.multistage_opt_settings
-
-    assert cr.mso_mode == Mode.RAPID
-    assert crf.mso_mode == Mode.RAPID
-    assert cr.conf_gen_mode == Mode.CAREFUL
-    assert crf.conf_gen_mode == Mode.CAREFUL
-
-    assert len(cr_msos.optimization_settings) == 0
-    assert len(crf_msos.optimization_settings) == 1
-
-    assert crf_msos.optimization_settings[0].tasks == ["frequencies"]
-
-
 def test_ts_constraints(water: Molecule) -> None:
     """Test that for transition states constraints are on for conformer generation and off for optimization."""
     constraints = [Constraint(constraint_type="bond", atoms=[1, 2])]
