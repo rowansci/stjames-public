@@ -47,9 +47,11 @@ class Method(LowercaseStrEnum):
 
     OFF_SAGE_2_2_1 = "off_sage_2_2_1"
 
+    RM1 = "rm1"
 
-PrepackagedNNPMethod = Literal[Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L]
-PREPACKAGED_NNP_METHODS = [Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L]
+
+PrepackagedNNPMethod = Literal[Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L, Method.RM1]
+PREPACKAGED_NNP_METHODS = [Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L, Method.RM1]
 
 CorrectableNNPMethod = Literal[Method.MACE_MP_0B2_L, Method.ORB_V2]
 CORRECTABLE_NNP_METHODS = [Method.MACE_MP_0B2_L, Method.ORB_V2]
