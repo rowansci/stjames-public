@@ -48,13 +48,7 @@ class IRCWorkflow(Workflow):
         return repr(self)
 
     def __repr__(self) -> str:
-        """
-        String representation of the workflow.
-
-        >>> workflow = IRCWorkflow(mode=Mode.RAPID, solvent=Solvent.WATER)
-        <IRCWorkflow RAPID>
-        """
-
+        """String representation of the workflow."""
         if self.mode != Mode.MANUAL:
             return f"<{type(self).__name__} {self.mode.name}>"
 
