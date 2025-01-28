@@ -27,6 +27,7 @@ class IRCWorkflow(Workflow):
     :param final_opt: whether to optimize the final IRC geometry to a minimum
 
     Results:
+    :param starting_TS: optimized TS before the IRC (==initial_molecule if preopt=False)
     :param irc_forward: forward calculations
     :param irc_backward: reverse calculations
     :param opt_forward: optimization steps after the forward IRC
@@ -38,6 +39,8 @@ class IRCWorkflow(Workflow):
 
     preopt: bool = False
     final_opt: bool = False
+
+    starting_TS: UUID | None = None
 
     irc_forward: list[UUID] = Field(default_factory=list)
     irc_backward: list[UUID] = Field(default_factory=list)
