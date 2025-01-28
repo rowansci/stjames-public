@@ -12,6 +12,7 @@ dependencies = [
     "atomium>=1,<2",
     "pydantic>=2.4",
     "numpy",
+    "atomium>=1.0,<2.0",
 ]
 
 [build-system]

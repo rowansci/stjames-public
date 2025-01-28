@@ -72,6 +72,25 @@ class Molecule(Base):
     def coordinates(self) -> Vector3DPerAtom:
         return [a.position for a in self.atoms]
 
+    def translated(self, vector: Vector3D) -> Self:
+        r"""
+        Translate the molecule by a vector.
+
+        >>> mol = Molecule.from_xyz("H 0 0 0\nH 0 0 1")
+        >>> print(mol.translated((1, 0, 0)).to_xyz())
+        2
+        <BLANKLINE>
+        H     1.0000000000    0.0000000000    0.0000000000
+        H     1.0000000000    0.0000000000    1.0000000000
+        """
+
+        def translated(position: Vector3D) -> Vector3D:
+            return tuple(q + v for q, v in zip(position, vector, strict=True))  # type: ignore [return-value]
+
+        atoms = [atom.copy(update={"position": translated(atom.position)}) for atom in self.atoms]
+
+        return self.copy(update={"atoms": atoms})
+
     @property
     def atomic_numbers(self) -> list[NonNegativeInt]:
         return [a.atomic_number for a in self.atoms]
