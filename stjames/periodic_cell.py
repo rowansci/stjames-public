@@ -1,16 +1,16 @@
-from typing import TypeAlias
+from typing import Annotated, TypeAlias
 
 import numpy as np
 import pydantic
 
 from .base import Base
-from .types import Matrix3x3
+from .types import Matrix3x3, round_matrix3x3
 
 Bool3: TypeAlias = tuple[bool, bool, bool]
 
 
 class PeriodicCell(Base):
-    lattice_vectors: Matrix3x3
+    lattice_vectors: Annotated[Matrix3x3, pydantic.AfterValidator(round_matrix3x3(6))]
     is_periodic: Bool3 = (True, True, True)
 
     @pydantic.field_validator("lattice_vectors")
