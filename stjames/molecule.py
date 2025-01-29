@@ -14,12 +14,15 @@ from .types import FloatPerAtom, Matrix3x3, Vector3D, Vector3DPerAtom, round_vec
 class MoleculeReadError(RuntimeError):
     pass
 
+
 x: Annotated[float, AfterValidator(round_float(3))]
+
+
 class VibrationalMode(Base):
     frequency: Annotated[float, AfterValidator(round_float(3))]  # in cm-1
     reduced_mass: Annotated[float, AfterValidator(round_float(3))]  # amu
     force_constant: Annotated[float, AfterValidator(round_float(3))]  # mDyne/Å
-    displacements: Annotated[Vector3DPerAtom, AfterValidator(round_vector3d_per_atom(6))] # Å
+    displacements: Annotated[Vector3DPerAtom, AfterValidator(round_vector3d_per_atom(6))]  # Å
 
 
 class Molecule(Base):

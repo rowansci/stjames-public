@@ -6,6 +6,7 @@ import pydantic
 
 _T = TypeVar("_T")
 
+
 def round_float(round_to: int) -> Callable[[float], float]:
     """Return a function that rounds a float to a given number of decimal places."""
 
@@ -14,12 +15,15 @@ def round_float(round_to: int) -> Callable[[float], float]:
 
     return inner_round
 
+
 def round_optional_float(precision: int = 6) -> Callable[[Optional[float]], Optional[float]]:
     """Create a validator that rounds an optional float to the specified precision."""
+
     def rounder(value: Optional[float]) -> Optional[float]:
         if value is None:
             return None
         return round(value, precision)
+
     return rounder
 
 
