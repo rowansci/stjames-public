@@ -8,14 +8,21 @@ from pydantic import AfterValidator, NonNegativeInt, PositiveInt, ValidationErro
 from .atom import Atom
 from .base import Base, round_float, round_optional_float
 from .periodic_cell import PeriodicCell
-from .types import FloatPerAtom, Matrix3x3, Vector3D, Vector3DPerAtom, round_vector3d_per_atom
+from .types import (
+    FloatPerAtom,
+    Matrix3x3,
+    Vector3D,
+    Vector3DPerAtom,
+    round_optional_float_per_atom,
+    round_optional_matrix3x3,
+    round_optional_vector3d,
+    round_optional_vector3d_per_atom,
+    round_vector3d_per_atom,
+)
 
 
 class MoleculeReadError(RuntimeError):
     pass
-
-
-x: Annotated[float, AfterValidator(round_float(3))]
 
 
 class VibrationalMode(Base):
@@ -36,18 +43,18 @@ class Molecule(Base):
     energy: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None  # in Hartree
     scf_iterations: Optional[NonNegativeInt] = None
     scf_completed: Optional[bool] = None
-    elapsed: Optional[float] = None  # in seconds
+    elapsed: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None  # in seconds
 
-    homo_lumo_gap: Optional[float] = None  # in eV
+    homo_lumo_gap: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None  # in eV
 
-    gradient: Optional[Vector3DPerAtom] = None  # Hartree/Å
-    stress: Optional[Matrix3x3] = None  # Hartree/Å
+    gradient: Annotated[Optional[Vector3DPerAtom], AfterValidator(round_optional_vector3d_per_atom(6))] = None  # Hartree/Å
+    stress: Annotated[Optional[Matrix3x3], AfterValidator(round_optional_matrix3x3(6))] = None  # Hartree/Å
 
-    velocities: Optional[Vector3DPerAtom] = None  # Å/fs
+    velocities: Annotated[Optional[Vector3DPerAtom], AfterValidator(round_optional_vector3d_per_atom(6))] = None  # Å/fs
 
-    mulliken_charges: FloatPerAtom | None = None
-    mulliken_spin_densities: FloatPerAtom | None = None
-    dipole: Optional[Vector3D] = None  # in Debye
+    mulliken_charges: Annotated[FloatPerAtom | None, AfterValidator(round_optional_float_per_atom(6))] = None
+    mulliken_spin_densities: Annotated[FloatPerAtom | None, AfterValidator(round_optional_float_per_atom(6))] = None
+    dipole: Annotated[Optional[Vector3D], AfterValidator(round_optional_vector3d(6))] = None  # in Debye
 
     vibrational_modes: Optional[list[VibrationalMode]] = None
 

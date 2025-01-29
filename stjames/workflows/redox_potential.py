@@ -1,7 +1,8 @@
-from typing import Any, TypeVar
+from typing import Annotated, Any, TypeVar
 
-from pydantic import ValidationInfo, field_validator, model_validator
+from pydantic import AfterValidator, ValidationInfo, field_validator, model_validator
 
+from ..base import round_optional_float
 from ..mode import Mode
 from ..solvent import Solvent
 from ..types import UUID
@@ -58,8 +59,8 @@ class RedoxPotentialWorkflow(Workflow, MultiStageOptMixin):
     anion_molecule: UUID | None = None
     cation_molecule: UUID | None = None
 
-    reduction_potential: float | None = None
-    oxidation_potential: float | None = None
+    reduction_potential: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
+    oxidation_potential: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
 
     @field_validator("solvent", mode="before")
     @classmethod

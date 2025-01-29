@@ -1,7 +1,8 @@
-from typing import Any
+from typing import Annotated, Any
 
-from pydantic import BaseModel, Field, PositiveInt, field_validator, model_validator
+from pydantic import AfterValidator, BaseModel, Field, PositiveInt, field_validator, model_validator
 
+from ..base import round_float
 from ..mode import Mode
 from ..types import UUID
 from .multistage_opt import MultiStageOptMixin
@@ -23,7 +24,7 @@ class SpinState(BaseModel):
     """
 
     multiplicity: PositiveInt
-    energy: float
+    energy: Annotated[float, AfterValidator(round_float(6))]
     calculation: list[UUID | None]
 
     def __str__(self) -> str:

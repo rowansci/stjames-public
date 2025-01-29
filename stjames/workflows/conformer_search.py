@@ -1,15 +1,15 @@
 """Conformer Search Workflow."""
 
 from abc import ABC
-from typing import Self, Sequence, TypeVar
+from typing import Annotated, Self, Sequence, TypeVar
 
-from pydantic import BaseModel, Field, field_validator, model_validator
+from pydantic import AfterValidator, BaseModel, Field, field_validator, model_validator
 
 from ..base import LowercaseStrEnum
 from ..constraint import Constraint
 from ..method import Method, XTBMethod
 from ..mode import Mode
-from ..types import UUID
+from ..types import UUID, FloatPerAtom, round_float_per_atom
 from .multistage_opt import MultiStageOptMixin
 from .workflow import Workflow
 
@@ -364,4 +364,4 @@ class ConformerSearchWorkflow(ConformerSearchMixin, Workflow):
 
     # Results
     conformer_uuids: list[list[UUID | None]] = Field(default_factory=list)
-    energies: list[float] = Field(default_factory=list)
+    energies: Annotated[FloatPerAtom, AfterValidator(round_float_per_atom(6))] = Field(default_factory=list)

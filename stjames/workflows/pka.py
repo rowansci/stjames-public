@@ -1,6 +1,8 @@
-from typing import Optional
+from typing import Annotated
 
-from ..base import Base
+from pydantic import AfterValidator
+
+from ..base import Base, round_float, round_optional_float
 from ..mode import Mode
 from .workflow import DBCalculation, Workflow
 
@@ -8,8 +10,8 @@ from .workflow import DBCalculation, Workflow
 class pKaMicrostate(Base):
     atom_index: int
     structures: list[DBCalculation] = []
-    deltaG: float
-    pka: float
+    deltaG: Annotated[float, AfterValidator(round_float(3))]
+    pka: Annotated[float, AfterValidator(round_float(3))]
 
 
 class pKaWorkflow(Workflow):
@@ -26,5 +28,5 @@ class pKaWorkflow(Workflow):
     structures: list[DBCalculation] = []
     conjugate_acids: list[pKaMicrostate] = []
     conjugate_bases: list[pKaMicrostate] = []
-    strongest_acid: Optional[float] = None
-    strongest_base: Optional[float] = None
+    strongest_acid: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    strongest_base: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
