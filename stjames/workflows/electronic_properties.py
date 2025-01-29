@@ -1,20 +1,11 @@
-from typing import Annotated, Callable
+from typing import Annotated
 
 from pydantic import AfterValidator, NonNegativeFloat, NonNegativeInt
 
-from ..base import Base
+from ..base import Base, round_float
 from ..settings import Settings
 from ..types import UUID, FloatPerAtom, Matrix3x3, Vector3D
 from .workflow import Workflow
-
-
-def round_float(round_to: int) -> Callable[[float], float]:
-    """Return a function that rounds a float to a given number of decimal places."""
-
-    def inner_round(v: float) -> float:
-        return round(v, round_to)
-
-    return inner_round
 
 
 class PropertyCubePoint(Base):

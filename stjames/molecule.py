@@ -1,25 +1,25 @@
 import re
 from pathlib import Path
-from typing import Iterable, Optional, Self
+from typing import Annotated, Iterable, Optional, Self
 
 import pydantic
-from pydantic import NonNegativeInt, PositiveInt, ValidationError
+from pydantic import AfterValidator, NonNegativeInt, PositiveInt, ValidationError
 
 from .atom import Atom
-from .base import Base
+from .base import Base, round_float, round_optional_float
 from .periodic_cell import PeriodicCell
-from .types import FloatPerAtom, Matrix3x3, Vector3D, Vector3DPerAtom
+from .types import FloatPerAtom, Matrix3x3, Vector3D, Vector3DPerAtom, round_vector3d_per_atom
 
 
 class MoleculeReadError(RuntimeError):
     pass
 
-
+x: Annotated[float, AfterValidator(round_float(3))]
 class VibrationalMode(Base):
-    frequency: float  # in cm-1
-    reduced_mass: float  # amu
-    force_constant: float  # mDyne/Å
-    displacements: Vector3DPerAtom  # Å
+    frequency: Annotated[float, AfterValidator(round_float(3))]  # in cm-1
+    reduced_mass: Annotated[float, AfterValidator(round_float(3))]  # amu
+    force_constant: Annotated[float, AfterValidator(round_float(3))]  # mDyne/Å
+    displacements: Annotated[Vector3DPerAtom, AfterValidator(round_vector3d_per_atom(6))] # Å
 
 
 class Molecule(Base):
@@ -30,7 +30,7 @@ class Molecule(Base):
     # for periodic boundary conditions
     cell: Optional[PeriodicCell] = None
 
-    energy: Optional[float] = None  # in Hartree
+    energy: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None  # in Hartree
     scf_iterations: Optional[NonNegativeInt] = None
     scf_completed: Optional[bool] = None
     elapsed: Optional[float] = None  # in seconds
@@ -48,10 +48,10 @@ class Molecule(Base):
 
     vibrational_modes: Optional[list[VibrationalMode]] = None
 
-    zero_point_energy: Optional[float] = None
-    thermal_energy_corr: Optional[float] = None
-    thermal_enthalpy_corr: Optional[float] = None
-    thermal_free_energy_corr: Optional[float] = None
+    zero_point_energy: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
+    thermal_energy_corr: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
+    thermal_enthalpy_corr: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
+    thermal_free_energy_corr: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
 
     smiles: Optional[str] = None
 
