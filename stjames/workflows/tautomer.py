@@ -1,14 +1,16 @@
-from typing import Optional
+from typing import Annotated, Optional
 
-from ..base import Base
+from pydantic import AfterValidator
+
+from ..base import Base, round_float, round_optional_float
 from ..mode import Mode
 from .workflow import DBCalculation, Workflow
 
 
 class Tautomer(Base):
-    energy: float
-    weight: Optional[float] = None
-    predicted_relative_energy: Optional[float] = None
+    energy: Annotated[float, AfterValidator(round_float(6))]
+    weight: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
+    predicted_relative_energy: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
 
     # UUIDs, optionally
     structures: list[DBCalculation] = []

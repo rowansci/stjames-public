@@ -1,7 +1,10 @@
+from typing import Annotated
+
 import numpy as np
 from numpy.typing import NDArray
+from pydantic import AfterValidator
 
-from ..base import Base
+from ..base import Base, round_optional_float
 from ..molecule import Molecule
 from ..settings import Settings
 from ..types import UUID
@@ -11,7 +14,7 @@ from .workflow import Workflow
 class ScanPoint(Base):
     index: int
     molecule: Molecule
-    energy: float | None = None
+    energy: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
     uuid: UUID | None = None
 
 

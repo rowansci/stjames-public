@@ -1,10 +1,11 @@
 """Bond Dissociation Energy (BDE) workflow."""
 
 import itertools
-from typing import Any, Iterable, Self, TypeVar
+from typing import Annotated, Any, Iterable, Self, TypeVar
 
-from pydantic import BaseModel, Field, PositiveInt, ValidationInfo, field_validator, model_validator
+from pydantic import AfterValidator, BaseModel, Field, PositiveInt, ValidationInfo, field_validator, model_validator
 
+from ..base import round_optional_float
 from ..mode import Mode
 from ..molecule import Molecule
 from ..types import UUID
@@ -29,7 +30,7 @@ class BDE(BaseModel):
     """
 
     fragment_idxs: tuple[PositiveInt, ...]
-    energy: float | None
+    energy: Annotated[float | None, AfterValidator(round_optional_float(6))]
     fragment_energies: tuple[float | None, float | None]
     calculation_uuids: tuple[list[UUID | None], list[UUID | None]]
 

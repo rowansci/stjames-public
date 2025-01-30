@@ -1,20 +1,11 @@
-from typing import Annotated, Callable
+from typing import Annotated
 
 from pydantic import AfterValidator, NonNegativeFloat, NonNegativeInt
 
-from ..base import Base
+from ..base import Base, round_float
 from ..settings import Settings
-from ..types import UUID, FloatPerAtom, Matrix3x3, Vector3D
+from ..types import UUID, FloatPerAtom, Matrix3x3, Vector3D, round_optional_float_per_atom, round_optional_matrix3x3, round_optional_vector3d
 from .workflow import Workflow
-
-
-def round_float(round_to: int) -> Callable[[float], float]:
-    """Return a function that rounds a float to a given number of decimal places."""
-
-    def inner_round(v: float) -> float:
-        return round(v, round_to)
-
-    return inner_round
 
 
 class PropertyCubePoint(Base):
@@ -40,7 +31,7 @@ class MolecularOrbitalCube(PropertyCube):
     """
 
     occupation: NonNegativeInt
-    energy: float
+    energy: Annotated[float, AfterValidator(round_float(6))]
 
 
 class ElectronicPropertiesWorkflow(Workflow):
@@ -88,11 +79,11 @@ class ElectronicPropertiesWorkflow(Workflow):
     # Results
     calc_uuid: UUID | None = None
 
-    dipole: Vector3D | None = None
-    quadrupole: Matrix3x3 | None = None
+    dipole: Annotated[Vector3D | None, AfterValidator(round_optional_vector3d(6))] = None
+    quadrupole: Annotated[Matrix3x3 | None, AfterValidator(round_optional_matrix3x3(6))] = None
 
-    mulliken_charges: FloatPerAtom | None = None
-    lowdin_charges: FloatPerAtom | None = None
+    mulliken_charges: Annotated[FloatPerAtom | None, AfterValidator(round_optional_float_per_atom(6))] = None
+    lowdin_charges: Annotated[FloatPerAtom | None, AfterValidator(round_optional_float_per_atom(6))] = None
 
     wiberg_bond_orders: list[tuple[NonNegativeInt, NonNegativeInt, NonNegativeFloat]] = []
     mayer_bond_orders: list[tuple[NonNegativeInt, NonNegativeInt, NonNegativeFloat]] = []

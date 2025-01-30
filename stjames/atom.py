@@ -1,15 +1,15 @@
-from typing import Self, Sequence
+from typing import Annotated, Self, Sequence
 
-from pydantic import NonNegativeInt
+from pydantic import AfterValidator, NonNegativeInt
 
 from .base import Base
 from .data import ELEMENT_SYMBOL, SYMBOL_ELEMENT
-from .types import Vector3D
+from .types import Vector3D, round_vector3d
 
 
 class Atom(Base):
     atomic_number: NonNegativeInt
-    position: Vector3D  # in Å
+    position: Annotated[Vector3D, AfterValidator(round_vector3d(8))]  # in Å
 
     def __repr__(self) -> str:
         """

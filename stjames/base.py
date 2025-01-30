@@ -1,10 +1,30 @@
 from enum import Enum
-from typing import Annotated, Any, Hashable, TypeVar
+from typing import Annotated, Any, Callable, Hashable, Optional, TypeVar
 
 import numpy as np
 import pydantic
 
 _T = TypeVar("_T")
+
+
+def round_float(round_to: int) -> Callable[[float], float]:
+    """Return a function that rounds a float to a given number of decimal places."""
+
+    def inner_round(v: float) -> float:
+        return round(v, round_to)
+
+    return inner_round
+
+
+def round_optional_float(round_to: int) -> Callable[[Optional[float]], Optional[float]]:
+    """Create a validator that rounds an optional float to a given number of decimal places."""
+
+    def rounder(value: Optional[float]) -> Optional[float]:
+        if value is None:
+            return None
+        return round(value, round_to)
+
+    return rounder
 
 
 class Base(pydantic.BaseModel):
