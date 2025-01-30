@@ -8,5 +8,5 @@ class ComputeType(LowercaseStrEnum):
 
 
 class ComputeSettings(Base):
-    requested_compute_type: ComputeType = ComputeType.AUTO
+    requested_compute_type: ComputeType = ComputeType.CPU
     compute_type_used: ComputeType | None = None
