@@ -1,25 +1,25 @@
 """Docking workflow."""
 
-from typing import Self
+from typing import Annotated
 
-from pydantic import BaseModel, ConfigDict, field_validator, model_validator
+from pydantic import AfterValidator, ConfigDict, field_validator
 
-from ..molecule import Molecule
+from ..base import Base, round_float
 from ..pdb import PDB
-from ..types import Vector3D
+from ..types import UUID, Vector3D
 from .workflow import Workflow
 
 
-class Score(BaseModel):
+class Score(Base):
     """
     Pose with its score.
 
     :param pose: conformation of the ligand when docked
-    :param score: score of the pose
+    :param score: score of the pose, in kcal/mol
     """
 
-    pose: Molecule
-    score: float
+    pose: UUID | None  # for calculation
+    score: Annotated[float, AfterValidator(round_float(3))]
 
 
 class DockingWorkflow(Workflow):
@@ -27,12 +27,15 @@ class DockingWorkflow(Workflow):
     Docking workflow.
 
     Inherited:
-    :param initial_molecule: Molecule of interest (currently unused)
+    :param initial_molecule: Molecule of interest
     :param mode: Mode for workflow (currently unused)
 
     New:
     :param molecules: Molecules to dock (optional)
     :param smiles: SMILES strings of the ligands (optional)
+    :param do_csearch: whether to csearch starting structures
+    :param do_optimization: whether to optimize starting structures
+    :param conformers: UUIDs of optimized conformers
     :param target: PDB of the protein
     :param pocket: center (x, y, z) and size (x, y, z) of the pocket
 
@@ -42,12 +45,14 @@ class DockingWorkflow(Workflow):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    molecules: list[Molecule] = []
-    smiles: list[str] = []
+    do_csearch: bool = True
+    do_optimization: bool = True
+    conformers: list[UUID] = []
 
     target: PDB
     pocket: tuple[Vector3D, Vector3D]
 
+    do_pose_hydrogen_refinement: bool = True
     scores: list[Score] = []
 
     def __str__(self) -> str:
@@ -60,16 +65,6 @@ class DockingWorkflow(Workflow):
         ligand = "".join(atom.atomic_symbol for atom in self.initial_molecule.atoms)
 
         return f"<{type(self).__name__} {target} {ligand}>"
-
-    @model_validator(mode="after")
-    def check_molecules(self) -> Self:
-        """Check if molecules are provided."""
-        if self.molecules and self.smiles:
-            raise ValueError("Must provide only one of molecules or smiles, not both")
-        elif not self.molecules and not self.smiles:
-            raise ValueError("Must provide either molecules or smiles")
-
-        return self
 
     @field_validator("pocket", mode="after")
     def validate_pocket(cls, pocket: tuple[Vector3D, Vector3D]) -> tuple[Vector3D, Vector3D]:

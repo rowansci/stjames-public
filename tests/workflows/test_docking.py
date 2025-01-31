@@ -11,11 +11,6 @@ def water() -> Molecule:
 
 
 @fixture
-def ammonia() -> Molecule:
-    return Molecule.from_xyz("H 0 0 0\nN 0 0 1\nH 0 1 1\nH 1 0 1")
-
-
-@fixture
 def gfp() -> PDB:
     """Green fluorescent protein."""
     return read_pdb("tests/data/1ema.pdb")
@@ -26,7 +21,6 @@ def test_raises(water: Molecule, gfp: str) -> None:
         DockingWorkflow(
             initial_molecule=water,
             mode=Mode.RAPID,
-            smiles=["C", "N", "O"],
             target=gfp,
             pocket=((0, 0, 0), (-1, -1, -1)),
         )
@@ -36,7 +30,6 @@ def test_basic(water: Molecule, gfp: str) -> None:
     dwf = DockingWorkflow(
         initial_molecule=water,
         mode=Mode.RAPID,
-        smiles=["C", "N", "O"],
         target=gfp,
         pocket=((0, 0, 0), (1, 1, 1)),
     )
@@ -50,19 +43,18 @@ def test_basic(water: Molecule, gfp: str) -> None:
     assert dwf.target.description.code == "1EMA"
 
 
-def test_docked(water: Molecule, ammonia: Molecule, gfp: str) -> None:
+def test_docked(water: Molecule, gfp: str) -> None:
     dwf = DockingWorkflow(
         initial_molecule=water,
         mode=Mode.RAPID,
-        smiles=["N", "O"],
         target=gfp,
         pocket=((0, 0, 0), (10, 10, 10)),
     )
 
     dwf.scores = [
-        Score(pose=water, score=0.0),
-        Score(pose=ammonia, score=1.0),
+        Score(pose=None, score=0.0),
+        Score(pose=None, score=1.0),
     ]
 
     assert dwf.pocket == ((0.0, 0.0, 0.0), (10.0, 10.0, 10.0))
-    assert dwf.scores == [Score(pose=water, score=0.0), Score(pose=ammonia, score=1.0)]
+    assert dwf.scores == [Score(pose=None, score=0.0), Score(pose=None, score=1.0)]
