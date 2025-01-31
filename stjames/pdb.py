@@ -4,7 +4,7 @@ from typing import Any, Literal
 
 import atomium  # type: ignore [import-untyped]
 from atomium.pdb import pdb_dict_to_data_dict, pdb_string_to_pdb_dict  # type: ignore [import-untyped]
-from pydantic import BaseModel, ConfigDict, Field
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 from stjames.types import Matrix3x3, Vector3D
 
@@ -166,8 +166,16 @@ class PDBDescription(BaseModel):
     title: str | None
     authors: list[str] = []
     classification: str | None
-    deposition_date: date | None
+    deposition_date: str | None
     keywords: list[str] = []
+
+    @field_validator("deposition_date", mode="before")
+    @classmethod
+    def date_to_string(cls, v: str | date | None) -> str | None:
+        if v is None:
+            return v
+
+        return str(date)
 
 
 class PDB(BaseModel):

@@ -1,6 +1,6 @@
 from pytest import mark
 
-from stjames.pdb import fetch_pdb, pdb_from_string
+from stjames.pdb import PDB, fetch_pdb, pdb_from_string
 
 
 def test_1ema() -> None:
@@ -14,6 +14,9 @@ def test_read_pdb() -> None:
         data = f.read()
     pdb = pdb_from_string(data)
     assert pdb.description.code == "1EMA"
+
+    json = pdb.model_dump()
+    PDB.model_validate(json)
 
 
 # fmt: off
@@ -41,4 +44,7 @@ def test_read_pdb() -> None:
     ]
 )  # fmt: on
 def test_pdb(code: str) -> None:
-    fetch_pdb(code)
+    pdb = fetch_pdb(code)
+
+    json = pdb.model_dump()
+    PDB.model_validate(json)
