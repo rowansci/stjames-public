@@ -24,28 +24,24 @@ class IRCWorkflow(Workflow):
     :param settings: Settings for running the IRC (only for manual mode)
     :param solvent: Solvent for the calculation (non-Manual mode only)
     :param preopt: whether to optimize the geometry before starting the IRC
-    :param final_opt: whether to optimize the final IRC geometry to a minimum
+    :param max_irc_steps: maximum number of steps for the IRC
 
     Results:
     :param starting_TS: optimized TS before the IRC (==initial_molecule if preopt=False)
     :param irc_forward: forward calculations
     :param irc_backward: reverse calculations
-    :param opt_forward: optimization steps after the forward IRC
-    :param opt_backward: optimization steps after the reverse IRC
     """
 
     settings: Settings = _sentinel_settings
     solvent: Solvent | None = None
 
     preopt: bool = False
-    final_opt: bool = False
+    max_irc_steps: int = 10
 
     starting_TS: UUID | None = None
 
     irc_forward: list[UUID] = Field(default_factory=list)
     irc_backward: list[UUID] = Field(default_factory=list)
-    opt_forward: list[UUID] = Field(default_factory=list)
-    opt_backward: list[UUID] = Field(default_factory=list)
 
     def __str__(self) -> str:
         return repr(self)

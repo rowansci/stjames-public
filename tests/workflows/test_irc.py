@@ -20,5 +20,5 @@ def test_smoke(water: Molecule) -> None:
     assert ircwf.mode == Mode.RAPID
     assert ircwf.solvent is None
     assert not ircwf.preopt
-    assert not ircwf.final_opt
+    assert ircwf.max_irc_steps == 10
     assert ircwf.level_of_theory == "gfn2_xtb"
