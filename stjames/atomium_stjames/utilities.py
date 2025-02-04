@@ -6,7 +6,6 @@ import builtins
 import gzip
 from typing import Any
 
-import paramiko
 from requests import get
 
 from .data import File, data_dict_to_file
@@ -85,32 +84,6 @@ def fetch(code, *args, **kwargs) -> (File | dict[str, Any] | Any | dict):
     raise ValueError("Could not find anything at {}".format(url))
 
 
-def fetch_over_ssh(hostname, username, path, *args, password=None, **kwargs):
-    """Fetches a file from a remote location via SSH.
-
-    :param str hostname: the remote location.
-    :param str username: the username to use.
-    :param str path: the file location on the remote machine.
-    :param str password: if needed, the password to use.
-    :param bool file_dict: if ``True``, parsing will stop at the file ``dict``.
-    :param bool data_dict: if ``True``, parsing will stop at the data ``dict``.
-    :rtype: ``File``"""
-
-    client = paramiko.SSHClient()
-    try:
-        client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        if not password:
-            client.load_system_host_keys()
-            client.connect(hostname=hostname, username=username)
-        else:
-            client.connect(hostname=hostname, username=username, password=password)
-        stdin, stdout, stderr = client.exec_command("less " + path)
-        filestring = stdout.read().decode()
-    finally:
-        client.close()
-    return parse_string(filestring, path, *args, **kwargs)
-
-
 def parse_string(filestring, path, file_dict=False, data_dict=False):
     """Takes a filestring and parses it in the appropriate way. You must provide
     the string to parse itself, and some other string that ends in either .cif,
@@ -160,17 +133,3 @@ def get_parse_functions(filestring, path):
         return (mmcif_string_to_mmcif_dict, mmcif_dict_to_data_dict)
     else:
         return (pdb_string_to_pdb_dict, pdb_dict_to_data_dict)
-
-
-def save(filestring, path):
-    """Saves a filestring to file.
-
-    :param str filestring: the string to save.
-    :param str path: the place to save it."""
-
-    try:
-        with builtins.open(path, "w") as f:
-            f.write(filestring)
-    except Exception:
-        with builtins.open(path, "wb") as f:
-            f.write(filestring)
