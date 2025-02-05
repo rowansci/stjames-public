@@ -658,14 +658,9 @@ CODES = {
     "GLY": "G",
     "PRO": "P",
     "CYS": "C",
-    "HIP": "H",
-    "HIE": "H",
-    "DA": "A",
-    "DG": "G",
-    "DC": "C",
-    "DT": "T",
-    "A": "A",
-    "G": "G",
-    "C": "C",
-    "U": "U",
 }
+
+REVERSE_CODES = {'V': 'VAL', 'I': 'ILE', 'L': 'LEU', 'E': 'GLU', 'Q': 'GLN', 'D': 'ASP',
+                 'N': 'ASN', 'H': 'HIS', 'W': 'TRP', 'F': 'PHE', 'Y': 'TYR', 'R': 'ARG',
+                 'K': 'LYS', 'S': 'SER', 'T': 'THR', 'M': 'MET', 'A': 'ALA', 'G': 'GLY',
+                 'P': 'PRO', 'C': 'CYS'}

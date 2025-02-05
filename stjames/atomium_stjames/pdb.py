@@ -305,7 +305,6 @@ def extract_assembly_remark(pdb_dict, geometry_dict):
 
     :param dict pdb_dict: the ``dict`` to read.
     :param dict geometry_dict: the ``dict`` to update."""
-
     if pdb_dict.get("REMARK") and pdb_dict["REMARK"].get("350"):
         groups = [list(g) for k, g in groupby(pdb_dict["REMARK"]["350"], lambda x: "ECULE:" in x)][1:]
         assemblies = [list(chain(*a)) for a in zip(groups[::2], groups[1::2])]
@@ -381,6 +380,23 @@ def make_sequences(pdb_dict):
             seq[chain] += residues
     return {k: "".join([CODES.get(r, "X") for r in v]) for k, v in seq.items()}
 
+def inverse_make_sequences(seq, chain_id) -> dict:
+    """Converts a mapping of chain IDs to sequences back into SEQRES format.
+
+    :param dict seq_dict: A dictionary mapping chain IDs to sequences.
+    :rtype: ``dict`` with "SEQRES" key.
+    """
+    # Reverse CODES dictionary
+    REVERSE_CODES = {v: k for k, v in CODES.items()}
+
+    seqres_lines = []
+    residues = [REVERSE_CODES.get(aa, "UNK") for aa in seq]
+    # SEQRES records are typically formatted into lines of up to 13 residues
+    for i in range(0, len(residues), 13):
+        seqres_lines.append(f"SEQRES {i//13 + 1:>3} {chain_id} {len(seq):>4}  " + " ".join(residues[i:i+13]))
+
+    return seqres_lines
+
 
 def make_secondary_structure(pdb_dict):
     """Creates a dictionary of helices and strands, with each having a list of
@@ -419,6 +435,7 @@ def get_full_names(pdb_dict):
             full_names[line[11:14].strip()] += line[15:].strip()
         except Exception:
             full_names[line[11:14].strip()] = line[15:].strip()
+
     return full_names
 
 
@@ -522,7 +539,7 @@ def atom_line_to_dict(line, aniso_dict):
     :param dict aniso_dict: the anisotropy dictionary to use.
     :rtype: ``dict``"""
 
-    a = {"occupancy": 1, "bvalue": None, "charge": 0, "anisotropy": aniso_dict.get(int(line[6:11].strip()), [0, 0, 0, 0, 0, 0])}
+    a = {"occupancy": 1, "bvalue": None, "charge": 0, "anisotropy": aniso_dict.get(int(line[6:11].strip()), None)}
     a["is_hetatm"] = line[:6] == "HETATM"
     a["name"] = line[12:16].strip() or None
     a["alt_loc"] = line[16].strip() or None
@@ -539,6 +556,13 @@ def atom_line_to_dict(line, aniso_dict):
             a["charge"] = int(line[78:80].strip())
         except Exception:
             a["charge"] = int(line[78:80][::-1].strip())
+
+    if a["charge"] == 0:
+        a["charge"] = None
+    if not a["is_hetatm"]:
+        a["is_hetatm"] = None
+    if not a["alt_loc"]:
+        a["alt_loc"] = None
     return a
 
 

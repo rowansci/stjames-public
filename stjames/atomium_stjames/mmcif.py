@@ -6,6 +6,7 @@
 import re
 from collections import deque
 from datetime import datetime
+from typing import Any
 
 import numpy as np
 import valerius
@@ -13,7 +14,7 @@ import valerius
 from .data import CODES, Chain, Ligand, Residue
 
 
-def mmcif_string_to_mmcif_dict(filestring):
+def mmcif_string_to_mmcif_dict(filestring) -> dict:
     """Takes a .cif filestring and turns into a ``dict`` which represents its
     table structure. Only lines which aren't empty and which don't begin with
     ``#`` are used.
@@ -186,7 +187,7 @@ def strip_quotes(mmcif_dict):
                     row[k] = row[k].replace("\x1a", '"').replace("\x1b", "'")
 
 
-def mmcif_dict_to_data_dict(mmcif_dict):
+def mmcif_dict_to_data_dict(mmcif_dict) -> dict[str, Any]:
     """Converts an .mmcif dictionary into an atomium data dictionary, with the
     same standard layout that the other file formats get converted into.
 

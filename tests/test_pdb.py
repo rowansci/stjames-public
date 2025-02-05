@@ -1,6 +1,6 @@
 from pytest import mark
 
-from stjames.pdb import PDB, fetch_pdb, pdb_from_string
+from stjames.pdb import PDB, fetch_pdb, pdb_from_mmcif_filestring, pdb_from_pdb_filestring, pdb_object_to_pdb_filestring
 
 
 def test_1ema() -> None:
@@ -8,11 +8,22 @@ def test_1ema() -> None:
     fetch_pdb("1EMA")
 
 
-def test_read_pdb() -> None:
+def test_read_pdb_filestring() -> None:
     """Rest reading of a pdb string."""
     with open("tests/data/1ema.pdb") as f:
         data = f.read()
-    pdb = pdb_from_string(data)
+    pdb = pdb_from_pdb_filestring(data)
+    assert pdb.description.code == "1EMA"
+
+    json = pdb.model_dump()
+    PDB.model_validate(json)
+
+
+def test_read_mmcif_filestring() -> None:
+    """Rest reading of a mmcif string."""
+    with open("tests/data/1ema.cif") as f:
+        data = f.read()
+    pdb = pdb_from_mmcif_filestring(data)
     assert pdb.description.code == "1EMA"
 
     json = pdb.model_dump()
@@ -48,3 +59,21 @@ def test_pdb(code: str) -> None:
 
     json = pdb.model_dump()
     PDB.model_validate(json)
+
+def test_from_pdb_to_pdb_2qto() -> None:
+    with open("tests/data/2qto.pdb") as f:
+        data = f.read()
+    pdb = pdb_from_pdb_filestring(data)
+    filestring = pdb_object_to_pdb_filestring(pdb)
+    pdb2 = pdb_from_pdb_filestring(filestring)
+
+    assert pdb == pdb2
+
+def test_from_pdb_to_pdb_1ema() -> None:
+    with open("tests/data/1ema.pdb") as f:
+        data = f.read()
+    pdb = pdb_from_pdb_filestring(data)
+    filestring = pdb_object_to_pdb_filestring(pdb)
+    pdb2 = pdb_from_pdb_filestring(filestring)
+
+    assert pdb == pdb2
