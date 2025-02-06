@@ -603,7 +603,8 @@ def _build_secondary_structure_and_seqres(pdb: PDB, full_name_dict: dict[str, st
             for helix_line in _helix_list_to_pdb_helix(model.polymer, polymer.helices):
                 seqres_lines.append(helix_line)
             # Add SEQRES lines from the polymer’s sequence
-            seqres_lines.extend(inverse_make_sequences(polymer.sequence, chain_id))
+            if polymer.sequence:
+                seqres_lines.extend(inverse_make_sequences(polymer.sequence, chain_id))
             # Collect full names from each residue
             for _, residue in polymer.residues.items():
                 if residue.full_name and residue.name:

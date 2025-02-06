@@ -546,7 +546,7 @@ def add_sequences_to_polymers(model, mmcif_dict, entities):
         polymer["sequence"] = sequences.get(entities.get(polymer["internal_id"], ""), "")
 
 
-def add_secondary_structure_to_polymers(model, ss_dict):
+def add_secondary_structure_to_polymers(model, ss_dict) -> None:
     """Updates polymer dictionaries with secondary structure information, from
     a previously created mapping.
 
