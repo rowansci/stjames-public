@@ -1,5 +1,3 @@
-# mypy: ignore-errors
-
 """Contains functions for dealing with the .cif file format."""
 
 import re
@@ -12,7 +10,7 @@ import numpy as np
 from .data import CODES
 
 
-def mmcif_string_to_mmcif_dict(filestring) -> dict:
+def mmcif_string_to_mmcif_dict(filestring: str) -> dict[str, Any]:
     """Takes a .cif filestring and turns into a ``dict`` which represents its
     table structure. Only lines which aren't empty and which don't begin with
     ``#`` are used.
@@ -37,7 +35,7 @@ def mmcif_string_to_mmcif_dict(filestring) -> dict:
     return mmcif_dict
 
 
-def consolidate_strings(lines):
+def consolidate_strings(lines: deque[str]) -> deque[str]:
     """Generally, .cif files have a one file line to one table row
     correspondence. Sometimes however, a string cell is given a line of its own,
     breaking the row over several lines. This function takes the lines of a .cif
@@ -46,7 +44,7 @@ def consolidate_strings(lines):
     :param deque lines: the .cif file lines.
     :rtype: ``deque``"""
 
-    new_lines = deque()
+    new_lines: deque[str] = deque()
     while lines:
         line = lines.popleft()
         if line.startswith(";"):
@@ -60,7 +58,7 @@ def consolidate_strings(lines):
     return new_lines
 
 
-def mmcif_lines_to_mmcif_blocks(lines):
+def mmcif_lines_to_mmcif_blocks(lines: deque[str]) -> list[dict[str, Any]]:
     """A .cif file is ultimately a list of tables. This function takes a list of
     .cif file lines and splits them into these table blocks. Each block will be
     a ``dict`` containing a category name and a list of lines.
@@ -69,7 +67,8 @@ def mmcif_lines_to_mmcif_blocks(lines):
     :rtype: ``list``"""
 
     category = None
-    block, blocks = [], []
+    block: list[str] = []
+    blocks = []
     while lines:
         line = lines.popleft()
         if line.startswith("data_"):
@@ -88,11 +87,11 @@ def mmcif_lines_to_mmcif_blocks(lines):
             block = []
         block.append(line)
     if block:
-        blocks.append({"category": category[1:], "lines": block})
+        blocks.append({"category": category[1:], "lines": block})  # type: ignore [index]
     return blocks
 
 
-def non_loop_block_to_list(block):
+def non_loop_block_to_list(block: dict[str, Any]) -> list[dict[str, Any]]:
     """Takes a simple block ``dict`` with no loop and turns it into a table
     ``list``.
 
@@ -113,7 +112,7 @@ def non_loop_block_to_list(block):
     return [d]
 
 
-def loop_block_to_list(block):
+def loop_block_to_list(block: dict[str, Any]) -> list[dict[str, Any]]:
     """Takes a loop block ``dict`` where the initial lines are table headers and
     turns it into a table ``list``. Sometimes a row is broken over several lines
     so this function deals with that too.
@@ -139,7 +138,7 @@ def loop_block_to_list(block):
     return l
 
 
-def split_values(line):
+def split_values(line: str) -> list[str]:
     """The body of a .cif table is a series of lines, with each cell divided by
     whitespace. This function takes a string line and breaks it into cells.
 
@@ -153,7 +152,8 @@ def split_values(line):
     if not re.search("['\"]", line):
         return line.split()
     chars = deque(line.strip())
-    values, value, in_string = [], [], False
+    values, in_string = [], False
+    value: list[Any] = []
     while chars:
         char = chars.popleft()
         if char == " " and not in_string:
@@ -170,7 +170,7 @@ def split_values(line):
     return ["".join(v) for v in values if v]
 
 
-def strip_quotes(mmcif_dict):
+def strip_quotes(mmcif_dict: dict[str, Any]) -> None:
     """Goes through each table in the mmcif ``dict`` and removes any unneeded
     quote marks from the cells.
 
@@ -185,7 +185,7 @@ def strip_quotes(mmcif_dict):
                     row[k] = row[k].replace("\x1a", '"').replace("\x1b", "'")
 
 
-def mmcif_dict_to_data_dict(mmcif_dict) -> dict[str, Any]:
+def mmcif_dict_to_data_dict(mmcif_dict: dict[str, Any]) -> dict[str, Any]:
     """Converts an .mmcif dictionary into an atomium data dictionary, with the
     same standard layout that the other file formats get converted into.
 
@@ -207,7 +207,7 @@ def mmcif_dict_to_data_dict(mmcif_dict) -> dict[str, Any]:
     return data_dict
 
 
-def update_description_dict(mmcif_dict, data_dict):
+def update_description_dict(mmcif_dict: dict[str, Any], data_dict: dict[str, Any]) -> None:
     """Takes a data dictionary and updates its description sub-dictionary with
     information from a .mmcif dictionary.
 
@@ -222,7 +222,7 @@ def update_description_dict(mmcif_dict, data_dict):
     mmcif_to_data_transfer(mmcif_dict, data_dict, "description", "authors", "audit_author", "name", multi=True)
 
 
-def update_experiment_dict(mmcif_dict, data_dict):
+def update_experiment_dict(mmcif_dict: dict[str, Any], data_dict: dict[str, Any]) -> None:
     """Takes a data dictionary and updates its experiment sub-dictionary with
     information from a .mmcif dictionary.
 
@@ -244,7 +244,7 @@ def update_experiment_dict(mmcif_dict, data_dict):
         data_dict["experiment"]["missing_residues"].append({"id": f"{r['auth_asym_id']}.{r['auth_seq_id']}{insert}", "name": r["auth_comp_id"]})
 
 
-def update_quality_dict(mmcif_dict, data_dict):
+def update_quality_dict(mmcif_dict: dict[str, Any], data_dict: dict[str, Any]) -> None:
     """Takes a data dictionary and updates its quality sub-dictionary with
     information from a .mmcif dictionary.
 
@@ -260,7 +260,7 @@ def update_quality_dict(mmcif_dict, data_dict):
     mmcif_to_data_transfer(mmcif_dict, data_dict, "quality", "rfree", "refine", "ls_R_factor_R_free", func=float)
 
 
-def update_geometry_dict(mmcif_dict, data_dict):
+def update_geometry_dict(mmcif_dict: dict[str, Any], data_dict: dict[str, Any]) -> None:
     """Takes a data dictionary and updates its geometry sub-dictionary with
     information from a .mmcif dictionary.
 
@@ -290,7 +290,7 @@ def update_geometry_dict(mmcif_dict, data_dict):
     update_crystallography_dict(mmcif_dict, data_dict)
 
 
-def assign_metrics_to_assembly(mmcif_dict, assembly):
+def assign_metrics_to_assembly(mmcif_dict: dict[str, Any], assembly: dict[str, Any]) -> None:
     """Takes an assembly dict, and goes through an mmcif dictionary looking for
     relevant energy etc. information to update it with.
 
@@ -307,7 +307,7 @@ def assign_metrics_to_assembly(mmcif_dict, assembly):
                 assembly["buried_surface_area"] = float(a["value"].split("/")[0])
 
 
-def assign_transformations_to_assembly(mmcif_dict, operations, assembly):
+def assign_transformations_to_assembly(mmcif_dict: dict[str, Any], operations: Any, assembly: dict[str, Any]) -> None:
     """Takes an assembly dict, and goes through an mmcif dictionary looking for
     relevant transformation information to update it with.
 
@@ -325,7 +325,7 @@ def assign_transformations_to_assembly(mmcif_dict, operations, assembly):
                 )
 
 
-def get_operation_id_groups(expression):
+def get_operation_id_groups(expression: str) -> list[list[str]]:
     """Takes an operator expression from an .mmcif transformation dict, and
     works out what transformation IDs it is referring to. For example, (1,2,3)
     becomes [[1, 2, 3]], (1-3)(8-11,17) becomes [[1, 2, 3], [8, 9, 10, 11, 17]],
@@ -351,7 +351,7 @@ def get_operation_id_groups(expression):
     return group_ids
 
 
-def update_crystallography_dict(mmcif_dict, data_dict):
+def update_crystallography_dict(mmcif_dict: dict[str, Any], data_dict: dict[str, Any]) -> None:
     """Takes a data dictionary and updates its crystallography
     sub-sub-dictionary with information from a .mmcif dictionary.
 
@@ -367,7 +367,7 @@ def update_crystallography_dict(mmcif_dict, data_dict):
         data_dict["geometry"]["crystallography"] = {}
 
 
-def operation_id_groups_to_operations(operations, operation_id_groups):
+def operation_id_groups_to_operations(operations: Any, operation_id_groups: Any) -> Any:
     """Creates a list of operation matrices for an assembly, from a list of
     operation IDs - cross multiplying as required.
 
@@ -385,7 +385,7 @@ def operation_id_groups_to_operations(operations, operation_id_groups):
     return operation_groups[0]
 
 
-def update_models_list(mmcif_dict, data_dict):
+def update_models_list(mmcif_dict: dict[str, Any], data_dict: dict[str, Any]) -> None:
     """Takes a data dictionary and updates its models list with
     information from a .mmcif dictionary.
 
@@ -399,7 +399,7 @@ def update_models_list(mmcif_dict, data_dict):
     # sequences = make_sequences(mmcif_dict)
     secondary_structure = make_secondary_structure(mmcif_dict)
     aniso = make_aniso(mmcif_dict)
-    model = {"polymer": {}, "non-polymer": {}, "water": {}, "branched": {}}
+    model: dict[str, Any] = {"polymer": {}, "non-polymer": {}, "water": {}, "branched": {}}
     model_num = mmcif_dict["atom_site"][0]["pdbx_PDB_model_num"]
     for atom in mmcif_dict["atom_site"]:
         if atom["pdbx_PDB_model_num"] != model_num:
@@ -417,18 +417,19 @@ def update_models_list(mmcif_dict, data_dict):
         add_secondary_structure_to_polymers(model, secondary_structure)
 
 
-def make_aniso(mmcif_dict):
+def make_aniso(mmcif_dict: dict[str, Any]) -> dict[int, Any]:
     """Makes a mapping of atom IDs to anisotropy information.
 
     :param mmcif_dict: the .mmcif dict to read.
     :rtype: ``dict``"""
 
     return {
-        int(a["id"]): [float(a["U[{}][{}]".format(x, y)]) for x, y in ["11", "22", "33", "12", "13", "23"]] for a in mmcif_dict.get("atom_site_anisotrop", [])
+        int(a["id"]): [float(a["U[{}][{}]".format(x, y)]) for x, y in ["11", "22", "33", "12", "13", "23"]]  # type: ignore [has-type, misc]
+        for a in mmcif_dict.get("atom_site_anisotrop", [])
     }
 
 
-def make_secondary_structure(mmcif_dict):
+def make_secondary_structure(mmcif_dict: dict[str, Any]) -> dict[str, Any]:
     """Creates a dictionary of helices and strands, with each having a list of
     start and end residues.
 
@@ -461,7 +462,7 @@ def make_secondary_structure(mmcif_dict):
     return {"helices": helices, "strands": strands}
 
 
-def add_atom_to_polymer(atom, aniso, model, names):
+def add_atom_to_polymer(atom: dict[str, Any], aniso: dict[int, Any], model: dict[str, Any], names: dict[str, Any]) -> None:
     """Takes an MMCIF atom dictionary, converts it, and adds it to a polymer
     dictionary.
 
@@ -499,7 +500,7 @@ def add_atom_to_polymer(atom, aniso, model, names):
             }
 
 
-def add_atom_to_non_polymer(atom, aniso, model, mol_type, names):
+def add_atom_to_non_polymer(atom: dict[str, Any], aniso: dict[int, Any], model: dict[str, Any], mol_type: str, names: dict[str, Any]) -> None:
     """Takes an MMCIF atom dictionary, converts it, and adds it to a non-polymer
     dictionary.
 
@@ -523,7 +524,7 @@ def add_atom_to_non_polymer(atom, aniso, model, mol_type, names):
         }
 
 
-def make_residue_id(d):
+def make_residue_id(d: dict[str, Any]) -> str:
     """Generates a residue ID for an atom.
 
     :param dict d: the atom dictionary to read.
@@ -533,7 +534,7 @@ def make_residue_id(d):
     return "{}.{}{}".format(d["auth_asym_id"], d["auth_seq_id"], insert)
 
 
-def add_sequences_to_polymers(model, mmcif_dict, entities):
+def add_sequences_to_polymers(model: dict[str, Any], mmcif_dict: dict[str, Any], entities: dict[str, Any]) -> None:
     """Takes a pre-populated mapping of chain IDs to entity IDs, and uses them
     to add sequence information to a model.
 
@@ -546,7 +547,7 @@ def add_sequences_to_polymers(model, mmcif_dict, entities):
         polymer["sequence"] = sequences.get(entities.get(polymer["internal_id"], ""), "")
 
 
-def add_secondary_structure_to_polymers(model, ss_dict) -> None:
+def add_secondary_structure_to_polymers(model: dict[str, Any], ss_dict: dict[str, Any]) -> None:
     """Updates polymer dictionaries with secondary structure information, from
     a previously created mapping.
 
@@ -568,7 +569,7 @@ def add_secondary_structure_to_polymers(model, ss_dict) -> None:
                         break
 
 
-def make_sequences(mmcif_dict):
+def make_sequences(mmcif_dict: dict[str, Any]) -> dict[str, Any]:
     """Creates a mapping of entity IDs to sequences.
 
     :param dict mmcif_dict: the .mmcif dictionary to read.
@@ -581,7 +582,7 @@ def make_sequences(mmcif_dict):
     }
 
 
-def atom_dict_to_atom_dict(d, aniso_dict):
+def atom_dict_to_atom_dict(d: dict[str, Any], aniso_dict: dict[int, Any]) -> dict[str, Any]:
     """Turns an .mmcif atom dictionary into an atomium atom data dictionary.
 
     :param dict d: the .mmcif atom dictionary.
@@ -608,7 +609,18 @@ def atom_dict_to_atom_dict(d, aniso_dict):
     return atom
 
 
-def mmcif_to_data_transfer(mmcif_dict, data_dict, d_cat, d_key, m_table, m_key, date=False, split=False, multi=False, func=None):
+def mmcif_to_data_transfer(
+    mmcif_dict: dict[str, Any],
+    data_dict: dict[str, Any],
+    d_cat: Any,
+    d_key: Any,
+    m_table: Any,
+    m_key: Any,
+    date: bool = False,
+    split: bool = False,
+    multi: bool = False,
+    func: Any = None,
+) -> None:
     """A function for transfering a bit of data from a .mmcif dictionary to a
     data dictionary, or doing nothing if the data doesn't exist.
 
@@ -629,34 +641,11 @@ def mmcif_to_data_transfer(mmcif_dict, data_dict, d_cat, d_key, m_table, m_key, 
         else:
             value = mmcif_dict[m_table][0][m_key]
         if date:
-            value = datetime.strptime(value, "%Y-%m-%d").date()
+            value = datetime.strptime(value, "%Y-%m-%d").date()  # type: ignore [arg-type, assignment]
         if split:
-            value = value.replace(", ", ",").split(",")
+            value = value.replace(", ", ",").split(",")  # type: ignore [attr-defined]
         if func:
             value = func(value)
-        data_dict[d_cat][d_key] = None if value == "?" else value
+        data_dict[d_cat][d_key] = None if value == "?" else value  # type: ignore [comparison-overlap]
     except Exception:
         pass
-
-
-def get_atom_name(atom):
-    """Formats an atom name for packing in .cif.
-
-    :param Atom atom: the atom to read.
-    :rtype: ``str``"""
-
-    return '"{}"'.format(atom._name) if "'" in atom._name else atom._name
-
-
-def split_residue_id(atom):
-    """Takes an atom and splits its het ID into components.
-
-    :param Atom atom: the atom to read.
-    :rtype: ``tuple``"""
-
-    if atom.het:
-        id = atom.het.id.split(".")[-1]
-        num = "".join([c for c in id if c.isdigit()])
-        insert = "".join([c for c in id if c.isalpha()]) or "?"
-        return num, insert
-    return ".."
