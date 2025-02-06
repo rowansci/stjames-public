@@ -1,17 +1,16 @@
-# mypy: ignore-errors
 """Contains various file handling helper functions."""
 
 import builtins
 import gzip
 from typing import Any
 
-from requests import get
+from requests import get  # type: ignore [import-untyped]
 
 from .mmcif import mmcif_dict_to_data_dict, mmcif_string_to_mmcif_dict
 from .pdb import pdb_dict_to_data_dict, pdb_string_to_pdb_dict
 
 
-def open(path, *args, **kwargs) -> Any:
+def open(path: str, *args, **kwargs) -> Any:  # type: ignore [no-untyped-def]
     """Opens a file at a given path, works out what filetype it is, and parses
     it accordingly.
 
@@ -42,11 +41,11 @@ def open(path, *args, **kwargs) -> Any:
                 filestring = f.read()
         except Exception:
             with builtins.open(path, "rb") as f:
-                filestring = f.read()
+                filestring = f.read()  # type: ignore [assignment]
         return parse_string(filestring, path, *args, **kwargs)
 
 
-def fetch(code, *args, **kwargs) -> Any:
+def fetch(code: str, *args, **kwargs) -> Any:  # type: ignore [no-untyped-def]
     """Fetches a file from a remote location via HTTP.
 
     If a PDB code is given, the .cif form of that struture will be fetched from
@@ -81,7 +80,7 @@ def fetch(code, *args, **kwargs) -> Any:
     raise ValueError("Could not find anything at {}".format(url))
 
 
-def parse_string(filestring, path, file_dict=False, data_dict=False):
+def parse_string(filestring: str, path: str, file_dict: bool = False, data_dict: bool = False) -> Any:
     """Takes a filestring and parses it in the appropriate way. You must provide
     the string to parse itself, and some other string that ends in either .cif,
     .mmtf, or .cif - that will determine how the file is parsed.
@@ -102,7 +101,7 @@ def parse_string(filestring, path, file_dict=False, data_dict=False):
     return parsed
 
 
-def get_parse_functions(filestring, path):
+def get_parse_functions(filestring: str, path: str) -> Any:
     """Works out which parsing functions to use for a given filestring and
     returns them.
 
