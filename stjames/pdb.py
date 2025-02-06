@@ -215,8 +215,8 @@ def pdb_from_mmcif_filestring(pdb: str) -> PDB:
 
 
 def pdb_object_to_pdb_filestring(pdb: PDB) -> str:
-    pdb_lines = []
-    chains = []
+    pdb_lines: list[str] = []
+    chains: list[str] = []
     # Header
     pdb_lines.extend(_build_header_section(pdb))
     pdb_lines.extend(_build_source_section(pdb))
@@ -616,7 +616,7 @@ def _build_keyword_section(pdb: PDB) -> list[str]:
     return lines
 
 
-def _build_secondary_structure_and_seqres(pdb: PDB, full_name_dict: dict) -> (list[str], list[str]):  # type: ignore
+def _build_secondary_structure_and_seqres(pdb: PDB, full_name_dict: dict[str, str]) -> tuple[list[str], list[str]]:
     """
     Iterates over models and polymers to build secondary structure lines (e.g. sheets, helices)
     and sequence records (SEQRES). Also collects full names for heterogen records.
@@ -637,11 +637,12 @@ def _build_secondary_structure_and_seqres(pdb: PDB, full_name_dict: dict) -> (li
             seqres_lines.extend(inverse_make_sequences(polymer.sequence, chain_id))
             # Collect full names from each residue
             for _, residue in polymer.residues.items():
-                if residue.full_name:
+                if residue.full_name and residue.name:
                     full_name_dict[residue.name] = residue.full_name
         # Also collect full names for non-polymer molecules
         for _, non_polymer in model.non_polymer.items():
-            full_name_dict[non_polymer.name] = non_polymer.full_name
+            if non_polymer.full_name and non_polymer.name:
+                full_name_dict[non_polymer.name] = non_polymer.full_name
 
     return seqres_lines, chains
 

@@ -5,14 +5,10 @@
 import re
 from datetime import datetime
 from itertools import chain, groupby
-from math import ceil
 from typing import Any
-
-import valerius
 
 from .data import CODES
 from .mmcif import add_secondary_structure_to_polymers
-from .structures import Ligand, Residue
 
 
 def pdb_string_to_pdb_dict(filestring) -> dict:
@@ -576,108 +572,3 @@ def merge_lines(lines, start, join=" "):
 
     string = join.join([line[start:].strip() for line in lines])
     return string
-
-
-def structure_to_pdb_string(structure):
-    """Converts a :py:class:`.AtomStructure` to a .pdb filestring.
-
-    :param AtomStructure structure: the structure to convert.
-    :rtype: ``str``"""
-
-    lines = []
-    pack_sequences(structure, lines)
-    atoms = sorted(structure.atoms(), key=lambda a: a.id)
-    for i, atom in enumerate(atoms):
-        atom_to_atom_line(atom, lines)
-        if isinstance(atom.het, Residue) and (atom is atoms[-1] or atoms[i + 1].chain is not atom.chain or isinstance(atoms[i + 1].het, Ligand)):
-            last = lines[-1]
-            lines.append(f"TER   {last[6:11]}      {last[17:20]} {last[21]}{last[22:26]}{last[26]}")
-    return "\n".join(lines)
-
-
-def pack_sequences(structure, lines):
-    """Adds SEQRES lines from polymer sequence data.
-
-    :param AtomStructure structure: the structure to convert.
-    :param list lines: the string lines to update."""
-
-    try:
-        for chain in sorted(structure.chains(), key=lambda c: c.id):
-            residues = valerius.from_string(chain.sequence).codes
-            length = len(residues)
-            line_count = ceil(length / 13)
-            for line_num in range(line_count):
-                lines += ["SEQRES {:>3} {} {:>4}  {}".format(line_num + 1, chain.id, length, " ".join(residues[line_num * 13 : (line_num + 1) * 13]))]
-    except AttributeError:
-        pass
-
-
-def atom_to_atom_line(a, lines):
-    """Converts an :py:class:`.Atom` to an ATOM or HETATM record. ANISOU lines
-    will also be added where appropriate.
-
-    :param Atom a: The Atom to pack.
-    :param list lines: the string lines to update."""
-
-    line = "{:6}{:5} {:4} {:3} {:1}{:4}{:1}   "
-    line += "{:>8}{:>8}{:>8}  1.00{:6}          {:>2}{:2}"
-    id_, residue_name, chain_id, residue_id, insert_code = "", "", "", "", ""
-    if a.het:
-        id_, residue_name = a.het.id, a.het._name
-        chain_id = a.chain.id if a.chain is not None else ""
-        residue_id = int("".join([c for c in id_ if c.isdigit() or c == "-"]))
-        insert_code = id_[-1] if id_ and id_[-1].isalpha() else ""
-    atom_name = a._name or ""
-    atom_name = " " + atom_name if len(atom_name) < 4 else atom_name
-    # occupancy = "  1.00"
-    line = line.format(
-        "HETATM" if isinstance(a.het, Ligand) or a._is_hetatm else "ATOM",
-        a.id,
-        atom_name,
-        residue_name,
-        chain_id,
-        residue_id,
-        insert_code,
-        "{:.3f}".format(a.location[0]) if a.location[0] is not None else "",
-        "{:.3f}".format(a.location[1]) if a.location[1] is not None else "",
-        "{:.3f}".format(a.location[2]) if a.location[2] is not None else "",
-        "{:.2f}".format(a.bvalue).strip().rjust(6) if a.bvalue is not None else "",
-        a.element or "",
-        str(int(a.charge))[::-1] if a.charge else "",
-    )
-    lines.append(line)
-    if a.anisotropy != [0, 0, 0, 0, 0, 0]:
-        lines.append(atom_to_anisou_line(a, atom_name, residue_name, chain_id, residue_id, insert_code))
-
-
-def atom_to_anisou_line(a, name, res_name, chain_id, res_id, insert):
-    """Converts an :py:class:`.Atom` to an ANISOU record.
-
-    :param Atom a: The Atom to pack.
-    :param str name: The atom name to use.
-    :param str res_name: The residue name to use.
-    :param str chain_id: The chain ID to use.
-    :param str res_id: The residue ID to use.
-    :param str insert: The residue insert code to use.
-    :rtype: ``str``"""
-
-    line = "ANISOU{:5} {:4} {:3} {:1}{:4}{:1} "
-    line += "{:>7}{:>7}{:>7}{:>7}{:>7}{:>7}      {:>2}{:2}"
-    anisotropy = [round(x * 10000) for x in a.anisotropy]
-    line = line.format(
-        a.id,
-        name,
-        res_name,
-        chain_id,
-        res_id,
-        insert,
-        anisotropy[0],
-        anisotropy[1],
-        anisotropy[2],
-        anisotropy[3],
-        anisotropy[4],
-        anisotropy[5],
-        a.element if a.element else "",
-        str(int(a.charge))[::-1] if a.charge else "",
-    )
-    return line

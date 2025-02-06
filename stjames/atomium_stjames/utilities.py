@@ -8,13 +8,11 @@ from typing import Any
 
 from requests import get
 
-from .data import File, data_dict_to_file
 from .mmcif import mmcif_dict_to_data_dict, mmcif_string_to_mmcif_dict
-from .mmtf import mmtf_bytes_to_mmtf_dict, mmtf_dict_to_data_dict
 from .pdb import pdb_dict_to_data_dict, pdb_string_to_pdb_dict
 
 
-def open(path, *args, **kwargs) -> (File | dict[str, Any] | Any | dict):
+def open(path, *args, **kwargs) -> Any:
     """Opens a file at a given path, works out what filetype it is, and parses
     it accordingly.
 
@@ -49,7 +47,7 @@ def open(path, *args, **kwargs) -> (File | dict[str, Any] | Any | dict):
         return parse_string(filestring, path, *args, **kwargs)
 
 
-def fetch(code, *args, **kwargs) -> (File | dict[str, Any] | Any | dict):
+def fetch(code, *args, **kwargs) -> Any:
     """Fetches a file from a remote location via HTTP.
 
     If a PDB code is given, the .cif form of that struture will be fetched from
@@ -102,9 +100,6 @@ def parse_string(filestring, path, file_dict=False, data_dict=False):
     parsed = file_func(filestring)
     if not file_dict:
         parsed = data_func(parsed)
-        if not data_dict:
-            filetype = data_func.__name__.split("_")[0].replace("mmc", "c")
-            parsed = data_dict_to_file(parsed, filetype)
     return parsed
 
 
@@ -124,11 +119,8 @@ def get_parse_functions(filestring, path):
         if ending in ("mmtf", "cif", "pdb"):
             return {
                 "cif": (mmcif_string_to_mmcif_dict, mmcif_dict_to_data_dict),
-                "mmtf": (mmtf_bytes_to_mmtf_dict, mmtf_dict_to_data_dict),
                 "pdb": (pdb_string_to_pdb_dict, pdb_dict_to_data_dict),
             }[ending]
-    if isinstance(filestring, bytes):
-        return (mmtf_bytes_to_mmtf_dict, mmtf_dict_to_data_dict)
     elif "_atom_sites" in filestring:
         return (mmcif_string_to_mmcif_dict, mmcif_dict_to_data_dict)
     else:
