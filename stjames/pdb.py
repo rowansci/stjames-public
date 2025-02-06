@@ -657,7 +657,7 @@ def _build_remark_section(pdb: PDB, chains: list[str]) -> list[str]:
     lines.append("REMARK 465 MISSING RESIDUES")
     lines.append("REMARK 465 THE FOLLOWING RESIDUES WERE NOT LOCATED IN THE")
     lines.append("REMARK 465 EXPERIMENT. (M=MODEL NUMBER; RES=RESIDUE NAME; C=CHAIN")
-    lines.append("REMARK 465 IDENTIFIER; SSSEQ=SEQUENCE NUMBER; I=INSERTION CODE.")
+    lines.append("REMARK 465 IDENTIFIER; SSSEQ=SEQUENCE NUMBER; I=INSERTION CODE.)")
     lines.append("REMARK 465")
     lines.append("REMARK 465   M RES C SSSEQI")
     for missing_residue in pdb.experiment.missing_residues:
