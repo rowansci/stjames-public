@@ -393,22 +393,7 @@ def _format_atom_line(
     Return a single PDB ATOM/HETATM record line as a string, using standard
     column alignment conventions:
 
-    Columns (1-based):
-     1-6   : Record name (ATOM  or HETATM)
-     7-11  : Atom serial number (right-justified)
-     13-16 : Atom name (left-justified, typically in columns 13-14 for element)
-     17    : Alternate location indicator
-     18-20 : Residue name
-     22    : Chain ID
-     23-26 : Residue sequence number (right-justified)
-     27    : Insertion code
-     31-38 : X coordinate (right-justified, 8.3f)
-     39-46 : Y coordinate (right-justified, 8.3f)
-     47-54 : Z coordinate (right-justified, 8.3f)
-     55-60 : Occupancy (right-justified, 6.2f)
-     61-66 : Temperature factor (aka B-value, right-justified, 6.2f)
-     77-78 : Element symbol (right-justified)
-     79-80 : Charge (right-justified)
+    See https://files.wwpdb.org/pub/pdb/doc/format_descriptions/Format_v33_Letter.pdf for details
     """
     record_type = "HETATM" if atom.is_hetatm else "ATOM  "
 
@@ -464,26 +449,10 @@ def _format_anisou_line(
     alt_loc: str = "",
 ) -> str:
     """
-    Return a single PDB ATOM/HETATM record line as a string, using standard
+    Return a single PDB ANISOU record line as a string, using standard
     column alignment conventions:
 
-    Columns (1-based):
-     1-6   : Record name ANISOU
-     7-11  : Atom serial number (right-justified)
-     13-16 : Atom name (left-justified, typically in columns 13-14 for element)
-     17    : Alternate location indicator
-     18-20 : Residue name
-     22    : Chain ID
-     23-26 : Residue sequence number (right-justified)
-     27    : Insertion code
-     29-35 : U(1,1)
-     36-42 : U(2,2)
-     43-49 : U(3,3)
-     50-56 : U(1,2)
-     57-63 : U(1,3)
-     64-70 : U(2,3)
-     77-78 : Element symbol (right-justified)
-     79-80 : Charge (right-justified)
+    See https://files.wwpdb.org/pub/pdb/doc/format_descriptions/Format_v33_Letter.pdf for details
     """
     record_type = "ANISOU"
 
