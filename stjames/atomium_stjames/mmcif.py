@@ -1,5 +1,4 @@
 # mypy: ignore-errors
-# fmt: off
 
 """Contains functions for dealing with the .cif file format."""
 

@@ -1,5 +1,4 @@
 # mypy: ignore-errors
-# fmt: off
 """Contains functions for dealing with the .pdb file format."""
 
 import re
@@ -376,6 +375,7 @@ def make_sequences(pdb_dict):
             seq[chain] += residues
     return {k: "".join([CODES.get(r, "X") for r in v]) for k, v in seq.items()}
 
+
 def inverse_make_sequences(seq, chain_id) -> dict:
     """Converts a mapping of chain IDs to sequences back into SEQRES format.
 
@@ -389,7 +389,7 @@ def inverse_make_sequences(seq, chain_id) -> dict:
     residues = [REVERSE_CODES.get(aa, "UNK") for aa in seq]
     # SEQRES records are typically formatted into lines of up to 13 residues
     for i in range(0, len(residues), 13):
-        seqres_lines.append(f"SEQRES {i//13 + 1:>3} {chain_id} {len(seq):>4}  " + " ".join(residues[i:i+13]))
+        seqres_lines.append(f"SEQRES {i // 13 + 1:>3} {chain_id} {len(seq):>4}  " + " ".join(residues[i : i + 13]))
 
     return seqres_lines
 

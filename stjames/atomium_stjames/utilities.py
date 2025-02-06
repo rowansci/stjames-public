@@ -1,5 +1,4 @@
 # mypy: ignore-errors
-# fmt: off
 """Contains various file handling helper functions."""
 
 import builtins
