@@ -23,12 +23,12 @@ class PDBAtom(BaseModel):
     z: float
     element: str
     name: str
-    charge: float | None
-    occupancy: float | None
-    alt_loc: str | None
-    anisotropy: list[float] | None
+    charge: float | None = None
+    occupancy: float | None = None
+    alt_loc: str | None = None
+    anisotropy: list[float] | None = None
     bvalue: float
-    is_hetatm: bool | None
+    is_hetatm: bool | None = None
 
 
 class PDBWater(BaseModel):
@@ -36,10 +36,10 @@ class PDBWater(BaseModel):
 
     model_config = ConfigDict(extra=EXTRA)
 
-    name: str | None
-    full_name: str | None
+    name: str | None = None
+    full_name: str | None = None
     atoms: dict[int, PDBAtom] = {}
-    internal_id: str | None
+    internal_id: str | None = None
     polymer: str
 
 
@@ -48,7 +48,7 @@ class PDBResidue(BaseModel):
 
     model_config = ConfigDict(extra=EXTRA)
 
-    name: str | None
+    name: str | None = None
     full_name: str | None = None
     atoms: dict[int, PDBAtom] = {}
     number: int
@@ -62,7 +62,7 @@ class PDBPolymer(BaseModel):
     internal_id: str
     helices: list[list[str]] = []
     residues: dict[str, PDBResidue] = {}
-    sequence: str | None
+    sequence: str | None = None
     strands: list[list[str]] = []
 
 
@@ -105,10 +105,10 @@ class PDBAssembly(BaseModel):
     model_config = ConfigDict(extra=EXTRA)
 
     transformations: list[PDBTransformations]
-    software: str | None
-    buried_surface_area: float | None
-    surface_area: float | None
-    delta_energy: float | None
+    software: str | None = None
+    buried_surface_area: float | None = None
+    surface_area: float | None = None
+    delta_energy: float | None = None
     id: int
 
 
@@ -152,10 +152,10 @@ class PDBExperiment(BaseModel):
 
     model_config = ConfigDict(extra=EXTRA)
 
-    expression_system: str | None
+    expression_system: str | None = None
     missing_residues: list[PDBMissingResidue] = []
-    source_organism: str | None
-    technique: str | None
+    source_organism: str | None = None
+    technique: str | None = None
 
 
 class PDBDescription(BaseModel):
@@ -163,11 +163,11 @@ class PDBDescription(BaseModel):
 
     model_config = ConfigDict(extra=EXTRA)
 
-    code: str | None
-    title: str | None
+    code: str | None = None
+    title: str | None = None
     authors: list[str] = []
-    classification: str | None
-    deposition_date: str | None
+    classification: str | None = None
+    deposition_date: str | None = None
     keywords: list[str] = []
 
     @field_validator("deposition_date", mode="before")
