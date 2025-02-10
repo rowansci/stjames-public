@@ -23,12 +23,12 @@ class PDBAtom(BaseModel):
     z: float
     element: str
     name: str
-    charge: float | None
-    occupancy: float | None
-    alt_loc: str | None
-    anisotropy: list[float] | None
+    charge: float | None = None
+    occupancy: float | None = None
+    alt_loc: str | None = None
+    anisotropy: list[float] | None = None
     bvalue: float
-    is_hetatm: bool | None
+    is_hetatm: bool | None = None
 
 
 class PDBWater(BaseModel):
