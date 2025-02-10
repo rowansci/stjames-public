@@ -351,10 +351,6 @@ def pdb_object_to_pdb_filestring(pdb: PDB) -> str:
     # Finally, the PDB standard ends with an END record
     pdb_lines.append("END")
 
-    with open("testing2.pdb", "w") as f:
-        for line in pdb_lines:
-            f.write(line + "\n")
-
     resulting_string = _create_filestring(pdb_lines)
     return resulting_string
 
