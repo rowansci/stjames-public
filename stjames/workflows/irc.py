@@ -1,6 +1,6 @@
 from typing import Self
 
-from pydantic import Field, model_validator
+from pydantic import Field, PositiveFloat, field_validator, model_validator
 
 from ..method import XTB_METHODS, Method
 from ..mode import Mode
@@ -24,28 +24,26 @@ class IRCWorkflow(Workflow):
     :param settings: Settings for running the IRC (only for manual mode)
     :param solvent: Solvent for the calculation (non-Manual mode only)
     :param preopt: whether to optimize the geometry before starting the IRC
-    :param final_opt: whether to optimize the final IRC geometry to a minimum
+    :param max_irc_steps: maximum number of steps for the IRC
+    :param step_size: step size for the IRC (Å)
 
     Results:
     :param starting_TS: optimized TS before the IRC (==initial_molecule if preopt=False)
     :param irc_forward: forward calculations
     :param irc_backward: reverse calculations
-    :param opt_forward: optimization steps after the forward IRC
-    :param opt_backward: optimization steps after the reverse IRC
     """
 
     settings: Settings = _sentinel_settings
     solvent: Solvent | None = None
 
     preopt: bool = False
-    final_opt: bool = False
+    max_irc_steps: int = 10
+    step_size: PositiveFloat = 0.05
 
     starting_TS: UUID | None = None
 
     irc_forward: list[UUID] = Field(default_factory=list)
     irc_backward: list[UUID] = Field(default_factory=list)
-    opt_forward: list[UUID] = Field(default_factory=list)
-    opt_backward: list[UUID] = Field(default_factory=list)
 
     def __str__(self) -> str:
         return repr(self)
@@ -61,6 +59,15 @@ class IRCWorkflow(Workflow):
     def level_of_theory(self) -> str:
         """Level of theory for the workflow."""
         return self.settings.level_of_theory
+
+    @field_validator("step_size", mode="after")
+    @classmethod
+    def validate_step_size(cls, step_size: float) -> float:
+        """Validate the step size."""
+        if step_size < 1e-3 or step_size > 0.1:
+            raise ValueError(f"Step size must be between 0.001 and 0.1 Å, got: {step_size}")
+
+        return step_size
 
     @model_validator(mode="after")
     def validate_mode(self) -> Self:
