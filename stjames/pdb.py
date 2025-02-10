@@ -179,7 +179,7 @@ class PDBDescription(BaseModel):
         if isinstance(v, date):
             return v.isoformat()
 
-        return str(date)
+        return str(v)
 
 
 class PDB(BaseModel):
