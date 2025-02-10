@@ -399,12 +399,12 @@ def update_models_list(mmcif_dict: dict[str, Any], data_dict: dict[str, Any]) ->
     # sequences = make_sequences(mmcif_dict)
     secondary_structure = make_secondary_structure(mmcif_dict)
     aniso = make_aniso(mmcif_dict)
-    model: dict[str, Any] = {"polymer": {}, "non-polymer": {}, "water": {}, "branched": {}}
+    model: dict[str, Any] = {"polymer": {}, "non_polymer": {}, "water": {}, "branched": {}}
     model_num = mmcif_dict["atom_site"][0]["pdbx_PDB_model_num"]
     for atom in mmcif_dict["atom_site"]:
         if atom["pdbx_PDB_model_num"] != model_num:
             data_dict["models"].append(model)
-            model = {"polymer": {}, "non-polymer": {}, "water": {}, "branched": {}}
+            model = {"polymer": {}, "non_polymer": {}, "water": {}, "branched": {}}
             model_num = atom["pdbx_PDB_model_num"]
         mol_type = types[entities[atom["label_asym_id"]]]
         if mol_type == "polymer" or mol_type == "branched":
@@ -501,13 +501,13 @@ def add_atom_to_polymer(atom: dict[str, Any], aniso: dict[int, Any], model: dict
 
 
 def add_atom_to_non_polymer(atom: dict[str, Any], aniso: dict[int, Any], model: dict[str, Any], mol_type: str, names: dict[str, Any]) -> None:
-    """Takes an MMCIF atom dictionary, converts it, and adds it to a non-polymer
+    """Takes an MMCIF atom dictionary, converts it, and adds it to a non_polymer
     dictionary.
 
     :param dict atom: the .mmcif dictionary to read.
     :param dict aniso: lookup dictionary for anisotropy information.
     :param dict model: the model to update.
-    :param str mol_type: non-polymer or water.
+    :param str mol_type: non_polymer or water.
     :param dict names: the lookup dictionary for full name information."""
 
     mol_id = make_residue_id(atom)
@@ -606,6 +606,16 @@ def atom_dict_to_atom_dict(d: dict[str, Any], aniso_dict: dict[int, Any]) -> dic
     for key in ["x", "y", "z", "charge", "bvalue", "occupancy"]:
         if atom[key] is not None:
             atom[key] = float(atom[key])
+    if atom["charge"] == 0:
+        atom["charge"] = None
+    if not atom["is_hetatm"]:
+        atom["is_hetatm"] = None
+    if not atom["alt_loc"]:
+        atom["alt_loc"] = None
+    if atom["occupancy"] == 1:
+        atom["occupancy"] = None
+    if atom["name"] == atom["element"]:
+        atom["name"] = None
     return atom
 
 

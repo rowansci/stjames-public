@@ -145,7 +145,7 @@ def update_models_list(pdb_dict: dict[str, Any], data_dict: dict[str, Any]) -> N
     for model_lines in pdb_dict["MODEL"]:
         aniso = make_aniso(model_lines)
         last_ter = get_last_ter_line(model_lines)
-        model: dict[str, Any] = {"polymer": {}, "non-polymer": {}, "water": {}}
+        model: dict[str, Any] = {"polymer": {}, "non_polymer": {}, "water": {}}
         for index, line in enumerate(model_lines):
             if line[:6] in ["ATOM  ", "HETATM"]:
                 chain_id = line[21] if index < last_ter else id_from_line(line)
@@ -512,7 +512,7 @@ def add_atom_to_non_polymer(line: str, model: dict[Any, Any], res_id: str, aniso
     :param str res_id: the molecule ID to add to.
     :param dict aniso_dict: lookup dictionary for anisotropy information."""
 
-    key = "water" if line[17:20] in ["HOH", "DOD"] else "non-polymer"
+    key = "water" if line[17:20] in ["HOH", "DOD"] else "non_polymer"
     try:
         model[key][res_id]["atoms"][int(line[6:11])] = atom_line_to_dict(line, aniso_dict)
     except Exception:
@@ -557,6 +557,10 @@ def atom_line_to_dict(line: str, aniso_dict: dict[Any, Any]) -> dict[str, Any]:
         a["is_hetatm"] = None
     if not a["alt_loc"]:
         a["alt_loc"] = None
+    if a["occupancy"] == 1:
+        a["occupancy"] = None
+    if a["name"] == a["element"]:
+        a["name"] = None
     return a
 
 
