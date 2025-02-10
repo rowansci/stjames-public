@@ -71,7 +71,7 @@ def fetch(code: str, *args, **kwargs) -> Any:  # type: ignore [no-untyped-def]
         url = "https://mmtf.rcsb.org/v1.0/full/{}".format(code[:-5].lower())
     else:
         if "." not in code:
-            code += ".cif"
+            code += ".pdb"
         url = "https://files.rcsb.org/view/" + code.lower()
     response = get(url, stream=True)
     if response.status_code == 200:
