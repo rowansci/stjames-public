@@ -606,6 +606,16 @@ def atom_dict_to_atom_dict(d: dict[str, Any], aniso_dict: dict[int, Any]) -> dic
     for key in ["x", "y", "z", "charge", "bvalue", "occupancy"]:
         if atom[key] is not None:
             atom[key] = float(atom[key])
+    if atom["charge"] == 0:
+        atom["charge"] = None
+    if not atom["is_hetatm"]:
+        atom["is_hetatm"] = None
+    if not atom["alt_loc"]:
+        atom["alt_loc"] = None
+    if atom["occupancy"] == 1:
+        atom["occupancy"] = None
+    if atom["name"] == atom["element"]:
+        atom["name"] = None
     return atom
 
 

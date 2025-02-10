@@ -22,7 +22,7 @@ class PDBAtom(BaseModel):
     y: float
     z: float
     element: str
-    name: str
+    name: str | None = None
     charge: float | None = None
     occupancy: float | None = None
     alt_loc: str | None = None
@@ -413,12 +413,15 @@ def _format_atom_line(
     else:
         chg = "  "
 
+    atom_name = atom.name if atom.name else atom.element
+    occupancy = atom.occupancy if atom.occupancy else 1.0
+
     # Construct the line.
     # Use exact spacing & field widths to match PDB guidelines.
     line = (
         f"{record_type}"
         f"{serial:5d} "  # atom serial number (columns 7-11)
-        f"{atom.name:<4}"  # atom name (columns 13-16, left-justified in this snippet)
+        f"{atom_name:<4}"  # atom name (columns 13-16, left-justified in this snippet)
         f"{alt_loc_char}"  # altLoc (column 17)
         f"{residue_name:>3}"  # residue name (columns 18-20)
         f" {chain_char}"  # chain ID (column 22)
@@ -427,7 +430,7 @@ def _format_atom_line(
         f"{atom.x:8.3f}"  # x (columns 31-38)
         f"{atom.y:8.3f}"  # y (columns 39-46)
         f"{atom.z:8.3f}"  # z (columns 47-54)
-        f"{atom.occupancy:6.2f}"  # occupancy (columns 55-60)
+        f"{occupancy:6.2f}"  # occupancy (columns 55-60)
         f"{atom.bvalue:6.2f}"  # temp factor (columns 61-66)
         f"          "  # columns 67-76 (padding)
         f"{atom.element:>2}"  # element (columns 77-78)
@@ -468,6 +471,8 @@ def _format_anisou_line(
     else:
         chg = "  "
 
+    atom_name = atom.name if atom.name else atom.element
+
     if atom.anisotropy:
         aniso_lines = (
             f"{_float_to_pdb_string(atom.anisotropy[0]):>7}"  # x (columns 29-35)
@@ -493,7 +498,7 @@ def _format_anisou_line(
     line = (
         f"{record_type}"
         f"{serial:5d} "  # atom serial number (columns 7-11)
-        f"{atom.name:<4}"  # atom name (columns 13-16, left-justified in this snippet)
+        f"{atom_name:<4}"  # atom name (columns 13-16, left-justified in this snippet)
         f"{alt_loc_char}"  # altLoc (column 17)
         f"{residue_name:>3}"  # residue name (columns 18-20)
         f" {chain_char}"  # chain ID (column 22)

@@ -557,6 +557,10 @@ def atom_line_to_dict(line: str, aniso_dict: dict[Any, Any]) -> dict[str, Any]:
         a["is_hetatm"] = None
     if not a["alt_loc"]:
         a["alt_loc"] = None
+    if a["occupancy"] == 1:
+        a["occupancy"] = None
+    if a["name"] == a["element"]:
+        a["name"] = None
     return a
 
 
