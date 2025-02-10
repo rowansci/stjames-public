@@ -84,7 +84,7 @@ class PDBModel(BaseModel):
     model_config = ConfigDict(extra=EXTRA)
 
     polymer: dict[str, PDBPolymer] = {}
-    non_polymer: dict[str, PDBNonPolymer] = Field(alias="non-polymer", default_factory=dict)
+    non_polymer: dict[str, PDBNonPolymer] = {}
     branched: dict[str, Any] = {}
     water: dict[str, PDBWater] = {}
 
