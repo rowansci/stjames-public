@@ -50,7 +50,7 @@ def open(path: Path | str, file_dict: bool = False, data_dict: bool = False) -> 
     return parse_string(filestring, path, file_dict=file_dict, data_dict=data_dict)
 
 
-def fetch(code: str, file_dict: bool = False, data_dict: bool = False) -> Any:
+def fetch(code: str, file_dict: bool = False, data_dict: bool = False) -> dict[str, Any]:
     """Fetches a file from a remote location via HTTP.
 
     If a PDB code is given, the .cif form of that struture will be fetched from
