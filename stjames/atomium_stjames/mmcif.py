@@ -3,7 +3,7 @@
 import re
 from collections import deque
 from datetime import datetime
-from typing import Any
+from typing import Any, Callable
 
 import numpy as np
 
@@ -676,7 +676,7 @@ def mmcif_to_data_transfer(
     date: bool = False,
     split: bool = False,
     multi: bool = False,
-    func: Any = None,
+    func: Callable[[Any], Any] | None = None,
 ) -> None:
     """
     Function for transfering a bit of data from a .mmcif dictionary to a
@@ -698,12 +698,18 @@ def mmcif_to_data_transfer(
             value = [row[m_key] for row in mmcif_dict[m_table]]
         else:
             value = mmcif_dict[m_table][0][m_key]
+
         if date:
             value = datetime.strptime(value, "%Y-%m-%d").date()  # type: ignore [arg-type, assignment]
         if split:
             value = value.replace(", ", ",").split(",")  # type: ignore [attr-defined]
         if func:
             value = func(value)
-        data_dict[d_cat][d_key] = None if value == "?" else value  # type: ignore [comparison-overlap]
+
+        if isinstance(value, str) and value == "?":
+            value = None
+
+        data_dict[d_cat][d_key] = value
+
     except Exception:
         pass
