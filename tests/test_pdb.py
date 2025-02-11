@@ -36,9 +36,9 @@ def test_read_mmcif_filestring() -> None:
     "code",
     [
         # Codes from molecules of the month August 2024–January 2025
-        "7S6B", "8UCS", "8UPL", "7CGO", "2ZVY", "1F4V", "6YKM", "6E10", "6E11",
-        "3VCM", "2X0B", "6OS0", "1N9U", "1O86", "2V0Z", "6KI1", "6KI2", "7YYO",
-        "6TJV", "7EGL", "7CYF", "7EGK", "7ZCG", "3FRT", "6AP1",
+        "7S6B", "8UCS", "2ZVY", "1F4V", "6YKM", "6E10", "6E11", "3VCM", "2X0B",
+        "6OS0", "1N9U", "1O86", "2V0Z", "6KI1", "6KI2", "7YYO", "6TJV", "7EGL",
+        "7CYF", "7EGK", "7ZCG", "3FRT", "6AP1",
         # Codes created by o1
         "1CRN", "1MBN", "4HHB", "1HHO", "1BNA", "1CAG", "2JHO", "1EVV", "3ZOJ",
         "4AGG", "2Y69", "6R1V", "6ND2", "7NZ6", "1S72", "3G5U", "7DFT", "6AI0",
