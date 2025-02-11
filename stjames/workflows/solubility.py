@@ -35,7 +35,7 @@ class SolubilityWorkflow(MoleculeWorkflow):
     Inputs:
     :param initial_smiles: SMILES string of the molecule
     :param solvents: list of solvent SMILES strings
-    :param temperatures: list of temperatures in K
+    :param temperatures: temperatures in K
 
     Results:
     :param solubilities: {solvent: SolubilityResult}
@@ -43,7 +43,7 @@ class SolubilityWorkflow(MoleculeWorkflow):
 
     initial_smiles: str
     solvents: list[str]
-    temperatures: list[float]
+    temperatures: list[float] = [273.15, 298.15, 323.15, 348.15, 373.15, 398.15, 423.15]  # 0–150 °C
 
     solubilities: dict[str, SolubilityResult] = {}
 
