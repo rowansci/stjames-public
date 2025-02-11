@@ -21,7 +21,7 @@ from .scan import *
 from .solubility import *
 from .spin_states import *
 from .tautomer import *
-from .workflow import Workflow
+from .workflow import *
 
 WORKFLOW_NAME = Literal[
     "admet",
