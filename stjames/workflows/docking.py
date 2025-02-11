@@ -1,8 +1,8 @@
 """Docking workflow."""
 
-from typing import Annotated
+from typing import Annotated, Self
 
-from pydantic import AfterValidator, ConfigDict, field_validator
+from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
 
 from ..base import Base, round_float
 from ..pdb import PDB
@@ -49,7 +49,8 @@ class DockingWorkflow(Workflow):
     do_optimization: bool = True
     conformers: list[UUID] = []
 
-    target: PDB
+    target: PDB | None = None
+    target_uuid: UUID | None = None
     pocket: tuple[Vector3D, Vector3D]
 
     do_pose_hydrogen_refinement: bool = True
@@ -60,16 +61,25 @@ class DockingWorkflow(Workflow):
 
     def __repr__(self) -> str:
         """Return a string representation of the Docking workflow."""
-        desc = self.target.description
-        target = desc.code or desc.title
-        ligand = "".join(atom.atomic_symbol for atom in self.initial_molecule.atoms)
+        if self.target is not None:
+            desc = self.target.description
+            target = desc.code or desc.title
+        else:
+            target = ""
 
+        ligand = "".join(atom.atomic_symbol for atom in self.initial_molecule.atoms)
         return f"<{type(self).__name__} {target} {ligand}>"
+
+    @model_validator(mode="after")
+    def check_protein(self) -> Self:
+        """Check if protein is provided."""
+        if not self.target and not self.target_uuid:
+            raise ValueError("Must provide either molecules or smiles")
+        return self
 
     @field_validator("pocket", mode="after")
     def validate_pocket(cls, pocket: tuple[Vector3D, Vector3D]) -> tuple[Vector3D, Vector3D]:
         center, size = pocket
         if any(q <= 0 for q in size):
             raise ValueError(f"Pocket size must be positive, got: {size}")
-
         return pocket

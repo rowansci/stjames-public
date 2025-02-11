@@ -17,11 +17,20 @@ def gfp() -> PDB:
 
 
 def test_raises(water: Molecule, gfp: str) -> None:
+    # negative pocket
     with raises(ValueError):
         DockingWorkflow(
             initial_molecule=water,
             mode=Mode.RAPID,
             target=gfp,
+            pocket=((0, 0, 0), (-1, -1, -1)),
+        )
+
+    # no protein
+    with raises(ValueError):
+        DockingWorkflow(
+            initial_molecule=water,
+            mode=Mode.RAPID,
             pocket=((0, 0, 0), (-1, -1, -1)),
         )
 
