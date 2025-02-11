@@ -1,3 +1,5 @@
+"""Spin-state prediction workflow."""
+
 from typing import Annotated, Any
 
 from pydantic import AfterValidator, BaseModel, Field, PositiveInt, field_validator, model_validator
@@ -6,7 +8,7 @@ from ..base import round_float
 from ..mode import Mode
 from ..types import UUID
 from .multistage_opt import MultiStageOptMixin
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 
 class SpinState(BaseModel):
@@ -37,7 +39,7 @@ class SpinState(BaseModel):
 _sentinel_mso_mode = object()
 
 
-class SpinStatesWorkflow(Workflow, MultiStageOptMixin):
+class SpinStatesWorkflow(MoleculeWorkflow, MultiStageOptMixin):
     """
     Workflow for computing spin states of molecules.
 

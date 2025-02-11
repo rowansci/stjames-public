@@ -1,3 +1,5 @@
+"""Electronic properties workflow."""
+
 from typing import Annotated
 
 from pydantic import AfterValidator, NonNegativeFloat, NonNegativeInt
@@ -5,7 +7,7 @@ from pydantic import AfterValidator, NonNegativeFloat, NonNegativeInt
 from ..base import Base, round_float
 from ..settings import Settings
 from ..types import UUID, FloatPerAtom, Matrix3x3, Vector3D, round_optional_float_per_atom, round_optional_matrix3x3, round_optional_vector3d
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 
 class PropertyCubePoint(Base):
@@ -34,12 +36,13 @@ class MolecularOrbitalCube(PropertyCube):
     energy: Annotated[float, AfterValidator(round_float(6))]
 
 
-class ElectronicPropertiesWorkflow(Workflow):
+class ElectronicPropertiesWorkflow(MoleculeWorkflow):
     """
     Workflow for computing electronic properties.
 
     Inherited
     :param initial_molecule: Molecule of interest
+    :param mode: Mode for workflow (currently unused)
 
     Config settings:
     :param settings: settings for the calculation

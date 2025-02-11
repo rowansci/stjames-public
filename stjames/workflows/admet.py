@@ -1,7 +1,18 @@
-from typing import Optional
+"""ADME-Tox property prediction workflow."""
 
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 
-class ADMETWorkflow(Workflow):
-    properties: Optional[dict[str, float | int]] = None
+class ADMETWorkflow(MoleculeWorkflow):
+    """
+    A workflow for predicting ADME-Tox properties.
+
+    Inherited:
+    :param initial_molecule: Molecule of interest
+    :param mode: Mode for workflow (currently unused)
+
+    New:
+    :param properties: predicted properties
+    """
+
+    properties: dict[str, float | int] | None = None

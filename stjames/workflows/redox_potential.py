@@ -1,3 +1,5 @@
+"""Redox potential workflow."""
+
 from typing import Annotated, Any, TypeVar
 
 from pydantic import AfterValidator, ValidationInfo, field_validator, model_validator
@@ -7,12 +9,12 @@ from ..mode import Mode
 from ..solvent import Solvent
 from ..types import UUID
 from .multistage_opt import MultiStageOptMixin
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 _T = TypeVar("_T")
 
 
-class RedoxPotentialWorkflow(Workflow, MultiStageOptMixin):
+class RedoxPotentialWorkflow(MoleculeWorkflow, MultiStageOptMixin):
     """
     Workflow for computing spin states of molecules.
 
