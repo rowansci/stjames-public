@@ -26,6 +26,10 @@ class DockingWorkflow(Workflow):
     """
     Docking workflow.
 
+    Note that the protein can be supplied either by UUID or raw PDB object.
+    We anticipate that the former will dominate deployed usage, but the latter is handy for isolated testing.
+    If, for whatever reason, the workflow is initialized with both a `target_uuid` and a `target`, the UUID will be ignored.
+
     Inherited:
     :param initial_molecule: Molecule of interest
     :param mode: Mode for workflow (currently unused)
@@ -36,7 +40,8 @@ class DockingWorkflow(Workflow):
     :param do_csearch: whether to csearch starting structures
     :param do_optimization: whether to optimize starting structures
     :param conformers: UUIDs of optimized conformers
-    :param target: PDB of the protein
+    :param target: PDB of the protein.
+    :param target_uuid: UUID of the protein.
     :param pocket: center (x, y, z) and size (x, y, z) of the pocket
 
     Results:
