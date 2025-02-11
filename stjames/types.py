@@ -1,4 +1,4 @@
-from typing import Callable, TypeAlias
+from typing import Callable, Iterable, TypeAlias
 
 UUID: TypeAlias = str
 
@@ -8,6 +8,15 @@ Vector3DPerAtom: TypeAlias = list[Vector3D]
 FloatPerAtom: TypeAlias = list[float]
 
 Matrix3x3: TypeAlias = tuple[Vector3D, Vector3D, Vector3D]
+
+
+def round_list(round_to: int = 6) -> Callable[[Iterable[float]], list[float]]:
+    """Create a validator that rounds each float in a list to a given number of decimal places."""
+
+    def rounder(values: Iterable[float]) -> list[float]:
+        return [round(value, round_to) for value in values]
+
+    return rounder
 
 
 def round_vector3d(round_to: int = 6) -> Callable[[Vector3D], Vector3D]:
