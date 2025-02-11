@@ -1,3 +1,5 @@
+"""Molecular dynamics workflow."""
+
 from typing import Self
 
 from pydantic import PositiveFloat, PositiveInt, computed_field, model_validator
@@ -6,22 +8,28 @@ from ..base import Base, LowercaseStrEnum
 from ..constraint import PairwiseHarmonicConstraint, SphericalHarmonicConstraint
 from ..settings import Settings
 from ..types import UUID
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 
 class MolecularDynamicsInitialization(LowercaseStrEnum):
+    """Initialization method for molecular dynamics."""
+
     RANDOM = "random"
     QUASICLASSICAL = "quasiclassical"
     READ = "read"
 
 
 class ThermodynamicEnsemble(LowercaseStrEnum):
+    """Thermodynamic ensemble for molecular dynamics."""
+
     NPT = "npt"
     NVT = "nvt"
     NVE = "nve"
 
 
 class Frame(Base):
+    """A frame in a molecular dynamics simulation."""
+
     index: int  # what number frame this is within the MD simulation
 
     calculation_uuid: UUID | None = None  # UUID of calculation
@@ -39,6 +47,8 @@ class Frame(Base):
 
 
 class MolecularDynamicsSettings(Base):
+    """Settings for a molecular dynamics simulation."""
+
     ensemble: ThermodynamicEnsemble = ThermodynamicEnsemble.NVT
     initialization: MolecularDynamicsInitialization = MolecularDynamicsInitialization.RANDOM
 
@@ -66,10 +76,25 @@ class MolecularDynamicsSettings(Base):
         return self
 
 
-class MolecularDynamicsWorkflow(Workflow):
+class MolecularDynamicsWorkflow(MoleculeWorkflow):
+    """
+    Workflow for running a molecular dynamics simulation.
+
+    Inherited:
+    :param initial_molecule: Molecule of interest
+    :param mode: Mode for workflow (currently unused)
+
+    New:
+    :param settings: settings for the molecular dynamics simulation
+    :param calc_settings: settings for the gradient calculation
+    :param calc_engine: engine to use for the gradient calculation
+
+    Results:
+    :param frames: Frames from the MD
+    """
+
     settings: MolecularDynamicsSettings
     calc_settings: Settings
     calc_engine: str | None = None
 
-    # UUIDs of scan points
     frames: list[Frame] = []

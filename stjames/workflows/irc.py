@@ -1,3 +1,5 @@
+"""Intrinsic reaction coordinate (IRC) workflow."""
+
 from typing import Self
 
 from pydantic import Field, PositiveFloat, field_validator, model_validator
@@ -7,12 +9,12 @@ from ..mode import Mode
 from ..settings import Settings
 from ..solvent import Solvent, SolventModel, SolventSettings
 from ..types import UUID
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 _sentinel_settings: Settings = object()  # type: ignore [assignment]
 
 
-class IRCWorkflow(Workflow):
+class IRCWorkflow(MoleculeWorkflow):
     """
     Workflow for Intrinsic Reaction Coordinate (IRC) calculations.
 

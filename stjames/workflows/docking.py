@@ -7,7 +7,7 @@ from pydantic import AfterValidator, ConfigDict, field_validator, model_validato
 from ..base import Base, round_float
 from ..pdb import PDB
 from ..types import UUID, Vector3D
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 
 class Score(Base):
@@ -22,7 +22,7 @@ class Score(Base):
     score: Annotated[float, AfterValidator(round_float(3))]
 
 
-class DockingWorkflow(Workflow):
+class DockingWorkflow(MoleculeWorkflow):
     """
     Docking workflow.
 
@@ -84,7 +84,7 @@ class DockingWorkflow(Workflow):
 
     @field_validator("pocket", mode="after")
     def validate_pocket(cls, pocket: tuple[Vector3D, Vector3D]) -> tuple[Vector3D, Vector3D]:
-        center, size = pocket
+        _center, size = pocket
         if any(q <= 0 for q in size):
             raise ValueError(f"Pocket size must be positive, got: {size}")
         return pocket

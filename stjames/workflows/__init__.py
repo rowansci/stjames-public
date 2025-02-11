@@ -18,9 +18,10 @@ from .multistage_opt import *
 from .pka import *
 from .redox_potential import *
 from .scan import *
+from .solubility import *
 from .spin_states import *
 from .tautomer import *
-from .workflow import Workflow
+from .workflow import *
 
 WORKFLOW_NAME = Literal[
     "admet",
@@ -39,11 +40,12 @@ WORKFLOW_NAME = Literal[
     "pka",
     "redox_potential",
     "scan",
+    "solubility",
     "spin_states",
     "tautomers",
 ]
 
-WORKFLOW_MAPPING: dict[str, Workflow] = {
+WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "admet": ADMETWorkflow,  # type: ignore [dict-item]
     "basic_calculation": BasicCalculationWorkflow,  # type: ignore [dict-item]
     "bde": BDEWorkflow,  # type: ignore [dict-item]
@@ -60,6 +62,7 @@ WORKFLOW_MAPPING: dict[str, Workflow] = {
     "pka": pKaWorkflow,  # type: ignore [dict-item]
     "redox_potential": RedoxPotentialWorkflow,  # type: ignore [dict-item]
     "scan": ScanWorkflow,  # type: ignore [dict-item]
+    "solubility": SolubilityWorkflow,  # type: ignore [dict-item]
     "spin_states": SpinStatesWorkflow,  # type: ignore [dict-item]
     "tautomers": TautomerWorkflow,  # type: ignore [dict-item]
 }

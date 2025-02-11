@@ -1,3 +1,5 @@
+"""Multi-stage optimization workflow."""
+
 from typing import Self, Sequence
 
 from pydantic import BaseModel, Field, model_validator
@@ -10,7 +12,7 @@ from ..settings import Settings
 from ..solvent import Solvent, SolventSettings
 from ..task import Task
 from ..types import UUID
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 
 class MultiStageOptSettings(BaseModel):
@@ -177,9 +179,9 @@ class MultiStageOptSettings(BaseModel):
                 raise NotImplementedError(f"Cannot assign settings for {mode=}")
 
 
-class MultiStageOptWorkflow(Workflow, MultiStageOptSettings):
+class MultiStageOptWorkflow(MoleculeWorkflow, MultiStageOptSettings):
     """
-    Workflow for multi-stage optimizations.
+    MoleculeWorkflow for multi-stage optimizations.
 
     Inherited
     :param initial_molecule: Molecule of interest
