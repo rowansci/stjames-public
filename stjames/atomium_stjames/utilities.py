@@ -5,7 +5,7 @@ import gzip
 from pathlib import Path
 from typing import Any, Callable
 
-from requests import get  # type: ignore [import-untyped]
+from requests import get  # type: ignore[import-untyped]
 
 from .mmcif import mmcif_dict_to_data_dict, mmcif_string_to_mmcif_dict
 from .pdb import pdb_dict_to_data_dict, pdb_string_to_pdb_dict
@@ -86,7 +86,7 @@ def fetch(code: str, file_dict: bool = False, data_dict: bool = False) -> dict[s
     raise ValueError(f"Could not find anything at {url}")
 
 
-def parse_string(filestring: str, path: Path | str, file_dict: bool = False, data_dict: bool = False) -> dict[str, Any]:
+def parse_string(filestring: Any, path: Path | str, file_dict: bool = False, data_dict: bool = False) -> dict[str, Any]:
     """
     Takes a filestring and parses it in the appropriate way. You must provide
     the string to parse itself, and some other string that ends in either .cif,

@@ -1,9 +1,11 @@
 import re
 from pathlib import Path
-from typing import Annotated, Iterable, Optional, Self
+from typing import Annotated, Iterable, Optional, Self, TypeAlias
 
 import pydantic
 from pydantic import AfterValidator, NonNegativeInt, PositiveInt, ValidationError
+from rdkit import Chem
+from rdkit.Chem import AllChem
 
 from .atom import Atom
 from .base import Base, round_float, round_optional_float
@@ -19,6 +21,8 @@ from .types import (
     round_optional_vector3d_per_atom,
     round_vector3d_per_atom,
 )
+
+RdkitMol: TypeAlias = Chem.rdchem.Mol | Chem.rdchem.RWMol
 
 
 class MoleculeReadError(RuntimeError):
@@ -262,6 +266,47 @@ class Molecule(Base):
             return cls(atoms=[Atom.from_xyz(line) for line in lines], cell=cell, charge=charge, multiplicity=multiplicity)
         except (ValueError, ValidationError) as e:
             raise MoleculeReadError("Error reading molecule from extxyz") from e
+
+    @classmethod
+    def from_rdkit(cls: type[Self], rdkm: RdkitMol, cid: int = 0) -> Self:
+        if len(rdkm.GetConformers()) == 0:
+            rdkm = _embed_rdkit_mol(rdkm)
+
+        atoms = []
+        atomic_numbers = [atom.GetAtomicNum() for atom in rdkm.GetAtoms()]  # type: ignore [no-untyped-call]
+        geom = rdkm.GetConformers()[cid].GetPositions()
+
+        for i in range(len(atomic_numbers)):
+            atoms.append(Atom(atomic_number=atomic_numbers[i], position=geom[i]))
+
+        charge = Chem.GetFormalCharge(rdkm)
+        multiplicity = 1
+
+        return cls(atoms=atoms, charge=charge, multiplicity=multiplicity)
+
+    @classmethod
+    def from_smiles(cls: type[Self], smiles: str) -> Self:
+        return cls.from_rdkit(Chem.MolFromSmiles(smiles))
+
+
+def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
+    try:
+        AllChem.SanitizeMol(rdkm)  # type: ignore [attr-defined]
+    except Exception as e:
+        raise ValueError("Molecule could not be generated -- invalid chemistry!\n") from e
+
+    rdkm = AllChem.AddHs(rdkm)  # type: ignore [attr-defined]
+    try:
+        status1 = AllChem.EmbedMolecule(rdkm, maxAttempts=200)  # type: ignore [attr-defined]
+        assert status1 >= 0
+    except Exception as e:
+        status1 = AllChem.EmbedMolecule(rdkm, maxAttempts=200, useRandomCoords=True)  # type: ignore [attr-defined]
+        if status1 < 0:
+            raise ValueError(f"Cannot embed molecule! Error: {e}")
+
+    AllChem.MMFFOptimizeMolecule(rdkm, maxIters=200)  # type: ignore [attr-defined]
+
+    return rdkm
 
 
 def parse_comment_line(line: str) -> PeriodicCell:
