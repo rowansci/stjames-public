@@ -24,6 +24,7 @@ repos:
         - numpy
         - pydantic
         - pytest
+        - rdkit
 
 - repo: local
   hooks:
