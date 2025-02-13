@@ -1,13 +1,13 @@
 """Docking workflow."""
 
-from typing import Annotated
+from typing import Annotated, Self
 
-from pydantic import AfterValidator, ConfigDict, field_validator
+from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
 
 from ..base import Base, round_float
 from ..pdb import PDB
 from ..types import UUID, Vector3D
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 
 class Score(Base):
@@ -22,9 +22,13 @@ class Score(Base):
     score: Annotated[float, AfterValidator(round_float(3))]
 
 
-class DockingWorkflow(Workflow):
+class DockingWorkflow(MoleculeWorkflow):
     """
     Docking workflow.
+
+    Note that the protein can be supplied either by UUID or raw PDB object.
+    We anticipate that the former will dominate deployed usage, but the latter is handy for isolated testing.
+    If, for whatever reason, the workflow is initialized with both a `target_uuid` and a `target`, the UUID will be ignored.
 
     Inherited:
     :param initial_molecule: Molecule of interest
@@ -36,7 +40,8 @@ class DockingWorkflow(Workflow):
     :param do_csearch: whether to csearch starting structures
     :param do_optimization: whether to optimize starting structures
     :param conformers: UUIDs of optimized conformers
-    :param target: PDB of the protein
+    :param target: PDB of the protein.
+    :param target_uuid: UUID of the protein.
     :param pocket: center (x, y, z) and size (x, y, z) of the pocket
 
     Results:
@@ -49,7 +54,8 @@ class DockingWorkflow(Workflow):
     do_optimization: bool = True
     conformers: list[UUID] = []
 
-    target: PDB
+    target: PDB | None = None
+    target_uuid: UUID | None = None
     pocket: tuple[Vector3D, Vector3D]
 
     do_pose_hydrogen_refinement: bool = True
@@ -60,16 +66,25 @@ class DockingWorkflow(Workflow):
 
     def __repr__(self) -> str:
         """Return a string representation of the Docking workflow."""
-        desc = self.target.description
-        target = desc.code or desc.title
-        ligand = "".join(atom.atomic_symbol for atom in self.initial_molecule.atoms)
+        if self.target is not None:
+            desc = self.target.description
+            target = desc.code or desc.title
+        else:
+            target = ""
 
+        ligand = "".join(atom.atomic_symbol for atom in self.initial_molecule.atoms)
         return f"<{type(self).__name__} {target} {ligand}>"
+
+    @model_validator(mode="after")
+    def check_protein(self) -> Self:
+        """Check if protein is provided."""
+        if not self.target and not self.target_uuid:
+            raise ValueError("Must provide either molecules or smiles")
+        return self
 
     @field_validator("pocket", mode="after")
     def validate_pocket(cls, pocket: tuple[Vector3D, Vector3D]) -> tuple[Vector3D, Vector3D]:
-        center, size = pocket
+        _center, size = pocket
         if any(q <= 0 for q in size):
             raise ValueError(f"Pocket size must be positive, got: {size}")
-
         return pocket

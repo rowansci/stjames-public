@@ -1,3 +1,5 @@
+"""Deprecated conformer search workflow, use ConformerSearchWorkflow instead."""
+
 from typing import Annotated, Any, Optional
 
 from pydantic import AfterValidator
@@ -7,7 +9,7 @@ from ..constraint import Constraint
 from ..method import Method
 from ..mode import Mode
 from ..solvent import Solvent
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 
 class ConformerSettings(Base):
@@ -42,7 +44,7 @@ class Conformer(Base):
     uuid: Optional[str] = None
 
 
-class ConformerWorkflow(Workflow):
+class ConformerWorkflow(MoleculeWorkflow):
     mode: Mode = Mode.RAPID
     settings: ConformerSettings = ConformerSettings()
     conformers: list[Conformer] = []

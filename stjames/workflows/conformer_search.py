@@ -1,4 +1,4 @@
-"""Conformer Search Workflow."""
+"""Conformer search workflow."""
 
 from abc import ABC
 from typing import Annotated, Self, Sequence, TypeVar
@@ -11,7 +11,7 @@ from ..method import Method, XTBMethod
 from ..mode import Mode
 from ..types import UUID, FloatPerAtom, round_float_per_atom
 from .multistage_opt import MultiStageOptMixin
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 _sentinel = object()
 
@@ -338,7 +338,7 @@ class ConformerSearchMixin(ConformerGenMixin, MultiStageOptMixin):
         return self
 
 
-class ConformerSearchWorkflow(ConformerSearchMixin, Workflow):
+class ConformerSearchWorkflow(ConformerSearchMixin, MoleculeWorkflow):
     """
     ConformerSearch Workflow.
 

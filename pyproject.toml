@@ -1,6 +1,6 @@
 [project]
 name = "stjames"
-version = "0.0.59"
+version = "0.0.62"
 description = "standardized JSON atom/molecule encoding scheme"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -9,11 +9,10 @@ authors = [
 ]
 
 dependencies = [
-    "atomium>=1,<2",
     "pydantic>=2.4",
     "numpy",
-    "atomium>=1.0,<2.0",
-    "requests"
+    "requests",
+    "rdkit",
 ]
 
 [build-system]

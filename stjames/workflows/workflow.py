@@ -1,3 +1,5 @@
+"""Base classes for workflows."""
+
 from pydantic import field_validator
 
 from ..base import Base
@@ -11,17 +13,38 @@ class Workflow(Base):
     """
     Base class for Workflows.
 
-    :param initial_molecule: Molecule of interest
-    :param mode: Mode to use
     :param messages: messages to display
     """
 
-    initial_molecule: Molecule
-    mode: Mode = Mode.AUTO
     messages: list[Message] = []
 
     def __str__(self) -> str:
         return repr(self)
+
+
+class SMILESWorkflow(Workflow):
+    """
+    Base class for Workflows that operate on a single SMILES string.
+
+    :param initial_smiles: SMILES string of interest
+    """
+
+    initial_smiles: str
+
+    def __repr__(self) -> str:
+        return f"<{type(self).__name__} {self.initial_smiles}>"
+
+
+class MoleculeWorkflow(Workflow):
+    """
+    Base class for Workflows that operate on a single molecule.
+
+    :param initial_molecule: Molecule of interest
+    :param mode: Mode to use
+    """
+
+    initial_molecule: Molecule
+    mode: Mode = Mode.AUTO
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__} {self.mode.name}>"

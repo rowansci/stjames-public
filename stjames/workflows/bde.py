@@ -1,4 +1,4 @@
-"""Bond Dissociation Energy (BDE) workflow."""
+"""Bond-dissociation energy (BDE) workflow."""
 
 import itertools
 from typing import Annotated, Any, Iterable, Self, TypeVar
@@ -10,7 +10,7 @@ from ..mode import Mode
 from ..molecule import Molecule
 from ..types import UUID
 from .multistage_opt import MultiStageOptMixin
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 # the id of a mutable object may change, thus using object()
 _sentinel_mso_mode = object()
@@ -19,7 +19,7 @@ _T = TypeVar("_T")
 
 class BDE(BaseModel):
     """
-    Bond Dissociation Energy (BDE) result.
+    Bond-dissociation energy (BDE) result.
 
     energy => (E_{fragment1} + E_{fragment2}) - E_{starting molecule}
 
@@ -49,9 +49,9 @@ class BDE(BaseModel):
         return f"<{type(self).__name__} {self.fragment_idxs} {energy}>"
 
 
-class BDEWorkflow(Workflow, MultiStageOptMixin):
+class BDEWorkflow(MoleculeWorkflow, MultiStageOptMixin):
     """
-    Bond Dissociation Energy (BDE) workflow.
+    Bond-dissociation energy (BDE) workflow.
 
     Uses the modes from MultiStageOptSettings to compute BDEs.
 
