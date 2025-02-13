@@ -4,8 +4,8 @@ from typing import Annotated, Iterable, Optional, Self, TypeAlias
 
 import pydantic
 from pydantic import AfterValidator, NonNegativeInt, PositiveInt, ValidationError
-from rdkit import Chem  # type: ignore [import-not-found]
-from rdkit.Chem import AllChem  # type: ignore [import-not-found]
+from rdkit import Chem
+from rdkit.Chem import AllChem
 
 from .atom import Atom
 from .base import Base, round_float, round_optional_float
@@ -273,7 +273,7 @@ class Molecule(Base):
             rdkm = _embed_rdkit_mol(rdkm)
 
         atoms = []
-        atomic_numbers = [atom.GetAtomicNum() for atom in rdkm.GetAtoms()]
+        atomic_numbers = [atom.GetAtomicNum() for atom in rdkm.GetAtoms()]  # type: ignore [no-untyped-call]
         geom = rdkm.GetConformers()[cid].GetPositions()
 
         for i in range(len(atomic_numbers)):
@@ -291,23 +291,20 @@ class Molecule(Base):
 
 def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
     try:
-        AllChem.SanitizeMol(rdkm)
+        AllChem.SanitizeMol(rdkm)  # type: ignore [attr-defined]
     except Exception as e:
         raise ValueError(f"Molecule could not be generated -- invalid chemistry!\n{e}")
 
-    rdkm = AllChem.AddHs(rdkm)
+    rdkm = AllChem.AddHs(rdkm)  # type: ignore [attr-defined]
     try:
-        status1 = AllChem.EmbedMolecule(rdkm, maxAttempts=200)
+        status1 = AllChem.EmbedMolecule(rdkm, maxAttempts=200)  # type: ignore [attr-defined]
         assert status1 >= 0
     except Exception as e:
-        status1 = AllChem.EmbedMolecule(rdkm, maxAttempts=200, useRandomCoords=True)
+        status1 = AllChem.EmbedMolecule(rdkm, maxAttempts=200, useRandomCoords=True)  # type: ignore [attr-defined]
         if status1 < 0:
             raise ValueError(f"Cannot embed molecule! Error: {e}")
-    try:
-        status2 = AllChem.MMFFOptimizeMolecule(rdkm, maxIters=200)
-        assert status2 >= 0
-    except AssertionError:
-        pass
+
+    AllChem.MMFFOptimizeMolecule(rdkm, maxIters=200)  # type: ignore [attr-defined]
 
     return rdkm
 
