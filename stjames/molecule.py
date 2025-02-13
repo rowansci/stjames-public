@@ -293,7 +293,7 @@ def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
     try:
         AllChem.SanitizeMol(rdkm)  # type: ignore [attr-defined]
     except Exception as e:
-        raise ValueError(f"Molecule could not be generated -- invalid chemistry!\n{e}")
+        raise ValueError("Molecule could not be generated -- invalid chemistry!\n") from e
 
     rdkm = AllChem.AddHs(rdkm)  # type: ignore [attr-defined]
     try:
