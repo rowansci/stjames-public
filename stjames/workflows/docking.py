@@ -39,6 +39,7 @@ class DockingWorkflow(MoleculeWorkflow):
     :param smiles: SMILES strings of the ligands (optional)
     :param do_csearch: whether to csearch starting structures
     :param do_optimization: whether to optimize starting structures
+    :param do_pose_refinement: whether to optimize non-rotatable bonds in output poses
     :param conformers: UUIDs of optimized conformers
     :param target: PDB of the protein.
     :param target_uuid: UUID of the protein.
@@ -58,7 +59,7 @@ class DockingWorkflow(MoleculeWorkflow):
     target_uuid: UUID | None = None
     pocket: tuple[Vector3D, Vector3D]
 
-    do_pose_hydrogen_refinement: bool = True
+    do_pose_refinement: bool = True
     scores: list[Score] = []
 
     def __str__(self) -> str:
