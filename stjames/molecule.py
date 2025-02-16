@@ -273,7 +273,7 @@ class Molecule(Base):
             rdkm = _embed_rdkit_mol(rdkm)
 
         atoms = []
-        atomic_numbers = [atom.GetAtomicNum() for atom in rdkm.GetAtoms()]  # type: ignore [no-untyped-call]
+        atomic_numbers = [atom.GetAtomicNum() for atom in rdkm.GetAtoms()]  # type: ignore [no-untyped-call, unused-ignore]
         geom = rdkm.GetConformers()[cid].GetPositions()
 
         for i in range(len(atomic_numbers)):
@@ -286,25 +286,27 @@ class Molecule(Base):
 
     @classmethod
     def from_smiles(cls: type[Self], smiles: str) -> Self:
-        return cls.from_rdkit(Chem.MolFromSmiles(smiles))
+        rdkm = Chem.MolFromSmiles(smiles)
+        assert rdkm is not None
+        return cls.from_rdkit(rdkm)
 
 
 def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
     try:
-        AllChem.SanitizeMol(rdkm)  # type: ignore [attr-defined]
+        AllChem.SanitizeMol(rdkm)  # type: ignore [attr-defined, unused-ignore]
     except Exception as e:
         raise ValueError("Molecule could not be generated -- invalid chemistry!\n") from e
 
-    rdkm = AllChem.AddHs(rdkm)  # type: ignore [attr-defined]
+    rdkm = AllChem.AddHs(rdkm)  # type: ignore [attr-defined, unused-ignore]
     try:
-        status1 = AllChem.EmbedMolecule(rdkm, maxAttempts=200)  # type: ignore [attr-defined]
+        status1 = AllChem.EmbedMolecule(rdkm, maxAttempts=200)  # type: ignore [attr-defined, unused-ignore]
         assert status1 >= 0
     except Exception as e:
-        status1 = AllChem.EmbedMolecule(rdkm, maxAttempts=200, useRandomCoords=True)  # type: ignore [attr-defined]
+        status1 = AllChem.EmbedMolecule(rdkm, maxAttempts=200, useRandomCoords=True)  # type: ignore [attr-defined, unused-ignore]
         if status1 < 0:
             raise ValueError(f"Cannot embed molecule! Error: {e}")
 
-    AllChem.MMFFOptimizeMolecule(rdkm, maxIters=200)  # type: ignore [attr-defined]
+    AllChem.MMFFOptimizeMolecule(rdkm, maxIters=200)  # type: ignore [attr-defined, call-arg, unused-ignore]
 
     return rdkm
 
