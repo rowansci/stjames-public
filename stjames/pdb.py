@@ -633,7 +633,7 @@ def _build_hetname_section(full_name_dict: dict[str, str]) -> list[str]:
 def _build_remark_section(pdb: PDB, chains: list[str]) -> list[str]:
     """Builds REMARK lines (resolution, R factors, biomolecule and missing residues)."""
     lines = []
-    lines.append(f"REMARK   2 RESOLUTION. {pdb.quality.resolution:>7} ANGSTROMS.")
+    lines.append(f"REMARK   2 RESOLUTION. {pdb.quality.resolution or '':>7} ANGSTROMS.")
     if pdb.quality.rfree:
         lines.append(f"REMARK   3   FREE R VALUE                     : {pdb.quality.rfree}")
     if pdb.quality.rvalue:
