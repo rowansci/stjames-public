@@ -64,7 +64,7 @@ def test_from_pdb_to_pdb_2qto() -> None:
     with open("tests/data/2qto.pdb") as f:
         data = f.read()
     pdb = pdb_from_pdb_filestring(data)
-    filestring = pdb_object_to_pdb_filestring(pdb, header=True, source=True, keyword=True)
+    filestring = pdb_object_to_pdb_filestring(pdb, header=True, source=True, keyword=True, crystallography=True)
     pdb2 = pdb_from_pdb_filestring(filestring)
 
     assert pdb == pdb2
@@ -73,7 +73,7 @@ def test_from_pdb_to_pdb_1ema() -> None:
     with open("tests/data/1ema.pdb") as f:
         data = f.read()
     pdb = pdb_from_pdb_filestring(data)
-    filestring = pdb_object_to_pdb_filestring(pdb, header=True, source=True, keyword=True)
+    filestring = pdb_object_to_pdb_filestring(pdb, header=True, source=True, keyword=True, crystallography=True)
     pdb2 = pdb_from_pdb_filestring(filestring)
 
     assert pdb == pdb2
