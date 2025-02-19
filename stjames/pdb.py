@@ -214,13 +214,18 @@ def pdb_from_mmcif_filestring(pdb: str) -> PDB:
     return PDB.model_validate(mmcif_dict_to_data_dict(mmcif_string_to_mmcif_dict(pdb)))
 
 
-def pdb_object_to_pdb_filestring(pdb: PDB) -> str:
+def pdb_object_to_pdb_filestring(pdb: PDB, header: bool = False, source: bool = False, keyword: bool = False) -> str:
     pdb_lines: list[str] = []
     chains: list[str] = []
-    # Header
-    pdb_lines.extend(_build_header_section(pdb))
-    pdb_lines.extend(_build_source_section(pdb))
-    pdb_lines.extend(_build_keyword_section(pdb))
+
+    if header:
+        pdb_lines.extend(_build_header_section(pdb))
+
+    if source:
+        pdb_lines.extend(_build_source_section(pdb))
+
+    if keyword:
+        pdb_lines.extend(_build_keyword_section(pdb))
 
     full_name_dict: dict[str, str] = {}
     seqres_lines, chains = _build_secondary_structure_and_seqres(pdb, full_name_dict)
