@@ -654,9 +654,9 @@ def _build_remark_section(pdb: PDB, chains: list[str]) -> list[str]:
     lines = []
     lines.append(f"REMARK   2 RESOLUTION. {pdb.quality.resolution or '':>7} ANGSTROMS.")
     if pdb.quality.rfree:
-        lines.append(f"REMARK   3   FREE R VALUE                     : {pdb.quality.rfree}")
+        lines.append(f"REMARK   3   FREE R VALUE                     : {pdb.quality.rfree or ''}")
     if pdb.quality.rvalue:
-        lines.append(f"REMARK   3   R VALUE            (WORKING SET) : {pdb.quality.rvalue}")
+        lines.append(f"REMARK   3   R VALUE            (WORKING SET) : {pdb.quality.rvalue or ''}")
 
     # REMARK 350: Biomolecule details
     lines.append("REMARK 350")
