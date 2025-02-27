@@ -214,23 +214,42 @@ def pdb_from_mmcif_filestring(pdb: str) -> PDB:
     return PDB.model_validate(mmcif_dict_to_data_dict(mmcif_string_to_mmcif_dict(pdb)))
 
 
-def pdb_object_to_pdb_filestring(pdb: PDB) -> str:
+def pdb_object_to_pdb_filestring(
+    pdb: PDB,
+    header: bool = False,
+    source: bool = False,
+    keyword: bool = False,
+    seqres: bool = True,
+    hetnam: bool = True,
+    remark: bool = True,
+    crystallography: bool = False,
+) -> str:
     pdb_lines: list[str] = []
     chains: list[str] = []
-    # Header
-    pdb_lines.extend(_build_header_section(pdb))
-    pdb_lines.extend(_build_source_section(pdb))
-    pdb_lines.extend(_build_keyword_section(pdb))
+
+    if header:
+        pdb_lines.extend(_build_header_section(pdb))
+
+    if source:
+        pdb_lines.extend(_build_source_section(pdb))
+
+    if keyword:
+        pdb_lines.extend(_build_keyword_section(pdb))
 
     full_name_dict: dict[str, str] = {}
     seqres_lines, chains = _build_secondary_structure_and_seqres(pdb, full_name_dict)
 
-    pdb_lines.extend(seqres_lines)
-    pdb_lines.extend(_build_hetname_section(full_name_dict))
+    if seqres:
+        pdb_lines.extend(seqres_lines)
 
-    pdb_lines.extend(_build_remark_section(pdb, chains))
+    if hetnam:
+        pdb_lines.extend(_build_hetname_section(full_name_dict))
 
-    pdb_lines.extend(_build_crystallography_section(pdb))
+    if remark:
+        pdb_lines.extend(_build_remark_section(pdb, chains))
+
+    if crystallography:
+        pdb_lines.extend(_build_crystallography_section(pdb))
 
     for model_index, model in enumerate(pdb.models, start=1):
         # If more than one model, add MODEL line
@@ -633,11 +652,11 @@ def _build_hetname_section(full_name_dict: dict[str, str]) -> list[str]:
 def _build_remark_section(pdb: PDB, chains: list[str]) -> list[str]:
     """Builds REMARK lines (resolution, R factors, biomolecule and missing residues)."""
     lines = []
-    lines.append(f"REMARK   2 RESOLUTION. {pdb.quality.resolution:>7} ANGSTROMS.")
+    lines.append(f"REMARK   2 RESOLUTION. {pdb.quality.resolution or '':>7} ANGSTROMS.")
     if pdb.quality.rfree:
-        lines.append(f"REMARK   3   FREE R VALUE                     : {pdb.quality.rfree}")
+        lines.append(f"REMARK   3   FREE R VALUE                     : {pdb.quality.rfree or ''}")
     if pdb.quality.rvalue:
-        lines.append(f"REMARK   3   R VALUE            (WORKING SET) : {pdb.quality.rvalue}")
+        lines.append(f"REMARK   3   R VALUE            (WORKING SET) : {pdb.quality.rvalue or ''}")
 
     # REMARK 350: Biomolecule details
     lines.append("REMARK 350")
