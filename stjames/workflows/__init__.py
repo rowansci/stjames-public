@@ -12,6 +12,7 @@ from .docking import *
 from .electronic_properties import *
 from .fukui import *
 from .hydrogen_bond_basicity import *
+from .ion_mobility import *
 from .irc import *
 from .molecular_dynamics import *
 from .multistage_opt import *
@@ -34,6 +35,7 @@ WORKFLOW_NAME = Literal[
     "electronic_properties",
     "fukui",
     "hydrogen_bond_basicity",
+    "ion_mobility",
     "irc",
     "molecular_dynamics",
     "multistage_opt",
@@ -56,6 +58,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "electronic_properties": ElectronicPropertiesWorkflow,  # type: ignore [dict-item]
     "fukui": FukuiIndexWorkflow,  # type: ignore [dict-item]
     "hydrogen_bond_basicity": HydrogenBondBasicityWorkflow,  # type: ignore [dict-item]
+    "ion_mobility": IonMobilityWorkflow,  # type: ignore [dict-item]
     "irc": IRCWorkflow,  # type: ignore [dict-item]
     "molecular_dynamics": MolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "multistage_opt": MultiStageOptWorkflow,  # type: ignore [dict-item]
