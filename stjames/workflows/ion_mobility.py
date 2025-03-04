@@ -17,8 +17,9 @@ class IonMobilityWorkflow(MoleculeWorkflow):
     :param do_optimization: whether to perform an optimization
 
     Results:
-    :param per_conformer_ccs: the collision cross section (Å**2) per conformer
-    :param per_conformer_ccs_stdev: the uncertainty in the same
+    :param conformer_ccs: the collision cross section (Å**2) per conformer
+    :param conformer_ccs_stdev: the uncertainty in the same
+    :param conformer_weights: the Boltzmann weights at RT
     :param average_ccs: the Boltzmann-weighted CCS for the ensemble
     :param average_ccs_stdev: the uncertainty in the same
     """
@@ -27,8 +28,9 @@ class IonMobilityWorkflow(MoleculeWorkflow):
     do_optimization: bool = True
     conformers: list[UUID] = []
 
-    per_conformer_ccs: list[float] = []
-    per_conformer_ccs_stdev: list[float] = []
+    conformer_ccs: list[float] = []
+    conformer_ccs_stdev: list[float] = []
+    boltzmann_weights: list[float] = []
 
     average_ccs: float | None = None
     average_ccs_stdev: float | None = None
