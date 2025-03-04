@@ -68,6 +68,7 @@ class Molecule(Base):
     thermal_free_energy_corr: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
 
     smiles: Optional[str] = None
+    calculation_index: int | None = None
 
     def __len__(self) -> int:
         return len(self.atoms)
