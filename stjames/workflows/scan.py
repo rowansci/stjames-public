@@ -4,7 +4,7 @@ from typing import Annotated
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import AfterValidator
+from pydantic import AfterValidator, field_validator
 
 from ..base import Base, round_optional_float
 from ..molecule import Molecule
@@ -63,14 +63,29 @@ class ScanWorkflow(MoleculeWorkflow):
 
     New:
     :param scan_settings: information about what coordinate to scan
+    :param scan_settings_2d: information about what coordinate to scan, but also for 2nd dimension if desired
     :param calc_settings: settings for the calculation
     :param calc_engine: engine to use for the calculation
     :param scan_points: points along the scan
     """
 
-    scan_settings: ScanSettings
+    scan_settings: ScanSettings | list[ScanSettings]
+    scan_settings_2d: ScanSettings | list[ScanSettings] = []
     calc_settings: Settings
     calc_engine: str
 
     # UUIDs of scan points
     scan_points: list[UUID | None] = []
+
+    @field_validator("scan_settings", "scan_settings_2d", mode="before")
+    @classmethod
+    def validate_scan_settings(cls, val: ScanSettings | list[ScanSettings]) -> list[ScanSettings]:
+        """Ensure that scan_settings is a list, and that every list item has the same number of steps."""
+        if isinstance(val, ScanSettings):
+            val = [val]
+
+        for ss in val:
+            if ss.num != val[0].num:
+                raise ValueError("Concerted scan settings must have same number of steps!")
+
+        return val
