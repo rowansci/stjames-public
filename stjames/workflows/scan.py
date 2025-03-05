@@ -4,7 +4,7 @@ from typing import Annotated
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import AfterValidator
+from pydantic import AfterValidator, field_validator
 
 from ..base import Base, round_optional_float
 from ..molecule import Molecule
@@ -62,15 +62,33 @@ class ScanWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     New:
-    :param scan_settings: information about what coordinate to scan
+    :param scan_settings: what coordinate(s) to scan; if more than one, all will be performed simultaneously and should have the same number of steps
+    :param scan_settings_2d: what additional coordinate(s) to scan; makes a grid with `scan_settings`
+    :param wavefront propagation: whether to use wavefront propagation (10.1063/5.0009232) for more expensive but smoother scans
     :param calc_settings: settings for the calculation
     :param calc_engine: engine to use for the calculation
     :param scan_points: points along the scan
     """
 
-    scan_settings: ScanSettings
+    scan_settings: ScanSettings | list[ScanSettings]
+    scan_settings_2d: ScanSettings | list[ScanSettings] = []
     calc_settings: Settings
     calc_engine: str
 
+    wavefront_propagation: bool = True
+
     # UUIDs of scan points
     scan_points: list[UUID | None] = []
+
+    @field_validator("scan_settings", "scan_settings_2d", mode="before")
+    @classmethod
+    def validate_scan_settings(cls, val: ScanSettings | list[ScanSettings]) -> list[ScanSettings]:
+        """Ensure that scan_settings is a list, and that every list item has the same number of steps."""
+        if isinstance(val, ScanSettings):
+            val = [val]
+
+        for ss in val:
+            if ss.num != val[0].num:
+                raise ValueError("Concerted scan settings must have same number of steps!")
+
+        return val
