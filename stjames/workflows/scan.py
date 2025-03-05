@@ -62,8 +62,9 @@ class ScanWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     New:
-    :param scan_settings: information about what coordinate to scan
-    :param scan_settings_2d: information about what coordinate to scan, but also for 2nd dimension if desired
+    :param scan_settings: what coordinate(s) to scan; if more than one, all will be performed simultaneously and should have the same number of steps
+    :param scan_settings_2d: what additional coordinate(s) to scan; makes a grid with `scan_settings`
+    :param wavefront propagation: whether to use wavefront propagation (10.1063/5.0009232) for more expensive but smoother scans
     :param calc_settings: settings for the calculation
     :param calc_engine: engine to use for the calculation
     :param scan_points: points along the scan
@@ -73,6 +74,8 @@ class ScanWorkflow(MoleculeWorkflow):
     scan_settings_2d: ScanSettings | list[ScanSettings] = []
     calc_settings: Settings
     calc_engine: str
+
+    wavefront_propagation: bool = True
 
     # UUIDs of scan points
     scan_points: list[UUID | None] = []
