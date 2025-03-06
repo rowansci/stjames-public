@@ -80,7 +80,7 @@ class ScanWorkflow(MoleculeWorkflow):
     # UUIDs of scan points
     scan_points: list[UUID | None] = []
 
-    @field_validator("scan_settings", "scan_settings_2d", mode="before")
+    @field_validator("scan_settings", "scan_settings_2d", mode="after")
     @classmethod
     def validate_scan_settings(cls, val: ScanSettings | list[ScanSettings]) -> list[ScanSettings]:
         """Ensure that scan_settings is a list, and that every list item has the same number of steps."""
