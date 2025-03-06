@@ -34,6 +34,7 @@ class VibrationalMode(Base):
     reduced_mass: Annotated[float, AfterValidator(round_float(3))]  # amu
     force_constant: Annotated[float, AfterValidator(round_float(3))]  # mDyne/Å
     displacements: Annotated[Vector3DPerAtom, AfterValidator(round_vector3d_per_atom(6))]  # Å
+    ir_intensity: Annotated[Optional[float], AfterValidator(round_float(3))] = None  # km/mol
 
 
 class Molecule(Base):
