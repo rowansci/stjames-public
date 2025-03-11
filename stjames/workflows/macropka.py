@@ -5,6 +5,7 @@ from typing import Annotated, Self
 from pydantic import AfterValidator, model_validator
 
 from ..base import Base, round_float
+from ..types import round_list
 from .workflow import SMILESWorkflow
 
 
@@ -12,20 +13,23 @@ class MacropKaMicrostate(Base):
     """
     A microstate for pKa calculations.
 
-    :param atom_index: index of the atom
-    :param structures: structures for the microstate
-    :param deltaG: relative free energy
-    :param pka: pKa
+    :param smiles: SMILES string for this conformer
+    :param energy: free energy of this conformer
+    :param charge: the total charge
     """
 
     smiles: str
-    energy: Annotated[float, AfterValidator(round_float(3))]  # relative free energy
+    energy: Annotated[float, AfterValidator(round_float(3))]  # free energy
     charge: int
 
 
 class MacropKaValue(Base):
     """
     Represents a change in pKa.
+
+    :param initial_charge: the charge of the initial state
+    :param final_charge: the charge of the final state
+    :param pKa: the pKa for the transition
     """
 
     initial_charge: int
@@ -57,7 +61,7 @@ class MacropKaWorkflow(SMILESWorkflow):
 
     microstates: list[MacropKaMicrostate] = []
     pKa_values: list[MacropKaValue] = []
-    microstate_weights_by_pH: dict[float, list[Annotated[float, AfterValidator(round_float(3))]]] = {}
+    microstate_weights_by_pH: dict[float, Annotated[list[float], AfterValidator(round_list(6))]] = {}
 
     @model_validator(mode="after")
     def check_weights(self) -> Self:
