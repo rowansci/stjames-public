@@ -15,8 +15,7 @@ from stjames.pdb import (
 
 def test_1ema() -> None:
     """Green fluorescent protein."""
-    a = fetch_pdb("1EMA")
-    print(a)
+    fetch_pdb("1EMA")
 
 
 def test_8qvy() -> None:
