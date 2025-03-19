@@ -204,6 +204,12 @@ def fetch_pdb(code: str) -> PDB:
     return PDB.model_validate(astj.fetch(code, data_dict=True))
 
 
+def fetch_pdb_from_mmcif(code: str) -> PDB:
+    """Fetch a pdb from the Protein Data Bank."""
+    code += ".cif"
+    return PDB.model_validate(astj.fetch(code, data_dict=True))
+
+
 def pdb_from_pdb_filestring(pdb: str) -> PDB:
     """Read a PDB from a string."""
     return PDB.model_validate(pdb_dict_to_data_dict(pdb_string_to_pdb_dict(pdb)))

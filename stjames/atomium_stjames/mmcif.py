@@ -516,7 +516,7 @@ def add_atom_to_polymer(atom: dict[str, Any], aniso: dict[int, Any], model: dict
         try:
             model["polymer"][mol_id]["residues"][res_id] = {
                 "name": name,
-                "full_name": names.get(name),
+                "full_name": names.get(name).upper() if names.get(name) is not None else None,  # type: ignore [union-attr]
                 "atoms": {int(atom["id"]): atom_dict_to_atom_dict(atom, aniso)},
                 "number": len(model["polymer"][mol_id]["residues"]) + 1,
             }
@@ -530,7 +530,7 @@ def add_atom_to_polymer(atom: dict[str, Any], aniso: dict[int, Any], model: dict
                         "name": name,
                         "atoms": {int(atom["id"]): atom_dict_to_atom_dict(atom, aniso)},
                         "number": 1,
-                        "full_name": names.get(name),
+                        "full_name": names.get(name).upper() if names.get(name) is not None else None,  # type: ignore [union-attr]
                     }
                 },
             }
@@ -547,6 +547,8 @@ def add_atom_to_non_polymer(atom: dict[str, Any], aniso: dict[int, Any], model: 
     :param names: lookup dictionary for full name information
     """
     mol_id = make_residue_id(atom)
+    if mol_type == "non-polymer":
+        mol_type = "non_polymer"
 
     try:
         model[mol_type][mol_id]["atoms"][int(atom["id"])] = atom_dict_to_atom_dict(atom, aniso)
@@ -554,7 +556,7 @@ def add_atom_to_non_polymer(atom: dict[str, Any], aniso: dict[int, Any], model: 
         name = atom["auth_comp_id"]
         model[mol_type][mol_id] = {
             "name": name,
-            "full_name": names.get(name),
+            "full_name": names.get(name).upper() if names.get(name) is not None and names.get(name).lower() != "water" else None,  # type: ignore [union-attr]
             "internal_id": atom["label_asym_id"],
             "polymer": atom["auth_asym_id"],
             "atoms": {int(atom["id"]): atom_dict_to_atom_dict(atom, aniso)},
@@ -644,7 +646,7 @@ def atom_dict_to_atom_dict(d: dict[str, Any], aniso_dict: dict[int, Any]) -> dic
         "bvalue": d.get("B_iso_or_equiv"),
         "charge": d.get(charge, 0) if d.get(charge) != "?" else 0,
         "alt_loc": d.get("label_alt_id") if d.get("label_alt_id") != "." else None,
-        "anisotropy": aniso_dict.get(int(d["id"]), [0, 0, 0, 0, 0, 0]),
+        "anisotropy": aniso_dict.get(int(d["id"]), None),
         "is_hetatm": d.get("group_PDB", "ATOM") == "HETATM",
     }
 

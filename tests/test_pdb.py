@@ -1,11 +1,29 @@
 from pytest import mark
 
-from stjames.pdb import PDB, fetch_pdb, pdb_from_mmcif_filestring, pdb_from_pdb_filestring, pdb_object_to_pdb_filestring
+from stjames.pdb import (
+    PDB,
+    PDBDescription,
+    PDBExperiment,
+    PDBModel,
+    fetch_pdb,
+    fetch_pdb_from_mmcif,
+    pdb_from_mmcif_filestring,
+    pdb_from_pdb_filestring,
+    pdb_object_to_pdb_filestring,
+)
 
 
 def test_1ema() -> None:
     """Green fluorescent protein."""
     fetch_pdb("1EMA")
+
+
+def test_8qvy() -> None:
+    """
+    Human GABAA receptor
+    Not availble as a .pdb
+    """
+    fetch_pdb_from_mmcif("8VQY")
 
 
 def test_read_pdb_filestring() -> None:
@@ -77,3 +95,46 @@ def test_from_pdb_to_pdb_1ema() -> None:
     pdb2 = pdb_from_pdb_filestring(filestring)
 
     assert pdb == pdb2
+
+def mmcif_author_format_to_pdb_format(authors: list[str]) -> list[str]:
+    return [f"{last.upper()}{first.upper()}" for first, last in
+            (author.split(", ") for author in authors)]
+
+def compare_descriptions_mmcif_and_pdb(mmcif_description: PDBDescription, pdb_description: PDBDescription) -> bool:
+    return (
+        mmcif_description.code == pdb_description.code and
+        mmcif_description.title == pdb_description.title and
+        mmcif_author_format_to_pdb_format(mmcif_description.authors) == (pdb_description.authors) and
+        mmcif_description.classification == pdb_description.classification and
+        mmcif_description.deposition_date == pdb_description.deposition_date and
+        sorted(mmcif_description.keywords) == sorted(pdb_description.keywords)
+    )
+
+def compare_experiments_mmcif_and_pdb(mmcif_experiment: PDBExperiment, pdb_experiment: PDBExperiment) -> bool:
+    return (
+        mmcif_experiment.expression_system.upper() == pdb_experiment.expression_system and  # type: ignore [union-attr]
+        mmcif_experiment.missing_residues == pdb_experiment.missing_residues and
+        mmcif_experiment.source_organism.upper() == pdb_experiment.source_organism and  # type: ignore [union-attr]
+        mmcif_experiment.technique == pdb_experiment.technique
+    )
+
+def compare_models_mmcif_and_pdb(mmcif_models: list[PDBModel], pdb_models: list[PDBModel]) -> bool:
+    for i in range(len(mmcif_models)):
+        assert mmcif_models[i].polymer == pdb_models[i].polymer
+        assert mmcif_models[i].non_polymer == pdb_models[i].non_polymer
+        assert mmcif_models[i].branched == pdb_models[i].branched
+    return True
+
+def test_from_mmcif_to_pdb_1ema() -> None:
+    with open("tests/data/1ema.cif") as f:
+        mmcif_data = f.read()
+
+    with open("tests/data/1ema.pdb") as f:
+        pdb_data = f.read()
+    mmcif_1ema = pdb_from_mmcif_filestring(mmcif_data)
+    pdb_1ema = pdb_from_pdb_filestring(pdb_data)
+
+    assert compare_descriptions_mmcif_and_pdb(mmcif_1ema.description, pdb_1ema.description)
+    assert compare_experiments_mmcif_and_pdb(mmcif_1ema.experiment, pdb_1ema.experiment)
+    assert mmcif_1ema.quality == pdb_1ema.quality
+    assert compare_models_mmcif_and_pdb(mmcif_1ema.models, pdb_1ema.models)
