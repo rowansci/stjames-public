@@ -1,4 +1,4 @@
-import pytest
+from pytest import mark, raises
 
 from stjames import Atom, Molecule, MoleculeReadError, PeriodicCell
 
@@ -294,7 +294,7 @@ def test_molecule_from_extxyz_valid_with_forces() -> None:
     )
 
 
-@pytest.mark.parametrize(
+@mark.parametrize(
     "invalid_extxyz",
     [
         incorrect_num_atoms,
@@ -318,5 +318,5 @@ def test_molecule_from_extxyz_invalid(invalid_extxyz: str) -> None:
     """
     Test that invalid extxyz strings raise MoleculeReadError.
     """
-    with pytest.raises(MoleculeReadError):
+    with raises(MoleculeReadError):
         Molecule.from_extxyz(invalid_extxyz)
