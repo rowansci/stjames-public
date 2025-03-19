@@ -247,27 +247,74 @@ class Molecule(Base):
 
     @classmethod
     def from_extxyz_lines(cls: type[Self], lines: Iterable[str], charge: int = 0, multiplicity: PositiveInt = 1) -> Self:
-        # ensure first line is number of atoms
+        """
+        Parses an EXTXYZ file, extracting atom positions, forces (if present), and metadata.
+
+        Supports:
+        - Lattice vectors (cell information)
+        - Properties field (species, positions, forces, etc.)
+        - Other metadata like charge, multiplicity, energy, etc.
+        """
+
         lines = list(lines)
+
+        # Ensure first line contains number of atoms
         if len(lines[0].split()) == 1:
             natoms = lines[0].strip()
-            if not natoms.isdigit() or (int(lines[0]) != len(lines) - 2):
-                raise MoleculeReadError(f"First line of EXTXYZ file should be the number of atoms, got: {lines[0]} != {len(lines) - 2}")
+            if not natoms.isdigit() or (int(natoms) != len(lines) - 2):
+                raise MoleculeReadError(f"First line should be number of atoms, got: {lines[0]} != {len(lines) - 2}")
             lines = lines[1:]
         else:
-            raise MoleculeReadError(f"First line of EXTXYZ should be only an int denoting number of atoms. Got {lines[0].split()}")
+            raise MoleculeReadError(f"First line should be an integer denoting atom count. Got {lines[0].split()}")
 
-        # ensure second line contains key-value pairs
-        if "=" not in lines[0]:
-            raise MoleculeReadError(f"Invalid property line, got {lines[0]}")
+        # Extract metadata from the second line
+        metadata = parse_comment_line(lines[0])
 
-        cell = parse_comment_line(lines[0])
-        lines = lines[1:]
+        lines = lines[1:]  # Move to atomic data
 
-        try:
-            return cls(atoms=[Atom.from_xyz(line) for line in lines], cell=cell, charge=charge, multiplicity=multiplicity)
-        except (ValueError, ValidationError) as e:
-            raise MoleculeReadError("Error reading molecule from extxyz") from e
+        # Extract key metadata values
+        cell = metadata.get("cell")
+        charge = metadata.get("total_charge", charge)
+        multiplicity = metadata.get("multiplicity", multiplicity)
+        energy = metadata.get("energy", None)
+
+        # Extract properties like species, positions, and forces
+        properties_str = metadata.get("Properties", "")
+        properties = properties_str.split(":")
+
+        if len(properties) < 4 or properties[0].lower() != "species":
+            raise MoleculeReadError(f"Invalid or missing 'Properties' field in EXTXYZ. Got: {properties_str}")
+
+        # Identify column indices for position and force data
+        pos_idx = None
+        force_idx = None
+        current_idx = 0  # Start after 'species:S'
+
+        while current_idx < len(properties):
+            if properties[current_idx].lower() == "pos" and properties[current_idx + 1].lower() == "r" and properties[current_idx + 2] == "3":
+                pos_idx = current_idx
+            elif properties[current_idx].lower() == "forces" and properties[current_idx + 1].lower() == "r" and properties[current_idx + 2] == "3":
+                force_idx = current_idx
+            current_idx += 3  # Move to next property group
+
+        if pos_idx is None:
+            raise MoleculeReadError("No position data ('pos:R:3') found in Properties field.")
+
+        atoms = []
+        gradients = [] if force_idx is not None else None  # Will store gradients (-forces)
+
+        for line in lines:
+            values = line.split()
+            species = values[0]
+            position = tuple(map(float, values[1:4]))
+
+            atom = Atom.from_xyz(f"{species} {position[0]} {position[1]} {position[2]}")
+            atoms.append(atom)
+
+            if force_idx is not None:
+                force = tuple(map(float, values[4:7]))  # Forces are in next 3 columns
+                gradients.append(tuple(-f for f in force))  # Store gradients as -forces
+        return cls(atoms=atoms, cell=cell, charge=charge, multiplicity=multiplicity, energy=energy, gradient=gradients)
 
     @classmethod
     def from_rdkit(cls: type[Self], rdkm: RdkitMol, cid: int = 0) -> Self:
@@ -313,43 +360,55 @@ def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
     return rdkm
 
 
-def parse_comment_line(line: str) -> PeriodicCell:
+def parse_comment_line(line: str) -> dict:
     """
-    currently only supporting lattice and porperites fields from comment line
-    modify in future to support other fields from comment from_xyz_lines
-    ex: name, mulitplicity, charge, etc.
+    Parse the comment line of an EXTXYZ file, extracting lattice, properties, and metadata.
+
+    Supports:
+    - Lattice vectors (cell information)
+    - Properties field (species, positions, forces, etc.)
+    - Other metadata fields like charge, multiplicity, energy, etc.
+
+    Returns:
+        dict: Parsed properties including `cell`, `Properties`, and any other metadata.
     """
-    cell = None
+
     # Regular expression to match key="value", key='value', or key=value
     pattern = r"(\S+?=(?:\".*?\"|\'.*?\'|\S+))"
     pairs = re.findall(pattern, line)
 
     prop_dict = {}
+    cell = None
+
     for pair in pairs:
         key, value = pair.split("=", 1)
-        if key.lower() == "lattice":
-            value = value.strip("'\"").split()
-            if len(value) != 9:
-                raise MoleculeReadError(f"Lattice should have 9 entries got {len(value)}")
+        key = key.lower().strip()
+        value = value.strip("'\"")
 
-            # Convert the value to a 3x3 tuple of tuples of floats
+        if key == "lattice":
+            lattice_values = value.split()
+            if len(lattice_values) != 9:
+                raise MoleculeReadError(f"Lattice should have 9 entries, got {len(lattice_values)}")
+
+            # Convert to a 3x3 tuple of floats
             try:
-                cell = tuple(tuple(map(float, value[i : i + 3])) for i in range(0, 9, 3))
+                cell = tuple(tuple(map(float, lattice_values[i : i + 3])) for i in range(0, 9, 3))
             except ValueError:
-                raise MoleculeReadError(f"Lattice should be floats, got {value}")
+                raise MoleculeReadError(f"Lattice should be floats, got {lattice_values}")
 
-            prop_dict[key] = value
+        elif key == "properties":
+            prop_dict["Properties"] = value  # Store properties as raw text
 
-        elif key.lower() == "properties":
-            if value.lower() != "species:s:1:pos:r:3":
-                raise MoleculeReadError(f"Only accepting properties of form species:S:1:pos:R:3, got {value}")
-            prop_dict[key] = value
+        elif key in {"total_charge", "multiplicity"}:
+            prop_dict[key] = int(value)  # Store charge and multiplicity as integers
+
+        elif key in {"energy"}:
+            prop_dict[key] = float(value)  # Store energy as float
+
         else:
-            raise MoleculeReadError(f"Currently only accepting lattice and propery keys. Got {key}")
+            prop_dict[key] = value  # Store any other metadata as a string
 
-    if cell is None:
-        raise MoleculeReadError("Lattice field is required but missing.")
+    if cell is not None:
+        prop_dict["cell"] = PeriodicCell(lattice_vectors=cell)
 
-    if "properties" not in [key.lower() for key in prop_dict.keys()]:
-        raise MoleculeReadError(f"Property field is required, got keys {prop_dict.keys()}")
-    return PeriodicCell(lattice_vectors=cell)
+    return prop_dict
