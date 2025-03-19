@@ -301,7 +301,7 @@ class Molecule(Base):
             raise MoleculeReadError("No position data ('pos:R:3') found in Properties field.")
 
         atoms = []
-        gradients = [] if force_idx is not None else None  # Will store gradients (-forces)
+        gradients = [] if force_idx is not None else None  # type: ignore [var-annotated]
 
         for line in lines:
             values = line.split()
@@ -313,7 +313,7 @@ class Molecule(Base):
 
             if force_idx is not None:
                 force = tuple(map(float, values[4:7]))  # Forces are in next 3 columns
-                gradients.append(tuple(-f for f in force))  # Store gradients as -forces
+                gradients.append(tuple(-f for f in force))  # type: ignore [union-attr]
         return cls(atoms=atoms, cell=cell, charge=charge, multiplicity=multiplicity, energy=energy, gradient=gradients)
 
     @classmethod
@@ -360,7 +360,7 @@ def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
     return rdkm
 
 
-def parse_comment_line(line: str) -> dict:
+def parse_comment_line(line: str) -> dict:  # type: ignore [type-arg]
     """
     Parse the comment line of an EXTXYZ file, extracting lattice, properties, and metadata.
 
