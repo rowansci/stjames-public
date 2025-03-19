@@ -97,7 +97,7 @@ def test_from_pdb_to_pdb_1ema() -> None:
     assert pdb == pdb2
 
 def test_from_pdb_to_pdb_2hu4() -> None:
-    with open("tests/data/2hu4.pdb") as f:
+    with open("tests/data/2HU4.pdb") as f:
         data = f.read()
     pdb = pdb_from_pdb_filestring(data)
     filestring = pdb_object_to_pdb_filestring(pdb, header=True, source=True, keyword=True, crystallography=True)
