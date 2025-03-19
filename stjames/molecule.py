@@ -1,6 +1,6 @@
 import re
 from pathlib import Path
-from typing import Annotated, Iterable, Optional, Self, TypeAlias
+from typing import Annotated, Any, Iterable, Optional, Self, TypeAlias
 
 import pydantic
 from pydantic import AfterValidator, NonNegativeInt, PositiveInt, ValidationError
@@ -301,7 +301,7 @@ class Molecule(Base):
             raise MoleculeReadError("No position data ('pos:R:3') found in Properties field.")
 
         atoms = []
-        gradients = [] if force_idx is not None else None  # Will store gradients (-forces)
+        gradients: list[tuple[float, float, float]] = []  # Will store gradients (-forces)
 
         for line in lines:
             values = line.split()
@@ -312,9 +312,12 @@ class Molecule(Base):
             atoms.append(atom)
 
             if force_idx is not None:
-                force = tuple(map(float, values[4:7]))  # Forces are in next 3 columns
-                gradients.append(tuple(-f for f in force))  # Store gradients as -forces
-        return cls(atoms=atoms, cell=cell, charge=charge, multiplicity=multiplicity, energy=energy, gradient=gradients)
+                force = tuple(map(float, values[4:7]))
+                gradients.append(tuple(-f for f in force))  # type:ignore [arg-type]
+
+        actual_gradients = gradients or None
+
+        return cls(atoms=atoms, cell=cell, charge=charge, multiplicity=multiplicity, energy=energy, gradient=actual_gradients)
 
     @classmethod
     def from_rdkit(cls: type[Self], rdkm: RdkitMol, cid: int = 0) -> Self:
@@ -360,7 +363,7 @@ def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
     return rdkm
 
 
-def parse_comment_line(line: str) -> dict:
+def parse_comment_line(line: str) -> dict[str, Any]:
     """
     Parse the comment line of an EXTXYZ file, extracting lattice, properties, and metadata.
 
