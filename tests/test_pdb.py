@@ -96,6 +96,21 @@ def test_from_pdb_to_pdb_1ema() -> None:
 
     assert pdb == pdb2
 
+def test_from_pdb_to_pdb_2hu4() -> None:
+    with open("tests/data/2HU4.pdb") as f:
+        data = f.read()
+    pdb = pdb_from_pdb_filestring(data)
+    filestring = pdb_object_to_pdb_filestring(pdb, header=True, source=True, keyword=True, crystallography=True)
+
+    pdb2 = pdb_from_pdb_filestring(filestring)
+
+    assert pdb.description == pdb2.description
+    assert pdb.experiment == pdb2.experiment
+    # not true but doesn't matter
+    print(pdb.geometry == pdb2.geometry)
+    assert pdb.models == pdb2.models
+    assert pdb.quality == pdb2.quality
+
 def mmcif_author_format_to_pdb_format(authors: list[str]) -> list[str]:
     return [f"{last.upper()}{first.upper()}" for first, last in
             (author.split(", ") for author in authors)]

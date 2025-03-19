@@ -1,3 +1,4 @@
+import re
 from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Literal
@@ -276,7 +277,7 @@ def pdb_object_to_pdb_filestring(
                         atom=atom,
                         chain_id=this_chain_id,
                         res_name=residue.name,
-                        res_num=int(_residue_id[2:]),
+                        res_num=_residue_id[2:],
                         alt_loc=atom.alt_loc or "",
                     )
                     pdb_lines.append(line)
@@ -286,7 +287,7 @@ def pdb_object_to_pdb_filestring(
                             atom=atom,
                             chain_id=this_chain_id,
                             res_name=residue.name,
-                            res_num=int(_residue_id[2:]),
+                            res_num=_residue_id[2:],
                             alt_loc=atom.alt_loc or "",
                         )
                         pdb_lines.append(line)
@@ -308,7 +309,7 @@ def pdb_object_to_pdb_filestring(
                     atom=atom,
                     chain_id=chain_id_for_np,
                     res_name=nonpoly.name,
-                    res_num=int(_np_id[2:]),
+                    res_num=_np_id[2:],
                 )
                 pdb_lines.append(line)
                 if atom.anisotropy and atom.anisotropy != [0, 0, 0, 0, 0, 0]:
@@ -317,7 +318,7 @@ def pdb_object_to_pdb_filestring(
                         atom=atom,
                         chain_id=chain_id_for_np,
                         res_name=nonpoly.name,
-                        res_num=int(_np_id[2:]),
+                        res_num=_np_id[2:],
                     )
                     pdb_lines.append(line)
 
@@ -330,7 +331,7 @@ def pdb_object_to_pdb_filestring(
                     atom=atom,
                     chain_id=_w_id[0],  # Or you can use water.polymer if set
                     res_name="HOH",
-                    res_num=int(_w_id[2:]),  # or an incrementing value
+                    res_num=_w_id[2:],  # or an incrementing value
                 )
                 pdb_lines.append(line)
                 if atom.anisotropy and atom.anisotropy != [0, 0, 0, 0, 0, 0]:
@@ -339,7 +340,7 @@ def pdb_object_to_pdb_filestring(
                         atom=atom,
                         chain_id=_w_id[0],
                         res_name="HOH",
-                        res_num=int(_w_id[2:]),
+                        res_num=_w_id[2:],
                     )
                     pdb_lines.append(line)
 
@@ -357,7 +358,7 @@ def pdb_object_to_pdb_filestring(
                         atom=atom,
                         chain_id="B",
                         res_name="BRN",  # or branched_obj.get("name", "BRN")
-                        res_num=1,
+                        res_num="1",
                     )
                     pdb_lines.append(line)
                     if atom.anisotropy and atom.anisotropy != [0, 0, 0, 0, 0, 0]:
@@ -366,7 +367,7 @@ def pdb_object_to_pdb_filestring(
                             atom=atom,
                             chain_id="B",
                             res_name="BRN",
-                            res_num=1,
+                            res_num="1",
                         )
                         pdb_lines.append(line)
 
@@ -407,7 +408,7 @@ def _format_atom_line(
     atom: PDBAtom,
     chain_id: str,
     res_name: str,
-    res_num: int | None,
+    res_num: str | None,
     alt_loc: str = "",
 ) -> str:
     """
@@ -423,7 +424,15 @@ def _format_atom_line(
     alt_loc_char = alt_loc if alt_loc else " "
     residue_name = (res_name or "UNK")[:3]  # limit to 3 chars
     chain_char = (chain_id or "A")[:1]  # PDB chain ID is 1 char
-    residue_num = res_num if res_num is not None else 1
+    residue_num_str = "1"
+    insertion_code = " "
+    if res_num:
+        match = re.match(r"(\d+)([a-zA-Z]*)", res_num)
+        if match:
+            residue_num_str, insertion_code = match.groups()
+            insertion_code = insertion_code if insertion_code != "" else " "
+
+    residue_num = int(residue_num_str)
 
     # Format charge: PDB uses e.g. " 2-", " 1+" in columns 79-80
     # If your model stores charges differently, adapt as needed.
@@ -451,7 +460,8 @@ def _format_atom_line(
         f"{residue_name:>3}"  # residue name (columns 18-20)
         f" {chain_char}"  # chain ID (column 22)
         f"{residue_num:4d}"  # residue sequence number (columns 23-26)
-        f"    "  # columns 27-30 (insertion code plus spacing)
+        f"{insertion_code}"
+        f"   "  # columns 27-30 (spacing)
         f"{atom.x:8.3f}"  # x (columns 31-38)
         f"{atom.y:8.3f}"  # y (columns 39-46)
         f"{atom.z:8.3f}"  # z (columns 47-54)
@@ -469,7 +479,7 @@ def _format_anisou_line(
     atom: PDBAtom,
     chain_id: str,
     res_name: str,
-    res_num: int | None,
+    res_num: str | None,
     alt_loc: str = "",
 ) -> str:
     """
@@ -485,7 +495,15 @@ def _format_anisou_line(
     alt_loc_char = alt_loc if alt_loc else " "
     residue_name = (res_name or "UNK")[:3]  # limit to 3 chars
     chain_char = (chain_id or "A")[:1]  # PDB chain ID is 1 char
-    residue_num = res_num if res_num is not None else 1
+    residue_num_str = "1"
+    insertion_code = " "
+    if res_num:
+        match = re.match(r"(\d+)([a-zA-Z]*)", res_num)
+        if match:
+            residue_num_str, insertion_code = match.groups()
+            insertion_code = insertion_code if insertion_code != "" else " "
+
+    residue_num = int(residue_num_str)
 
     chg = ""
     if atom.charge and abs(atom.charge) > 0:
@@ -528,7 +546,8 @@ def _format_anisou_line(
         f"{residue_name:>3}"  # residue name (columns 18-20)
         f" {chain_char}"  # chain ID (column 22)
         f"{residue_num:4d}"  # residue sequence number (columns 23-26)
-        f"  "  # columns 27-28 (insertion code plus spacing)
+        f"{insertion_code}"
+        f" "  # columns 27-28 (plus spacing)
         f"{aniso_lines}"
         f"      "  # columns 70-76 (padding)
         f"{atom.element:>2}"  # element (columns 77-78)
