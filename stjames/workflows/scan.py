@@ -18,7 +18,7 @@ class ScanPoint(Base):
     A point in a scan.
 
     :param index: index of the point
-    :param index: index of the point in 2nd dimension, if applicable
+    :param index_2d: index of the point in 2nd dimension, if applicable
     :param molecule: Molecule at the point
     :param energy: energy of the point
     :param uuid: UUID of the calculation
