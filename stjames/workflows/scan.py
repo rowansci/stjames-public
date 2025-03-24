@@ -18,12 +18,14 @@ class ScanPoint(Base):
     A point in a scan.
 
     :param index: index of the point
+    :param index_2d: index of the point in 2nd dimension, if applicable
     :param molecule: Molecule at the point
     :param energy: energy of the point
     :param uuid: UUID of the calculation
     """
 
     index: int
+    index_2d: int = 0
     molecule: Molecule
     energy: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
     uuid: UUID | None = None

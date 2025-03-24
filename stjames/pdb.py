@@ -292,7 +292,7 @@ def pdb_object_to_pdb_filestring(
                         )
                         pdb_lines.append(line)
 
-            pdb_lines.append(f"TER   {_atom_id + 1:>5}      {residue.name:>3} {this_chain_id}{int(_residue_id[2:]):>4}")
+            pdb_lines.append(f"TER   {_atom_id + 1:>5}      {residue.name:>3} {this_chain_id}{_residue_id[2:]:>4}")
 
         # === 2) Non-polymers (e.g. ligands, ions) ===
         for _np_id, nonpoly in model.non_polymer.items():
