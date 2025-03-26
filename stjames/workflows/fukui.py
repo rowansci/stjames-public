@@ -5,7 +5,7 @@ from typing import Annotated
 from pydantic import AfterValidator
 
 from ..base import round_optional_float
-from ..method import Method
+from ..settings import Settings
 from ..types import UUID, FloatPerAtom, round_optional_float_per_atom
 from .workflow import MoleculeWorkflow
 
@@ -19,9 +19,10 @@ class FukuiIndexWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     Settings:
-    :param do_optimization: whether or not to optimize
-    :param method: the method
-    :param engine_str: the engine
+    :param opt_settings: if given, the settings for optimization. if none, no optimization will be conducted.
+    :param opt_engine: the engine for optimization
+    :param fukui_settings: the settings for Fukui index calculations.
+    :param fukui_engine: the engine for Fukui index calculations
 
     Results:
     :param optimization: UUID of optimization
@@ -31,11 +32,13 @@ class FukuiIndexWorkflow(MoleculeWorkflow):
     :param fukui_zero: Fukui index for zero charges
     """
 
-    do_optimization: bool = True
-    optimization: UUID | None = None
+    opt_settings: Settings | None = None
+    opt_engine: str | None = None
 
-    method: Method = Method.GFN1_XTB
-    engine_str: str | None = None
+    fukui_settings: Settings = Settings(method="gfn1_xtb")
+    fukui_engine: str | None = None
+
+    optimization: UUID | None = None
 
     global_electrophilicity_index: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
     fukui_positive: Annotated[FloatPerAtom | None, AfterValidator(round_optional_float_per_atom(6))] = None
