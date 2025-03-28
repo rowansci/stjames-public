@@ -55,9 +55,11 @@ class MacropKaWorkflow(SMILESWorkflow):
     :param microstate_weights_by_pH: precompute the % of different microstates
     """
 
-    temperature: Annotated[float, AfterValidator(round_float(3))] = 298.0
     min_pH: Annotated[float, AfterValidator(round_float(3))] = 0.0
     max_pH: Annotated[float, AfterValidator(round_float(3))] = 14.0
+
+    max_charge: int = 2
+    min_charge: int = -2
 
     microstates: list[MacropKaMicrostate] = []
     pKa_values: list[MacropKaValue] = []
@@ -68,5 +70,12 @@ class MacropKaWorkflow(SMILESWorkflow):
         for weights in self.microstate_weights_by_pH.values():
             if len(weights) != len(self.microstates):
                 raise ValueError("Length of microstate weights doesn't match!")
+
+        return self
+
+    @model_validator(mode="after")
+    def check_minmax_charges(self) -> Self:
+        if self.min_charge >= self.max_charge:
+            raise ValueError("Incoherent min/max charge specification")
 
         return self
