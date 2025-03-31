@@ -1,6 +1,6 @@
 """pKa workflow."""
 
-from typing import Annotated, Self
+from typing import Annotated, Optional, Self
 
 from pydantic import AfterValidator, model_validator
 
@@ -64,6 +64,8 @@ class MacropKaWorkflow(SMILESWorkflow):
     microstates: list[MacropKaMicrostate] = []
     pKa_values: list[MacropKaValue] = []
     microstate_weights_by_pH: dict[float, Annotated[list[float], AfterValidator(round_list(6))]] = {}
+
+    isoelectric_point: Annotated[Optional[float], AfterValidator(round_float(3))] = None
 
     @model_validator(mode="after")
     def check_weights(self) -> Self:
