@@ -63,7 +63,10 @@ class MacropKaWorkflow(SMILESWorkflow):
 
     microstates: list[MacropKaMicrostate] = []
     pKa_values: list[MacropKaValue] = []
-    microstate_weights_by_pH: dict[float, Annotated[list[float], AfterValidator(round_list(6))]] = {}
+    microstate_weights_by_pH: dict[
+        Annotated[float, AfterValidator(round_float(3))],
+        Annotated[list[float], AfterValidator(round_list(6))],
+    ] = {}
 
     isoelectric_point: Annotated[Optional[float], AfterValidator(round_float(3))] = None
 
