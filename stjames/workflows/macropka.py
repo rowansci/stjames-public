@@ -63,16 +63,25 @@ class MacropKaWorkflow(SMILESWorkflow):
 
     microstates: list[MacropKaMicrostate] = []
     pKa_values: list[MacropKaValue] = []
-    microstate_weights_by_pH: dict[
-        Annotated[float, AfterValidator(round_float(3))],
-        Annotated[list[float], AfterValidator(round_list(6))],
-    ] = {}
+    microstate_weights_by_pH: list[
+        tuple[
+            Annotated[float, AfterValidator(round_float(3))],
+            Annotated[list[float], AfterValidator(round_list(6))],
+        ]
+    ] = []
 
     isoelectric_point: Annotated[Optional[float], AfterValidator(round_float(3))] = None
 
+    logD_by_pH: list[
+        tuple[
+            Annotated[float, AfterValidator(round_float(3))],
+            Annotated[float, AfterValidator(round_float(3))],
+        ]
+    ] = []
+
     @model_validator(mode="after")
     def check_weights(self) -> Self:
-        for weights in self.microstate_weights_by_pH.values():
+        for _, weights in self.microstate_weights_by_pH:
             if len(weights) != len(self.microstates):
                 raise ValueError("Length of microstate weights doesn't match!")
 
