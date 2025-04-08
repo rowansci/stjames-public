@@ -36,6 +36,7 @@ class Method(LowercaseStrEnum):
     OCP24_S = "ocp24_s"
     OCP24_L = "ocp24_l"
     ORB_V2 = "orb_v2"
+    ORB_V3_CONSERVATIVE_INF_OMAT = "orb_v3_conservative_inf_omat"
 
     GFN_FF = "gfn_ff"
     GFN0_XTB = "gfn0_xtb"
