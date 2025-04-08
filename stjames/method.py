@@ -36,6 +36,7 @@ class Method(LowercaseStrEnum):
     OCP24_S = "ocp24_s"
     OCP24_L = "ocp24_l"
     ORB_V2 = "orb_v2"
+    ORB_V3_CONSERVATIVE_INF_OMAT = "orb_v3_conservative_inf_omat"
 
     GFN_FF = "gfn_ff"
     GFN0_XTB = "gfn0_xtb"
@@ -50,8 +51,8 @@ class Method(LowercaseStrEnum):
     RM1 = "rm1"
 
 
-PrepackagedNNPMethod = Literal[Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L, Method.RM1]
-PREPACKAGED_NNP_METHODS = [Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L, Method.RM1]
+PrepackagedNNPMethod = Literal[Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L, Method.RM1, Method.ORB_V3_CONSERVATIVE_INF_OMAT]
+PREPACKAGED_NNP_METHODS = [Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L, Method.RM1, Method.ORB_V3_CONSERVATIVE_INF_OMAT]
 
 CorrectableNNPMethod = Literal[Method.MACE_MP_0B2_L, Method.ORB_V2]
 CORRECTABLE_NNP_METHODS = [Method.MACE_MP_0B2_L, Method.ORB_V2]
