@@ -9,6 +9,7 @@ from .constraint import Constraint
 class OptimizationSettings(Base):
     max_steps: PositiveInt = 250
     transition_state: bool = False
+    recalc_hess_every: int = 0  # Recalculate the hessian every `n` steps (or never with 0)
 
     # when are we converged? (Hartree and Hartree/Å)
     max_gradient_threshold: PositiveFloat = 7e-4
