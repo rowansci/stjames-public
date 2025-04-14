@@ -45,32 +45,39 @@ class MacropKaWorkflow(SMILESWorkflow):
     :param initial_smiles:
 
     New:
-    :param temperature: the temperature, in K
-    :param min_pH: for precomputed microstate weights
-    :param max_pH: for precomputed microstate weights
+    :param min_pH: for precomputed microstate weights, logD, etc
+    :param max_pH: for precomputed microstate weights, logD, etc
+    :param max_charge: max charge to consider for microstates
+    :param min_charge: min charge to consider for microstates
+    :param compute_solvation_energy: whether to run a csearch + compute the solvation energy (for Kpuu)
 
     Results:
     :param microstates: microstates
     :param pKa_values: macroscopic pKa values
-    :param microstate_weights_by_pH: precompute the % of different microstates
+    :param isoelectric_point: the isoelectric point (in pH units)
+    :param solvation_energy: the solvation energy, in kcal/mol
+    :param microstate_weights_by_pH: the % of different microstates by pH
+    :param logD_by_pH: the distribution constant (water/octanol) by pH
+    :param aqueous_solubility_by_pH: the log(S)/L of the compound in water, by pH
     """
 
     min_pH: Annotated[float, AfterValidator(round_float(3))] = 0.0
     max_pH: Annotated[float, AfterValidator(round_float(3))] = 14.0
-
     max_charge: int = 2
     min_charge: int = -2
+    compute_solvation_energy: bool = True
 
     microstates: list[MacropKaMicrostate] = []
     pKa_values: list[MacropKaValue] = []
+    isoelectric_point: Annotated[Optional[float], AfterValidator(round_float(3))] = None
+    solvation_energy: Annotated[Optional[float], AfterValidator(round_float(3))] = None
+
     microstate_weights_by_pH: list[
         tuple[
             Annotated[float, AfterValidator(round_float(3))],
             Annotated[list[float], AfterValidator(round_list(6))],
         ]
     ] = []
-
-    isoelectric_point: Annotated[Optional[float], AfterValidator(round_float(3))] = None
 
     logD_by_pH: list[
         tuple[
