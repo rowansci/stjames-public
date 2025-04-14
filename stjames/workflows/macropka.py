@@ -79,6 +79,13 @@ class MacropKaWorkflow(SMILESWorkflow):
         ]
     ] = []
 
+    aqueous_solubility_by_pH: list[
+        tuple[
+            Annotated[float, AfterValidator(round_float(3))],
+            Annotated[float, AfterValidator(round_float(3))],
+        ]
+    ] = []
+
     @model_validator(mode="after")
     def check_weights(self) -> Self:
         for _, weights in self.microstate_weights_by_pH:
