@@ -86,6 +86,9 @@ class MacropKaWorkflow(SMILESWorkflow):
         ]
     ] = []
 
+    compute_solvation_energy: bool = True
+    solvation_energy: Annotated[Optional[float], AfterValidator(round_float(3))] = None
+
     @model_validator(mode="after")
     def check_weights(self) -> Self:
         for _, weights in self.microstate_weights_by_pH:
