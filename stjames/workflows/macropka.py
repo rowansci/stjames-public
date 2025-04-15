@@ -49,6 +49,7 @@ class MacropKaWorkflow(SMILESWorkflow):
     :param max_pH: for precomputed microstate weights, logD, etc
     :param max_charge: max charge to consider for microstates
     :param min_charge: min charge to consider for microstates
+    :param compute_aqueous_solubility: whether or not to compute aqueous solubility
     :param compute_solvation_energy: whether to run a csearch + compute the solvation energy (for Kpuu)
 
     Results:
@@ -65,6 +66,7 @@ class MacropKaWorkflow(SMILESWorkflow):
     max_pH: Annotated[float, AfterValidator(round_float(3))] = 14.0
     max_charge: int = 2
     min_charge: int = -2
+    compute_aqueous_solubility: bool = False
     compute_solvation_energy: bool = True
 
     microstates: list[MacropKaMicrostate] = []
