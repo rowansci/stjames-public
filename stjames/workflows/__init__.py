@@ -22,6 +22,7 @@ from .redox_potential import *
 from .scan import *
 from .solubility import *
 from .spin_states import *
+from .structure_prediction import *
 from .tautomer import *
 from .workflow import *
 
@@ -46,6 +47,7 @@ WORKFLOW_NAME = Literal[
     "scan",
     "solubility",
     "spin_states",
+    "structure_prediction",
     "tautomers",
 ]
 
@@ -70,5 +72,6 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "scan": ScanWorkflow,  # type: ignore [dict-item]
     "solubility": SolubilityWorkflow,  # type: ignore [dict-item]
     "spin_states": SpinStatesWorkflow,  # type: ignore [dict-item]
+    "structure_prediction": StructurePredictionWorkflow,  # type: ignore [dict-item]
     "tautomers": TautomerWorkflow,  # type: ignore [dict-item]
 }

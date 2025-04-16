@@ -22,6 +22,19 @@ class Workflow(Base):
         return repr(self)
 
 
+class FastaWorkflow(Workflow):
+    """
+    Base class for Workflows that operate on a fasta string.
+
+    :param initial_smiles: fasta string of interest
+    """
+
+    fasta_string: str
+
+    def __repr__(self) -> str:
+        return f"<{type(self).__name__} {self.fasta_string}>"
+
+
 class SMILESWorkflow(Workflow):
     """
     Base class for Workflows that operate on a single SMILES string.
