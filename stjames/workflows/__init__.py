@@ -43,11 +43,11 @@ WORKFLOW_NAME = Literal[
     "molecular_dynamics",
     "multistage_opt",
     "pka",
+    "protein_cofolding",
     "redox_potential",
     "scan",
     "solubility",
     "spin_states",
-    "structure_prediction",
     "tautomers",
 ]
 
