@@ -1,17 +1,23 @@
-"""Basic calculation workflow."""
+"""Protein Cofolding Workflow."""
 
-from typing import Any
+from pydantic import BaseModel
 
 from ..types import UUID
-from .workflow import FastaWorkflow
+from .workflow import FASTAWorkflow
 
 
-class StructurePredictionWorkflow(FastaWorkflow):
+class CofoldingScore(BaseModel):
+    confidence_score: float
+    ptm: float  # predicted template modelling score
+    iptm: float  # interface predicted template modelling score
+
+
+class ProteinCofoldingWorkflow(FASTAWorkflow):
     """
     A workflow for predicting structures. Especially protein structures.
 
     Inherited:
-    :param fasta_string: fasta file string to run stucture prediction on
+    :param initial_fasta: fasta string of interest
 
     New:
     :param use_msa_server: whether to use the MSA server
@@ -22,4 +28,4 @@ class StructurePredictionWorkflow(FastaWorkflow):
     use_msa_server: bool = False
     use_templates_server: bool = False
     predicted_structure_uuid: UUID | None = None
-    prediciton_scores: dict[str, Any] | None = None
+    scores: CofoldingScore | None = None

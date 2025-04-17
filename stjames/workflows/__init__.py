@@ -72,6 +72,6 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "scan": ScanWorkflow,  # type: ignore [dict-item]
     "solubility": SolubilityWorkflow,  # type: ignore [dict-item]
     "spin_states": SpinStatesWorkflow,  # type: ignore [dict-item]
-    "structure_prediction": StructurePredictionWorkflow,  # type: ignore [dict-item]
+    "protein_cofolding": ProteinCofoldingWorkflow,  # type: ignore [dict-item]
     "tautomers": TautomerWorkflow,  # type: ignore [dict-item]
 }
