@@ -18,11 +18,11 @@ from .macropka import *
 from .molecular_dynamics import *
 from .multistage_opt import *
 from .pka import *
+from .protein_cofolding import *
 from .redox_potential import *
 from .scan import *
 from .solubility import *
 from .spin_states import *
-from .structure_prediction import *
 from .tautomer import *
 from .workflow import *
 
