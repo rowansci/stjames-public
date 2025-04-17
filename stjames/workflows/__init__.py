@@ -18,6 +18,7 @@ from .macropka import *
 from .molecular_dynamics import *
 from .multistage_opt import *
 from .pka import *
+from .protein_cofolding import *
 from .redox_potential import *
 from .scan import *
 from .solubility import *
@@ -42,6 +43,7 @@ WORKFLOW_NAME = Literal[
     "molecular_dynamics",
     "multistage_opt",
     "pka",
+    "protein_cofolding",
     "redox_potential",
     "scan",
     "solubility",
@@ -70,5 +72,6 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "scan": ScanWorkflow,  # type: ignore [dict-item]
     "solubility": SolubilityWorkflow,  # type: ignore [dict-item]
     "spin_states": SpinStatesWorkflow,  # type: ignore [dict-item]
+    "protein_cofolding": ProteinCofoldingWorkflow,  # type: ignore [dict-item]
     "tautomers": TautomerWorkflow,  # type: ignore [dict-item]
 }

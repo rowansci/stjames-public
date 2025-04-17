@@ -425,7 +425,7 @@ def update_models_list(mmcif_dict: dict[str, Any], data_dict: dict[str, Any]) ->
 
     data_dict["models"] = []
     types = {e["id"]: e["type"] for e in mmcif_dict.get("entity", {})}
-    names = {e["id"]: e["name"] for e in mmcif_dict.get("chem_comp", {}) if e["mon_nstd_flag"] != "y"}
+    names = {e["id"]: e["name"] for e in mmcif_dict.get("chem_comp", {}) if e.get("mon_nstd_flag", "n") != "y"}
     entities = {m["id"]: m["entity_id"] for m in mmcif_dict.get("struct_asym", [])}
 
     # sequences = make_sequences(mmcif_dict)
