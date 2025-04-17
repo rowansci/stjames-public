@@ -8,8 +8,8 @@ from .workflow import FASTAWorkflow
 
 class CofoldingScores(BaseModel):
     confidence_score: float
-    ptm: float  # predicted template modelling score
-    iptm: float  # interface predicted template modelling score
+    ptm: float  # predicted template modeling score
+    iptm: float  # interface predicted template modeling score
 
 
 class ProteinCofoldingWorkflow(FASTAWorkflow):
@@ -17,7 +17,8 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     A workflow for predicting structures. Especially protein structures.
 
     Inherited:
-    :param initial_fasta: fasta string of interest
+    :param initial_protein_sequences: protein sequences of interest
+    :param initial_smiles_list: SMILES strings of interest
 
     New:
     :param use_msa_server: whether to use the MSA server
