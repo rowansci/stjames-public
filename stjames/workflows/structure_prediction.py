@@ -6,7 +6,7 @@ from ..types import UUID
 from .workflow import FASTAWorkflow
 
 
-class CofoldingScore(BaseModel):
+class CofoldingScores(BaseModel):
     confidence_score: float
     ptm: float  # predicted template modelling score
     iptm: float  # interface predicted template modelling score
@@ -28,4 +28,4 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     use_msa_server: bool = False
     use_templates_server: bool = False
     predicted_structure_uuid: UUID | None = None
-    scores: CofoldingScore | None = None
+    scores: CofoldingScores | None = None
