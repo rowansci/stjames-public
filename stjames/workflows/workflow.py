@@ -27,14 +27,14 @@ class FASTAWorkflow(Workflow):
     Base class for Workflows that operate on protein sequences and SMILES.
 
     :param initial_protein_sequences: protein sequences of interest
-    :param initial_smiles: SMILES strings of interest
+    :param initial_smiles_list: SMILES strings of interest
     """
 
     initial_protein_sequences: list[str]
-    initial_smiles: list[str] | None = None
+    initial_smiles_list: list[str] | None = None
 
     def __repr__(self) -> str:
-        return f"<{type(self).__name__} {self.initial_protein_sequences} {self.initial_smiles}>"
+        return f"<{type(self).__name__} {self.initial_protein_sequences} {self.initial_smiles_list}>"
 
 
 class SMILESWorkflow(Workflow):

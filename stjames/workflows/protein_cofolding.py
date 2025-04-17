@@ -18,7 +18,7 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
 
     Inherited:
     :param initial_protein_sequences: protein sequences of interest
-    :param initial_smiles: SMILES strings of interest
+    :param initial_smiles_list: SMILES strings of interest
 
     New:
     :param use_msa_server: whether to use the MSA server
