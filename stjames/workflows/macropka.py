@@ -60,6 +60,7 @@ class MacropKaWorkflow(SMILESWorkflow):
     :param microstate_weights_by_pH: the % of different microstates by pH
     :param logD_by_pH: the distribution constant (water/octanol) by pH
     :param aqueous_solubility_by_pH: the log(S)/L of the compound in water, by pH
+    :param kpuu_probability: the probability that Kpuu >= 0.3, the Schrodinger-determined threshold
     """
 
     min_pH: Annotated[float, AfterValidator(round_float(3))] = 0.0
@@ -73,6 +74,7 @@ class MacropKaWorkflow(SMILESWorkflow):
     pKa_values: list[MacropKaValue] = []
     isoelectric_point: Annotated[Optional[float], AfterValidator(round_float(3))] = None
     solvation_energy: Annotated[Optional[float], AfterValidator(round_float(3))] = None
+    kpuu_probability: Annotated[Optional[float], AfterValidator(round_float(3))] = None
 
     microstate_weights_by_pH: list[
         tuple[
