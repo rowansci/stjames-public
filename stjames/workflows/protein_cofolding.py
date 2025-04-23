@@ -2,8 +2,16 @@
 
 from pydantic import BaseModel
 
+from ..base import LowercaseStrEnum
 from ..types import UUID
 from .workflow import FASTAWorkflow
+
+
+class CofoldingModel(LowercaseStrEnum):
+    """Cofolding model to be used for prediction."""
+
+    CHAI_1R = "chai_1r"
+    BOLTZ = "boltz"
 
 
 class CofoldingScores(BaseModel):
@@ -30,3 +38,4 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     use_templates_server: bool = False
     predicted_structure_uuid: UUID | None = None
     scores: CofoldingScores | None = None
+    model: CofoldingModel = CofoldingModel.CHAI_1R
