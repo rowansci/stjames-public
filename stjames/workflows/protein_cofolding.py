@@ -11,7 +11,7 @@ class CofoldingModel(LowercaseStrEnum):
     """Cofolding model to be used for prediction."""
 
     CHAI_1R = "chai_1r"
-    BOLTZ = "boltz"
+    BOLTZ_1 = "boltz_1"
 
 
 class CofoldingScores(BaseModel):
