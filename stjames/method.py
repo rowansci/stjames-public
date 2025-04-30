@@ -52,11 +52,11 @@ class Method(LowercaseStrEnum):
 
     EGRET_1 = "egret_1"
     EGRET_1E = "egret_1e"
-    EGRET_1H = "egret_1h"
+    EGRET_1T = "egret_1t"
 
 
 PrepackagedNNPMethod = Literal[
-    Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L, Method.RM1, Method.ORB_V3_CONSERVATIVE_INF_OMAT, Method.EGRET_1, Method.EGRET_1E, Method.EGRET_1H
+    Method.AIMNET2_WB97MD3, Method.OCP24_S, Method.OCP24_L, Method.RM1, Method.ORB_V3_CONSERVATIVE_INF_OMAT, Method.EGRET_1, Method.EGRET_1E, Method.EGRET_1T
 ]
 
 PREPACKAGED_NNP_METHODS = [
@@ -67,7 +67,7 @@ PREPACKAGED_NNP_METHODS = [
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
     Method.EGRET_1,
     Method.EGRET_1E,
-    Method.EGRET_1H,
+    Method.EGRET_1T,
 ]
 
 CorrectableNNPMethod = Literal[Method.MACE_MP_0B2_L, Method.ORB_V2]
