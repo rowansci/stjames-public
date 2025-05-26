@@ -2,6 +2,7 @@ import re
 from pathlib import Path
 from typing import Annotated, Any, Iterable, Optional, Self, Sequence, TypeAlias, TypedDict, TypeVar
 
+import numpy as np
 import pydantic
 from pydantic import AfterValidator, NonNegativeInt, PositiveInt, ValidationError
 from rdkit import Chem
@@ -75,15 +76,34 @@ class Molecule(Base):
     def __len__(self) -> int:
         return len(self.atoms)
 
-    def distance(self, atom1: PositiveInt, atom2: PositiveInt) -> float:
+    def distance(self, i: PositiveInt, j: PositiveInt) -> float:
         r"""
-        Get the distance between atoms.
+        Calculate the distance between atoms.
 
         >>> mol = Molecule.from_xyz("H 0 1 0\nH 0 0 1")
         >>> mol.distance(1, 2)
         1.4142135623730951
         """
-        return sum((q2 - q1) ** 2 for q1, q2 in zip(self.atoms[atom1 - 1].position, self.atoms[atom2 - 1].position)) ** 0.5  # type: ignore [no-any-return,unused-ignore]
+        return sum((q2 - q1) ** 2 for q1, q2 in zip(self.atoms[i - 1].position, self.atoms[j - 1].position)) ** 0.5  # type: ignore [no-any-return,unused-ignore]
+
+    def angle(self, i: PositiveInt, j: PositiveInt, k: PositiveInt, degrees: bool = True) -> float:
+        r"""
+        Calculate the angle between three atoms.
+
+        >>> Molecule.from_xyz("H 0 0 0\nO 0 0 1\nH 0 1 1").angle(0, 1, 2)
+        90.0
+        """
+
+        return angle(self.coordinates[i], self.coordinates[j], self.coordinates[k], degrees=degrees)
+
+    def dihedral(self, i: int, j: int, k: int, l: int, degrees: bool = True, positive_domain: bool = True) -> float:
+        r"""
+        Calculate the dihedral angle between four atoms.
+
+        >>> Molecule.from_xyz("H 0 0 0\nO 0 0 1\nO 0 1 1\nH 1 1 1").dihedral(0, 1, 2, 3)
+        270.0
+        """
+        return dihedral(self.coordinates[i], self.coordinates[j], self.coordinates[k], self.coordinates[l], degrees=degrees, positive_domain=positive_domain)
 
     @property
     def coordinates(self) -> Vector3DPerAtom:
@@ -447,3 +467,67 @@ def parse_extxyz_comment_line(line: str) -> EXTXYZMetadata:
             prop_dict[key] = value  # type: ignore [literal-required]
 
     return prop_dict
+
+
+def angle(p0: Sequence[float], p1: Sequence[float], p2: Sequence[float], degrees: bool = True) -> float:
+    """
+    Angle between three points.
+
+    :param i, j, k: positions of points
+    :param degrees: whether to return in degrees
+    :return: angle in radians or degrees
+    """
+    a0, a1, a2 = map(np.asarray, (p0, p1, p2))
+    u = a1 - a0
+    v = a1 - a2
+
+    nu = np.linalg.norm(u)
+    nv = np.linalg.norm(v)
+    cos_theta = np.dot(u, v) / (nu * nv)
+    cos_theta = np.clip(cos_theta, -1.0, 1.0)
+
+    ang = np.arccos(cos_theta)
+    if degrees:
+        return float(np.degrees(ang))
+    return float(ang)
+
+
+def dihedral(p0: Sequence[float], p1: Sequence[float], p2: Sequence[float], p3: Sequence[float], degrees: bool = True, positive_domain: bool = True) -> float:
+    """
+    Dihedral angle between four points.
+
+    :param p0, p1, p2, p3: points
+    :param degrees: whether to return in degrees
+    :param positive_domain: (0, 360] if True else (-180, 180]
+    :return: angle in degrees or radians (or nan if collinearities detected)
+
+    >>> a = [0, 0, 0]
+    >>> b = [0, 0, 1]
+    >>> c = [0, 1, 1]
+    >>> d1 = [0, 1, 2]
+    >>> d2 = [0.5, 1, 1.5]
+    >>> dihedral(a, b, c, d1)
+    180.0
+    >>> dihedral(a, b, c, d2, positive_domain=False)
+    -135.0
+    """
+    a0, a1, a2, a3 = map(np.asarray, (p0, p1, p2, p3))
+    b0 = a1 - a0
+    b1 = a2 - a1
+    b2 = a3 - a2
+
+    b1 = b1 / np.linalg.norm(b1)
+
+    v = b1 * np.dot(b0, b1) - b0
+    w = b2 - b1 * np.dot(b2, b1)
+
+    x = np.dot(v, w)
+    y = np.dot(np.cross(b1, v), w)
+    ang = np.arctan2(y, x)
+
+    if positive_domain and ang < 0:
+        ang += 2 * np.pi
+
+    if degrees:
+        return float(np.degrees(ang))
+    return float(ang)
