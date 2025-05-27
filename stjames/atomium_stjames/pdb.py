@@ -526,6 +526,25 @@ def add_atom_to_non_polymer(line: str, model: dict[Any, Any], res_id: str, aniso
         }
 
 
+def guess_element_from_name(atom_name: str) -> str | None:
+    atom_name = atom_name.strip()
+    if not atom_name:
+        return None
+
+    # Case 1: Atom name starts with a digit (e.g. '1HG1') → element is second character
+    if atom_name[0].isdigit() and len(atom_name) > 1:
+        return atom_name[1].upper()
+
+    # # Case 2: Atom name starts with a letter
+    # if len(atom_name) >= 2 and atom_name[:2].isalpha():
+    #     possible = atom_name[:2].strip().capitalize()
+    #     # Check for common two-letter elements
+    #     if possible in {"Cl", "Br", "Fe", "Mg", "Zn", "Ca", "Na", "Cu", "Mn", "Co", "Ni"}:
+    #         return possible
+    # Fallback to first letter
+    return atom_name[0].upper()
+
+
 def atom_line_to_dict(line: str, aniso_dict: dict[Any, Any]) -> dict[str, Any]:
     """Converts an ATOM or HETATM record to an atom dictionary.
 
@@ -545,6 +564,8 @@ def atom_line_to_dict(line: str, aniso_dict: dict[Any, Any]) -> dict[str, Any]:
     if line[60:66].strip():
         a["bvalue"] = float(line[60:66].strip())
     a["element"] = line[76:78].strip() or None
+    if not a["element"]:
+        a["element"] = guess_element_from_name(a["name"])
     if line[78:80].strip():
         try:
             a["charge"] = int(line[78:80].strip())
