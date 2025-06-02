@@ -90,20 +90,27 @@ class Molecule(Base):
         r"""
         Calculate the angle between three atoms.
 
-        >>> Molecule.from_xyz("H 0 0 0\nO 0 0 1\nH 0 1 1").angle(0, 1, 2)
+        >>> Molecule.from_xyz("H 0 0 0\nO 0 0 1\nH 0 1 1").angle(1, 2, 3)
         90.0
         """
 
-        return angle(self.coordinates[i], self.coordinates[j], self.coordinates[k], degrees=degrees)
+        return angle(self.coordinates[i - 1], self.coordinates[j - 1], self.coordinates[k - 1], degrees=degrees)
 
     def dihedral(self, i: int, j: int, k: int, l: int, degrees: bool = True, positive_domain: bool = True) -> float:
         r"""
         Calculate the dihedral angle between four atoms.
 
-        >>> Molecule.from_xyz("H 0 0 0\nO 0 0 1\nO 0 1 1\nH 1 1 1").dihedral(0, 1, 2, 3)
+        >>> Molecule.from_xyz("H 0 0 0\nO 0 0 1\nO 0 1 1\nH 1 1 1").dihedral(1, 2, 3, 4)
         270.0
         """
-        return dihedral(self.coordinates[i], self.coordinates[j], self.coordinates[k], self.coordinates[l], degrees=degrees, positive_domain=positive_domain)
+        return dihedral(
+            self.coordinates[i - 1],
+            self.coordinates[j - 1],
+            self.coordinates[k - 1],
+            self.coordinates[l - 1],
+            degrees=degrees,
+            positive_domain=positive_domain,
+        )
 
     @property
     def coordinates(self) -> Vector3DPerAtom:
