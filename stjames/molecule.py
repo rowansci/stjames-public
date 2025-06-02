@@ -372,19 +372,17 @@ class Molecule(Base):
         return cls(atoms=atoms, cell=cell, charge=charge, multiplicity=multiplicity, energy=energy, gradient=gradients)
 
     @classmethod
-    def from_rdkit(cls: type[Self], rdkm: RdkitMol, cid: int = 0) -> Self:
+    def from_rdkit(cls: type[Self], rdkm: RdkitMol, cid: int = 0, multiplicity: int = 1) -> Self:
         if len(rdkm.GetConformers()) == 0:
             rdkm = _embed_rdkit_mol(rdkm)
 
-        atoms = []
         atomic_numbers = [atom.GetAtomicNum() for atom in rdkm.GetAtoms()]  # type: ignore [no-untyped-call, unused-ignore]
-        geom = rdkm.GetConformers()[cid].GetPositions()
-
-        for i in range(len(atomic_numbers)):
-            atoms.append(Atom(atomic_number=atomic_numbers[i], position=geom[i]))
+        atoms = [
+            Atom(atomic_number=atom, position=xyz)  # keep open
+            for atom, xyz in zip(atomic_numbers, rdkm.GetConformers()[cid].GetPositions(), strict=True)
+        ]
 
         charge = Chem.GetFormalCharge(rdkm)
-        multiplicity = 1
 
         return cls(atoms=atoms, charge=charge, multiplicity=multiplicity)
 
