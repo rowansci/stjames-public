@@ -565,6 +565,8 @@ def atom_line_to_dict(line: str, aniso_dict: dict[Any, Any]) -> dict[str, Any]:
         a["bvalue"] = float(line[60:66].strip())
     a["element"] = line[76:78].strip() or None
     if not a["element"]:
+        if not a["name"]:
+            raise ValueError("Cannot guess element from empty name.")
         a["element"] = guess_element_from_name(a["name"])
     if line[78:80].strip():
         try:
