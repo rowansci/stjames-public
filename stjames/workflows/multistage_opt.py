@@ -295,10 +295,12 @@ def mso_settings_from_method_string(
     opt_settings = OptimizationSettings(constraints=constraints, transition_state=transition_state)
     OPT = [Task.OPTIMIZE if not transition_state else Task.OPTIMIZE_TS]
 
+    valid_corrections = {c.name.lower() for c in Correction}  # Python3.11 hack
+
     def process(match: re.Match[str]) -> Settings:
         data = match.groupdict()
 
-        method, corrections = mit.partition(lambda x: x.lower() in Correction, data["method"].split("-"))
+        method, corrections = mit.partition(lambda x: x.lower() in valid_corrections, data["method"].split("-"))
         solvent_settings = SolventSettings(solvent=data["solvent"], model=data["solvent_model"]) if data["solvent"] else None
 
         return Settings(
