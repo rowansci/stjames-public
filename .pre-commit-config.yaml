@@ -25,6 +25,7 @@ repos:
         - pydantic
         - pytest
         - rdkit
+        - more-itertools
 
 - repo: local
   hooks:

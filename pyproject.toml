@@ -13,6 +13,7 @@ dependencies = [
     "numpy",
     "requests",
     "rdkit",
+    "more-itertools",
 ]
 
 [build-system]

@@ -90,20 +90,27 @@ class Molecule(Base):
         r"""
         Calculate the angle between three atoms.
 
-        >>> Molecule.from_xyz("H 0 0 0\nO 0 0 1\nH 0 1 1").angle(0, 1, 2)
+        >>> Molecule.from_xyz("H 0 0 0\nO 0 0 1\nH 0 1 1").angle(1, 2, 3)
         90.0
         """
 
-        return angle(self.coordinates[i], self.coordinates[j], self.coordinates[k], degrees=degrees)
+        return angle(self.coordinates[i - 1], self.coordinates[j - 1], self.coordinates[k - 1], degrees=degrees)
 
     def dihedral(self, i: int, j: int, k: int, l: int, degrees: bool = True, positive_domain: bool = True) -> float:
         r"""
         Calculate the dihedral angle between four atoms.
 
-        >>> Molecule.from_xyz("H 0 0 0\nO 0 0 1\nO 0 1 1\nH 1 1 1").dihedral(0, 1, 2, 3)
+        >>> Molecule.from_xyz("H 0 0 0\nO 0 0 1\nO 0 1 1\nH 1 1 1").dihedral(1, 2, 3, 4)
         270.0
         """
-        return dihedral(self.coordinates[i], self.coordinates[j], self.coordinates[k], self.coordinates[l], degrees=degrees, positive_domain=positive_domain)
+        return dihedral(
+            self.coordinates[i - 1],
+            self.coordinates[j - 1],
+            self.coordinates[k - 1],
+            self.coordinates[l - 1],
+            degrees=degrees,
+            positive_domain=positive_domain,
+        )
 
     @property
     def coordinates(self) -> Vector3DPerAtom:
@@ -365,19 +372,17 @@ class Molecule(Base):
         return cls(atoms=atoms, cell=cell, charge=charge, multiplicity=multiplicity, energy=energy, gradient=gradients)
 
     @classmethod
-    def from_rdkit(cls: type[Self], rdkm: RdkitMol, cid: int = 0) -> Self:
+    def from_rdkit(cls: type[Self], rdkm: RdkitMol, cid: int = 0, multiplicity: int = 1) -> Self:
         if len(rdkm.GetConformers()) == 0:
             rdkm = _embed_rdkit_mol(rdkm)
 
-        atoms = []
         atomic_numbers = [atom.GetAtomicNum() for atom in rdkm.GetAtoms()]  # type: ignore [no-untyped-call, unused-ignore]
-        geom = rdkm.GetConformers()[cid].GetPositions()
-
-        for i in range(len(atomic_numbers)):
-            atoms.append(Atom(atomic_number=atomic_numbers[i], position=geom[i]))
+        atoms = [
+            Atom(atomic_number=atom, position=xyz)  # keep open
+            for atom, xyz in zip(atomic_numbers, rdkm.GetConformers()[cid].GetPositions(), strict=True)
+        ]
 
         charge = Chem.GetFormalCharge(rdkm)
-        multiplicity = 1
 
         return cls(atoms=atoms, charge=charge, multiplicity=multiplicity)
 
