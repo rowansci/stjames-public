@@ -1,10 +1,39 @@
-from typing import Self
+from typing import Annotated, Self
 
-from pydantic import PositiveFloat, PositiveInt, model_validator
+from pydantic import AfterValidator, PositiveFloat, PositiveInt, model_validator
 
+from ..base import Base, round_float
 from ..pdb import PDB
-from ..types import UUID
+from ..types import UUID, round_list
 from .workflow import MoleculeWorkflow
+
+
+class BindingPoseContact(Base):
+    """
+    A single protein–ligand contact from an MD trajectory.
+
+    :param protein_atom_index: the index of the protein atom
+    :param ligand_atom_index: the index of the ligand atom
+    :occupancy: the probability of seeing this interaction in a frame, between 0 and 1
+    """
+
+    protein_atom_index: int
+    ligand_atom_index: int
+    occupancy: Annotated[float, AfterValidator(round_float(3))]
+
+
+class BindingPoseTrajectory(Base):
+    """
+    Represents a single trajectory looking at a binding pose.
+
+    :param uuid: the UUID of the trajectory
+    :param ligand_rmsd: the RMSD of the ligand vs. starting pose (aligning the protein)
+    :param contacts: the conserved binding-pose contacts
+    """
+
+    uuid: UUID
+    ligand_rmsd: Annotated[list[float], AfterValidator(round_list(3))] = []
+    contacts: list[BindingPoseContact] = []
 
 
 class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
@@ -46,26 +75,26 @@ class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
     protein_uuid: UUID | None = None
 
     num_trajectories: PositiveInt = 4
-    equilibration_time_ns: PositiveFloat = 5
-    simulation_time_ns: PositiveFloat = 10
+    equilibration_time_ns: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 5
+    simulation_time_ns: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 10
 
-    temperature: PositiveFloat = 300
-    pressure_atm: PositiveFloat = 1.0
-    langevin_timescale_ps: PositiveFloat = 1.0
+    temperature: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 300
+    pressure_atm: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 1.0
+    langevin_timescale_ps: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 1.0
 
-    timestep_fs: PositiveFloat = 2
+    timestep_fs: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 2
     constrain_hydrogens: bool = True
-    nonbonded_cutoff: PositiveFloat = 8.0
+    nonbonded_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 8.0
 
-    protein_prune_cutoff: PositiveFloat = 9.0
-    protein_restraint_cutoff: PositiveFloat = 7.0
-    protein_restraint_constant: PositiveFloat = 100
+    protein_prune_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 9.0
+    protein_restraint_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 7.0
+    protein_restraint_constant: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 100
 
-    ionic_strength_M: PositiveFloat = 0.10
-    water_buffer: PositiveFloat = 6.0
+    ionic_strength_M: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 0.10
+    water_buffer: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 6.0
 
     minimized_protein_uuid: UUID | None = None
-    trajectories: list[UUID] = []
+    trajectories: list[BindingPoseTrajectory] = []
 
     @model_validator(mode="after")
     def check_cutoff_sanity(self) -> Self:
