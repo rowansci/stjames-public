@@ -67,7 +67,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
     :param water_buffer: the amount of water to add around the protein, in Å
 
     Results:
-    :param trajectories: UUIDs corresponding to Trajectory objects
+    :param trajectories: for each replicate, a UUID and the corresponding analysis results
     :param minimized_protein_uuid: UUID of final system PDB
     """
 
