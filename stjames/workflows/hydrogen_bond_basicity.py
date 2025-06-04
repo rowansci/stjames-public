@@ -28,13 +28,11 @@ class HydrogenBondDonorSite(Base):
     :param atom_idx: index of the atom
     :param pk_alpha: Hydrogen-bond acidity
     :param position: position of the atom
-    :param name: name of the atom
     """
 
     atom_idx: int  # zero-indexed
     pk_alpha: float
     position: tuple[float, float, float]
-    name: str | None = None
 
 
 class HydrogenBondBasicityWorkflow(MoleculeWorkflow):
