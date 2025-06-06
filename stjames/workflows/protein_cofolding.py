@@ -12,12 +12,22 @@ class CofoldingModel(LowercaseStrEnum):
 
     CHAI_1R = "chai_1r"
     BOLTZ_1 = "boltz_1"
+    BOLTZ_2 = "boltz_2"
 
 
 class CofoldingScores(BaseModel):
     confidence_score: float
     ptm: float  # predicted template modeling score
     iptm: float  # interface predicted template modeling score
+
+
+class AffinityScore(BaseModel):
+    pred_value: float
+    probability_binary: float
+    pred_value1: float
+    probability_binary1: float
+    pred_value2: float
+    probability_binary2: float
 
 
 class ProteinCofoldingWorkflow(FASTAWorkflow):
@@ -38,4 +48,5 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     use_templates_server: bool = False
     predicted_structure_uuid: UUID | None = None
     scores: CofoldingScores | None = None
-    model: CofoldingModel = CofoldingModel.CHAI_1R
+    model: CofoldingModel = CofoldingModel.BOLTZ_2
+    affinity_score: AffinityScore | None = None

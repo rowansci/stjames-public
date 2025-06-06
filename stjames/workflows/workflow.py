@@ -32,6 +32,7 @@ class FASTAWorkflow(Workflow):
 
     initial_protein_sequences: list[str]
     initial_smiles_list: list[str] | None = None
+    ligand_binding_affinity_index: int | None = None
 
     def __repr__(self) -> str:
         return f"<{type(self).__name__} {self.initial_protein_sequences} {self.initial_smiles_list}>"

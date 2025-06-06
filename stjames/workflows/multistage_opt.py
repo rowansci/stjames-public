@@ -1,15 +1,19 @@
 """Multi-stage optimization workflow."""
 
+import re
 from typing import Self, Sequence
 
+import more_itertools as mit
 from pydantic import BaseModel, Field, model_validator
+
+from stjames.correction import Correction
 
 from ..constraint import Constraint
 from ..method import XTB_METHODS, Method
 from ..mode import Mode
 from ..opt_settings import OptimizationSettings
 from ..settings import Settings
-from ..solvent import Solvent, SolventSettings
+from ..solvent import Solvent, SolventModel, SolventSettings
 from ..task import Task
 from ..types import UUID
 from .workflow import MoleculeWorkflow
@@ -262,6 +266,73 @@ class MultiStageOptMixin(BaseModel):
                 )
 
         return self
+
+
+def mso_settings_from_method_string(
+    methods: str,
+    solvent: Solvent | None = None,
+    use_solvent_for_opt: bool = False,
+    constraints: list[Constraint] | None = None,
+    transition_state: bool = False,
+    frequencies: bool = False,
+) -> MultiStageOptSettings:
+    """
+    Helper function to construct multi-stage opt settings objects from a method string.
+
+    >>> mso_settings_from_method_string("r2SCAN-3c/CPCM(Water)//B3LYP-D3/6-31G(d)/ALPB(Water)//GFN2-xTB/CPCM(Water)//GFN0-xTB").level_of_theory
+    'r2scan_3c/cpcm(water)//b3lyp-d3/6-31g(d)/alpb(water)//gfn2_xtb/cpcm(water)//gfn0_xtb'
+    """
+    solvent_models = "|".join(model.name for model in SolventModel)
+
+    pattern = rf"""
+        (?P<method>[^/()]+)                                 # Method + optional corrections
+        (?:/(?P<basis_set>(?!{solvent_models})[^/]+?))?     # Optional basis_set, not starting with solvent model name
+        (?:/(?P<solvent_model>{solvent_models})             # Optional solvent model
+            \((?P<solvent>[^()]+)\))?                       # Solvent name in parentheses
+        (?:\/\/|$)                                          # End or separator
+"""
+    constraints = constraints or []
+    opt_settings = OptimizationSettings(constraints=constraints, transition_state=transition_state)
+    OPT = [Task.OPTIMIZE if not transition_state else Task.OPTIMIZE_TS]
+
+    valid_corrections = {c.name.lower() for c in Correction}  # Python3.11 hack
+
+    def process(match: re.Match[str]) -> Settings:
+        data = match.groupdict()
+
+        method, corrections = mit.partition(lambda x: x.lower() in valid_corrections, data["method"].split("-"))
+        solvent_settings = SolventSettings(solvent=data["solvent"], model=data["solvent_model"]) if data["solvent"] else None
+
+        return Settings(
+            method="-".join(method),
+            basis_set=data["basis_set"],
+            tasks=OPT,
+            solvent_settings=solvent_settings,
+            opt_settings=opt_settings,
+            corrections=list(corrections),
+        )
+
+    optimization_settings = [process(match) for match in re.finditer(pattern, methods, re.VERBOSE | re.IGNORECASE)]
+    if len(optimization_settings) > 1:
+        sp_settings = optimization_settings.pop(0)
+        sp_settings.tasks = [Task.ENERGY]
+    else:
+        sp_settings = None
+
+    optimization_settings = optimization_settings[::-1]
+    if frequencies:
+        optimization_settings[-1].tasks.append(Task.FREQUENCIES)
+
+    return MultiStageOptSettings(
+        mode=Mode.MANUAL,
+        optimization_settings=optimization_settings,
+        singlepoint_settings=sp_settings,
+        solvent=solvent,
+        xtb_preopt=False,
+        constraints=constraints,
+        transition_state=transition_state,
+        frequencies=frequencies,
+    )
 
 
 def build_mso_settings(

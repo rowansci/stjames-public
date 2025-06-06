@@ -3,7 +3,7 @@
 import re
 from datetime import datetime
 from itertools import chain, groupby
-from typing import Any, Callable
+from typing import Any, Callable, TypedDict
 
 from .data import CODES
 from .mmcif import add_secondary_structure_to_polymers
@@ -476,15 +476,17 @@ def add_atom_to_polymer(line: str, model: dict[Any, Any], chain_id: str, res_id:
     :param str res_id: the molecule ID to add to.
     :param dict aniso_dict: lookup dictionary for anisotropy information."""
 
+    atom = atom_line_to_dict(line, aniso_dict)
+
     try:
-        model["polymer"][chain_id]["residues"][res_id]["atoms"][int(line[6:11])] = atom_line_to_dict(line, aniso_dict)
+        model["polymer"][chain_id]["residues"][res_id]["atoms"][int(line[6:11])] = atom
     except Exception:
         name = line[17:20].strip()
         try:
             model["polymer"][chain_id]["residues"][res_id] = {
                 "name": name,
                 "full_name": full_names.get(name),
-                "atoms": {int(line[6:11]): atom_line_to_dict(line, aniso_dict)},
+                "atoms": {int(line[6:11]): atom},
                 "number": len(model["polymer"][chain_id]["residues"]) + 1,
             }
         except Exception:
@@ -495,7 +497,7 @@ def add_atom_to_polymer(line: str, model: dict[Any, Any], chain_id: str, res_id:
                 "residues": {
                     res_id: {
                         "name": line[17:20].strip(),
-                        "atoms": {int(line[6:11]): atom_line_to_dict(line, aniso_dict)},
+                        "atoms": {int(line[6:11]): atom},
                         "number": 1,
                         "full_name": None,
                     }
@@ -511,10 +513,11 @@ def add_atom_to_non_polymer(line: str, model: dict[Any, Any], res_id: str, aniso
     :param dict model: the model to update.
     :param str res_id: the molecule ID to add to.
     :param dict aniso_dict: lookup dictionary for anisotropy information."""
+    atom = atom_line_to_dict(line, aniso_dict)
 
     key = "water" if line[17:20] in ["HOH", "DOD"] else "non_polymer"
     try:
-        model[key][res_id]["atoms"][int(line[6:11])] = atom_line_to_dict(line, aniso_dict)
+        model[key][res_id]["atoms"][int(line[6:11])] = atom
     except Exception:
         name = line[17:20].strip()
         model[key][res_id] = {
@@ -522,18 +525,55 @@ def add_atom_to_non_polymer(line: str, model: dict[Any, Any], res_id: str, aniso
             "full_name": full_names.get(name),
             "internal_id": line[21],
             "polymer": line[21],
-            "atoms": {int(line[6:11]): atom_line_to_dict(line, aniso_dict)},
+            "atoms": {int(line[6:11]): atom},
         }
 
 
-def atom_line_to_dict(line: str, aniso_dict: dict[Any, Any]) -> dict[str, Any]:
-    """Converts an ATOM or HETATM record to an atom dictionary.
+def guess_element_from_name(atom_name: str) -> str | None:
+    atom_name = atom_name.strip()
+    if not atom_name:
+        return None
+
+    # Case 1: Atom name starts with a digit (e.g. '1HG1') → element is second character
+    if atom_name[0].isdigit() and len(atom_name) > 1:
+        return atom_name[1].upper()
+
+    # # Case 2: Atom name starts with a letter
+    # if len(atom_name) >= 2 and atom_name[:2].isalpha():
+    #     possible = atom_name[:2].strip().capitalize()
+    #     # Check for common two-letter elements
+    #     if possible in {"Cl", "Br", "Fe", "Mg", "Zn", "Ca", "Na", "Cu", "Mn", "Co", "Ni"}:
+    #         return possible
+    # Fallback to first letter
+    return atom_name[0].upper()
+
+
+class AtomDict(TypedDict, total=False):
+    """A dictionary representing an atom in a PDB file."""
+
+    occupancy: float | None
+    bvalue: float | None
+    charge: int | None
+    anisotropy: float | None
+    is_hetatm: bool | None
+    name: str | None
+    alt_loc: str | None
+    x: float
+    y: float
+    z: float
+    element: str | None
+
+
+def atom_line_to_dict(line: str, aniso_dict: dict[Any, Any]) -> AtomDict:
+    """
+    Converts an ATOM or HETATM record to an atom dictionary.
 
     :param str line: the record to convert.
     :param dict aniso_dict: the anisotropy dictionary to use.
-    :rtype: ``dict``"""
+    :return: atom dictionary
+    """
 
-    a = {"occupancy": 1, "bvalue": None, "charge": 0, "anisotropy": aniso_dict.get(int(line[6:11].strip()), None)}
+    a: AtomDict = {"occupancy": 1, "bvalue": None, "charge": 0, "anisotropy": aniso_dict.get(int(line[6:11].strip()), None)}
     a["is_hetatm"] = line[:6] == "HETATM"
     a["name"] = line[12:16].strip() or None
     a["alt_loc"] = line[16].strip() or None
@@ -545,6 +585,11 @@ def atom_line_to_dict(line: str, aniso_dict: dict[Any, Any]) -> dict[str, Any]:
     if line[60:66].strip():
         a["bvalue"] = float(line[60:66].strip())
     a["element"] = line[76:78].strip() or None
+    if not a["element"]:
+        if not a["name"]:
+            raise ValueError("Cannot guess element from empty name.")
+        assert isinstance(a["name"], str)
+        a["element"] = guess_element_from_name(a["name"])
     if line[78:80].strip():
         try:
             a["charge"] = int(line[78:80].strip())
@@ -561,6 +606,7 @@ def atom_line_to_dict(line: str, aniso_dict: dict[Any, Any]) -> dict[str, Any]:
         a["occupancy"] = None
     if a["name"] == a["element"]:
         a["name"] = None
+
     return a
 
 
