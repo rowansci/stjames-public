@@ -46,6 +46,7 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
 
     use_msa_server: bool = False
     use_templates_server: bool = False
+    use_potentials: bool = False
     predicted_structure_uuid: UUID | None = None
     scores: CofoldingScores | None = None
     model: CofoldingModel = CofoldingModel.BOLTZ_2
