@@ -19,6 +19,7 @@ class CofoldingScores(BaseModel):
     confidence_score: float
     ptm: float  # predicted template modeling score
     iptm: float  # interface predicted template modeling score
+    avg_lddt: float
 
 
 class AffinityScore(BaseModel):
@@ -51,3 +52,4 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     scores: CofoldingScores | None = None
     model: CofoldingModel = CofoldingModel.BOLTZ_2
     affinity_score: AffinityScore | None = None
+    lddt: list[float] | None = None
