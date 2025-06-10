@@ -1,9 +1,11 @@
 """Protein Cofolding Workflow."""
 
-from pydantic import BaseModel
+from typing import Annotated
 
-from ..base import LowercaseStrEnum
-from ..types import UUID
+from pydantic import AfterValidator, BaseModel
+
+from ..base import LowercaseStrEnum, round_float
+from ..types import UUID, round_optional_list
 from .workflow import FASTAWorkflow
 
 
@@ -16,19 +18,19 @@ class CofoldingModel(LowercaseStrEnum):
 
 
 class CofoldingScores(BaseModel):
-    confidence_score: float
-    ptm: float  # predicted template modeling score
-    iptm: float  # interface predicted template modeling score
-    avg_lddt: float
+    confidence_score: Annotated[float, AfterValidator(round_float(3))]
+    ptm: Annotated[float, AfterValidator(round_float(3))]  # predicted template modeling score
+    iptm: Annotated[float, AfterValidator(round_float(3))]  # interface predicted template modeling score
+    avg_lddt: Annotated[float, AfterValidator(round_float(3))]
 
 
 class AffinityScore(BaseModel):
-    pred_value: float
-    probability_binary: float
-    pred_value1: float
-    probability_binary1: float
-    pred_value2: float
-    probability_binary2: float
+    pred_value: Annotated[float, AfterValidator(round_float(3))]
+    probability_binary: Annotated[float, AfterValidator(round_float(3))]
+    pred_value1: Annotated[float, AfterValidator(round_float(3))]
+    probability_binary1: Annotated[float, AfterValidator(round_float(3))]
+    pred_value2: Annotated[float, AfterValidator(round_float(3))]
+    probability_binary2: Annotated[float, AfterValidator(round_float(3))]
 
 
 class ProteinCofoldingWorkflow(FASTAWorkflow):
@@ -52,4 +54,8 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     scores: CofoldingScores | None = None
     model: CofoldingModel = CofoldingModel.BOLTZ_2
     affinity_score: AffinityScore | None = None
-    lddt: list[float] | None = None
+    lddt: Annotated[list[float] | None, AfterValidator(round_optional_list(3))] = None
+
+
+reduced_mass: Annotated[float, AfterValidator(round_float(3))]  # amu
+solubilities: Annotated[list[float] | None, AfterValidator(round_optional_list(3))]
