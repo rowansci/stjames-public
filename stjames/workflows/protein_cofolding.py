@@ -55,7 +55,3 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     model: CofoldingModel = CofoldingModel.BOLTZ_2
     affinity_score: AffinityScore | None = None
     lddt: Annotated[list[float] | None, AfterValidator(round_optional_list(3))] = None
-
-
-reduced_mass: Annotated[float, AfterValidator(round_float(3))]  # amu
-solubilities: Annotated[list[float] | None, AfterValidator(round_optional_list(3))]
