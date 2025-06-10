@@ -19,6 +19,17 @@ def round_list(round_to: int = 6) -> Callable[[Iterable[float]], list[float]]:
     return rounder
 
 
+def round_optional_list(round_to: int = 6) -> Callable[[Iterable[float] | None], list[float] | None]:
+    """Create a validator that rounds each float in a list to a given number of decimal places."""
+
+    def rounder(values: Iterable[float] | None) -> list[float] | None:
+        if values is None:
+            return None
+        return [round(value, round_to) for value in values]
+
+    return rounder
+
+
 def round_vector3d(round_to: int = 6) -> Callable[[Vector3D], Vector3D]:
     """Create a validator that rounds each component of a Vector3D to a given number of decimal places."""
 
