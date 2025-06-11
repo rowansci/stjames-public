@@ -2,7 +2,7 @@
 
 from typing import Annotated
 
-from pydantic import AfterValidator, BaseModel
+from pydantic import AfterValidator, BaseModel, ConfigDict
 
 from ..base import LowercaseStrEnum, round_float
 from ..types import UUID, round_optional_list
@@ -46,6 +46,8 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     :param use_templates_server: whether to use the templates server
     :param predicted_structure_uuid: UUID of the predicted structure
     """
+
+    model_config = ConfigDict(validate_assignment=True)
 
     use_msa_server: bool = False
     use_templates_server: bool = False
