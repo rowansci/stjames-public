@@ -228,7 +228,7 @@ def pdb_object_to_pdb_filestring(
     keyword: bool = False,
     seqres: bool = True,
     hetnam: bool = True,
-    remark: bool = True,
+    remark: bool = False,
     crystallography: bool = False,
 ) -> str:
     pdb_lines: list[str] = []
