@@ -43,6 +43,7 @@ class Method(LowercaseStrEnum):
     GFN0_XTB = "gfn0_xtb"
     GFN1_XTB = "gfn1_xtb"
     GFN2_XTB = "gfn2_xtb"
+    G_XTB = "g_xtb"
 
     # this was going to be removed, but Jonathon wrote such a nice basis set test... it's off the front end.
     BP86 = "bp86"
@@ -86,8 +87,8 @@ CORRECTABLE_NNP_METHODS = [Method.MACE_MP_0B2_L, Method.ORB_V2]
 NNPMethod = PrepackagedNNPMethod | CorrectableNNPMethod
 NNP_METHODS = [*PREPACKAGED_NNP_METHODS, *CORRECTABLE_NNP_METHODS]
 
-XTBMethod = Literal[Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB]
-XTB_METHODS = [Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB]
+XTBMethod = Literal[Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB, Method.G_XTB]
+XTB_METHODS = [Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB, Method.G_XTB]
 
 CompositeMethod = Literal[Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
 COMPOSITE_METHODS = [Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
