@@ -94,6 +94,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
     water_buffer: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 6.0
 
     minimized_protein_uuid: UUID | None = None
+    bonds: list[tuple[int, int]] = []
     trajectories: list[BindingPoseTrajectory] = []
 
     @model_validator(mode="after")
