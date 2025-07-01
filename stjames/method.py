@@ -36,6 +36,7 @@ class Method(LowercaseStrEnum):
     OCP24_S = "ocp24_s"
     OCP24_L = "ocp24_l"
     OMOL25_CONSERVING_S = "omol25_conserving_s"
+    UMA_M_OMOL = "uma_m_omol"
     ORB_V2 = "orb_v2"
     ORB_V3_CONSERVATIVE_INF_OMAT = "orb_v3_conservative_inf_omat"
 
@@ -62,6 +63,7 @@ PrepackagedNNPMethod = Literal[
     Method.OCP24_S,
     Method.OCP24_L,
     Method.OMOL25_CONSERVING_S,
+    Method.UMA_M_OMOL,
     Method.RM1,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
     Method.EGRET_1,
@@ -74,6 +76,7 @@ PREPACKAGED_NNP_METHODS = [
     Method.OCP24_S,
     Method.OCP24_L,
     Method.OMOL25_CONSERVING_S,
+    Method.UMA_M_OMOL,
     Method.RM1,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
     Method.EGRET_1,
