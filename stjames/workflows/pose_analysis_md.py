@@ -86,7 +86,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
     constrain_hydrogens: bool = True
     nonbonded_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 8.0
 
-    protein_prune_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 9.0
+    protein_prune_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] | None = None
     protein_restraint_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 7.0
     protein_restraint_constant: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 100
 
@@ -100,6 +100,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
     @model_validator(mode="after")
     def check_cutoff_sanity(self) -> Self:
         """Check if protein is provided."""
-        if self.protein_prune_cutoff < self.protein_restraint_cutoff:
-            raise ValueError("Pruning cutoff must be larger than restraint cutoff")
+        if self.protein_prune_cutoff is not None:
+            if self.protein_prune_cutoff < self.protein_restraint_cutoff:
+                raise ValueError("Pruning cutoff must be larger than restraint cutoff")
         return self
