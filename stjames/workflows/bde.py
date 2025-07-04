@@ -6,10 +6,11 @@ from typing import Annotated, Any, Iterable, Self, TypeVar
 from pydantic import AfterValidator, BaseModel, Field, PositiveInt, ValidationInfo, field_validator, model_validator
 
 from ..base import round_optional_float
+from ..method import Method
 from ..mode import Mode
 from ..molecule import Molecule
 from ..types import UUID
-from .multistage_opt import MultiStageOptMixin
+from .multistage_opt import MultiStageOptMixin, mso_settings_from_method_string
 from .workflow import MoleculeWorkflow
 
 # the id of a mutable object may change, thus using object()
@@ -57,13 +58,13 @@ class BDEWorkflow(MoleculeWorkflow, MultiStageOptMixin):
 
     Inherited:
     :param initial_molecule: Molecule of interest
-    :param mode: Mode for workflow
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
     :param solvent: solvent to use for singlepoint
     :param xtb_preopt: pre-optimize with xtb (sets based on mode when None)
     :param frequencies: whether to calculate frequencies
 
     Overridden:
+    :param mode: Mode for workflow or method string from BDE_METHODS
     :param mso_mode: Mode for MultiStageOptSettings
 
     Turned off:
@@ -81,6 +82,7 @@ class BDEWorkflow(MoleculeWorkflow, MultiStageOptMixin):
     :param bdes: BDE results
     """
 
+    mode: Mode | str  # type: ignore [assignment]
     mso_mode: Mode = _sentinel_mso_mode  # type: ignore [assignment]
     optimize_fragments: bool = None  # type: ignore [assignment]
 
@@ -95,6 +97,13 @@ class BDEWorkflow(MoleculeWorkflow, MultiStageOptMixin):
     optimization_energy: float | None = None
     bdes: list[BDE] = Field(default_factory=list)
 
+    def __repr__(self) -> str:
+        if self.mode != Mode.MANUAL:
+            name = self.mode.name if isinstance(self.mode, Mode) else self.mode
+            return f"<{type(self).__name__} {name}>"
+
+        return f"<{type(self).__name__} {self.level_of_theory}>"
+
     def __str__(self) -> str:
         r"""
         Return a string representation of the BDE workflow.
@@ -104,7 +113,8 @@ class BDEWorkflow(MoleculeWorkflow, MultiStageOptMixin):
         (1,)
         (2,)
         """
-        return f"{type(self).__name__} {self.mode.name}\n" + "\n".join(map(str, self.fragment_indices))
+        name = self.mode.name if isinstance(self.mode, Mode) else self.mode
+        return f"{type(self).__name__} {name}\n" + "\n".join(map(str, self.fragment_indices))
 
     @property
     def level_of_theory(self) -> str:
@@ -142,7 +152,14 @@ class BDEWorkflow(MoleculeWorkflow, MultiStageOptMixin):
     @classmethod
     def set_mso_mode(cls, values: dict[str, Any]) -> dict[str, Any]:
         """Set the MultiStageOptSettings mode to match current BDE mode."""
-        values["mso_mode"] = values["mode"]
+        mode = values["mode"].upper()
+        if mode in BDE_METHODS:
+            values["mso_mode"] = Mode.MANUAL
+            values["multistage_opt_settings"] = mso_settings_from_method_string(mode)
+        else:
+            values["mode"] = Mode(mode)
+            values["mso_mode"] = values["mode"]
+
         return values
 
     @model_validator(mode="after")
@@ -158,6 +175,8 @@ class BDEWorkflow(MoleculeWorkflow, MultiStageOptMixin):
             case Mode.RAPID | Mode.CAREFUL | Mode.METICULOUS:
                 # Default on
                 self.optimize_fragments = self.optimize_fragments or self.optimize_fragments is None
+            case m if m in BDE_METHODS:
+                self.optimize_fragments = True
             case _:
                 raise NotImplementedError(f"{self.mode} not implemented.")
 
@@ -260,3 +279,11 @@ def find_AB_bonds(molecule: Molecule, a: int, b: int, distance_max: float) -> It
             atomic_number_indices(molecule, b),
         ),
     )
+
+
+BDE_METHODS = {
+    f"{Method.G_XTB.name}",
+    f"{Method.G_XTB.name}//{Method.GFN2_XTB.name}",
+    f"{Method.R2SCAN3C.name}//{Method.GFN2_XTB.name}",
+    f"{Method.OMOL25_CONSERVING_S.name}",
+}
