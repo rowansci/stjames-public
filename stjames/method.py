@@ -87,7 +87,7 @@ class Method(LowercaseStrEnum):
                 return "omol25"
             case Method.ORB_V3_CONSERVATIVE_INF_OMAT:
                 return "orb"
-            case Method.GFN_FF | Method.GFN0_XTB | Method.GFN1_XTB | Method.GFN2_XTB | Method.G_XTB:
+            case _ if self in XTB_METHODS:
                 return "tblite" if is_periodic else "xtb"
             case Method.OFF_SAGE_2_2_1:
                 return "openff"
