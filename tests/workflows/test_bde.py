@@ -140,3 +140,13 @@ def test_BDE_none() -> None:
     BDE(fragment_idxs=(1, 2), energy=None, fragment_energies=(1, None), calculation_uuids=(["1", "2"], ["2", "3"]))
     BDE(fragment_idxs=(1, 2), energy=None, fragment_energies=(None, 2), calculation_uuids=(["1", "2"], ["2", "3"]))
     BDE(fragment_idxs=(1, 2), energy=None, fragment_energies=(1, 2), calculation_uuids=(["1", "2"], ["2", "3"]))
+
+
+def test_new_methods(chloroethane: Molecule) -> None:
+    g_xtb = BDEWorkflow(initial_molecule=chloroethane, mode="G_XTB", atoms=[4, 5, 6, 7, 8])
+    g_xtb__gfn2_xtb = BDEWorkflow(initial_molecule=chloroethane, mode="G_XTB//GFN2_XTB", all_CH=True)
+    BDEWorkflow(initial_molecule=chloroethane, mode="R2SCAN3C//GFN2_XTB", all_CX=True)
+    BDEWorkflow(initial_molecule=chloroethane, mode="OMOL25_CONSERVING_S", all_CX=True, atoms=[3])
+
+    assert str(g_xtb) == "BDEWorkflow G_XTB\n(4,)\n(5,)\n(6,)\n(7,)\n(8,)"
+    assert repr(g_xtb__gfn2_xtb) == "<BDEWorkflow G_XTB//GFN2_XTB>"

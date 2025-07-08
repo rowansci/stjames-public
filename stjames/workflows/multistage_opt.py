@@ -271,7 +271,6 @@ class MultiStageOptMixin(BaseModel):
 def mso_settings_from_method_string(
     methods: str,
     solvent: Solvent | None = None,
-    use_solvent_for_opt: bool = False,
     constraints: list[Constraint] | None = None,
     transition_state: bool = False,
     frequencies: bool = False,
