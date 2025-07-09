@@ -37,6 +37,7 @@ class Method(LowercaseStrEnum):
     OCP24_L = "ocp24_l"
     OMOL25_CONSERVING_S = "omol25_conserving_s"
     UMA_M_OMOL = "uma_m_omol"
+    UMA_S_OMOL = "uma_s_omol"
     ORB_V3_CONSERVATIVE_INF_OMAT = "orb_v3_conservative_inf_omat"
 
     GFN_FF = "gfn_ff"
@@ -83,7 +84,7 @@ class Method(LowercaseStrEnum):
                 return "mace"
             case Method.OCP24_S | Method.OCP24_L:
                 return "ocp24"
-            case Method.OMOL25_CONSERVING_S | Method.UMA_M_OMOL:
+            case Method.OMOL25_CONSERVING_S | Method.UMA_M_OMOL | Method.UMA_S_OMOL:
                 return "omol25"
             case Method.ORB_V3_CONSERVATIVE_INF_OMAT:
                 return "orb"
@@ -104,6 +105,7 @@ PrepackagedNNPMethod = Literal[
     Method.OCP24_L,
     Method.OMOL25_CONSERVING_S,
     Method.UMA_M_OMOL,
+    Method.UMA_S_OMOL,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
     Method.EGRET_1,
     Method.EGRET_1E,
@@ -116,6 +118,7 @@ PREPACKAGED_NNP_METHODS = [
     Method.OCP24_L,
     Method.OMOL25_CONSERVING_S,
     Method.UMA_M_OMOL,
+    Method.UMA_S_OMOL,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
     Method.EGRET_1,
     Method.EGRET_1E,
