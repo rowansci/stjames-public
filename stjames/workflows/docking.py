@@ -110,7 +110,7 @@ class DockingWorkflow(MoleculeWorkflow):
     def check_protein(self) -> Self:
         """Check if protein is provided."""
         if not self.target and not self.target_uuid:
-            raise ValueError("Must provide either target or uuid")
+            raise ValueError("Must provide either target or target_uuid")
         return self
 
     @field_validator("pocket", mode="after")
