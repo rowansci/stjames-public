@@ -4,7 +4,7 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
 
-from ..base import Base, LowercaseStrEnum, round_float
+from ..base import Base, round_float
 from ..pdb import PDB
 from ..types import UUID, Vector3D
 from .conformer_search import ConformerGenSettings, ETKDGSettings
@@ -22,10 +22,6 @@ class Score(Base):
     pose: UUID | None  # for calculation
     score: Annotated[float, AfterValidator(round_float(3))]
     posebusters_valid: bool
-
-
-class DockingEngine(LowercaseStrEnum):
-    VINA = "vina"
 
 
 class DockingSettings(Base):
@@ -62,8 +58,6 @@ class DockingWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     New:
-    :param molecules: Molecules to dock (optional, currently unused)
-    :param smiles: SMILES strings of the ligands (optional, currently unused)
     :param docking_engine: which docking method to use
     :param do_csearch: whether to csearch starting structures
     :param csearch_settings: settings for initial conformer search.
@@ -116,7 +110,7 @@ class DockingWorkflow(MoleculeWorkflow):
     def check_protein(self) -> Self:
         """Check if protein is provided."""
         if not self.target and not self.target_uuid:
-            raise ValueError("Must provide either molecules or smiles")
+            raise ValueError("Must provide either target or uuid")
         return self
 
     @field_validator("pocket", mode="after")
