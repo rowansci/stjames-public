@@ -4,9 +4,10 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
 
-from ..base import Base, round_float
+from ..base import Base, LowercaseStrEnum, round_float
 from ..pdb import PDB
 from ..types import UUID, Vector3D
+from .conformer_search import ConformerGenSettings, ETKDGSettings
 from .workflow import MoleculeWorkflow
 
 
@@ -20,6 +21,11 @@ class Score(Base):
 
     pose: UUID | None  # for calculation
     score: Annotated[float, AfterValidator(round_float(3))]
+    posebusters_valid: bool
+
+
+class DockingEngine(LowercaseStrEnum):
+    VINA = "vina"
 
 
 class DockingWorkflow(MoleculeWorkflow):
@@ -37,29 +43,37 @@ class DockingWorkflow(MoleculeWorkflow):
     New:
     :param molecules: Molecules to dock (optional)
     :param smiles: SMILES strings of the ligands (optional)
+    :param docking_engine: which docking method to use
     :param do_csearch: whether to csearch starting structures
+    :param csearch_settings: settings for initial conformer search.
     :param do_optimization: whether to optimize starting structures
+    :param opt_settings: settings for conformer optimization.
     :param do_pose_refinement: whether to optimize non-rotatable bonds in output poses
-    :param conformers: UUIDs of optimized conformers
     :param target: PDB of the protein.
     :param target_uuid: UUID of the protein.
     :param pocket: center (x, y, z) and size (x, y, z) of the pocket
 
     Results:
+    :param conformers: UUIDs of optimized conformers
     :param scores: docked poses sorted by score
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
-
-    do_csearch: bool = True
-    do_optimization: bool = True
-    conformers: list[UUID] = []
+    docking_engine: DockingEngine = DockingEngine.VINA
 
     target: PDB | None = None
     target_uuid: UUID | None = None
     pocket: tuple[Vector3D, Vector3D]
 
+    do_csearch: bool = True
+    conformer_gen_settings: ConformerGenSettings = ETKDGSettings(mode="reckless")
+
+    do_optimization: bool = True
+    # optimization_settings - here in future once we have a cleaner mode sol'n, ccw 7.9.25
+
     do_pose_refinement: bool = True
+
+    conformers: list[UUID] = []
     scores: list[Score] = []
 
     def __str__(self) -> str:
