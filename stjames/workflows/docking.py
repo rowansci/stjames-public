@@ -4,7 +4,7 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
 
-from ..base import Base, LowercaseStrEnum, round_float
+from ..base import Base, round_float
 from ..pdb import PDB
 from ..types import UUID, Vector3D
 from .conformer_search import ConformerGenSettings, ETKDGSettings
@@ -24,8 +24,25 @@ class Score(Base):
     posebusters_valid: bool
 
 
-class DockingEngine(LowercaseStrEnum):
-    VINA = "vina"
+class DockingSettings(Base):
+    """
+    Base class for controlling how docked poses are generated.
+
+    :param max_poses: the maximum number of poses generated per input molecule
+    """
+
+    max_poses: int = 4
+
+
+class VinaSettings(DockingSettings):
+    """
+    Controls how AutoDock Vina is run.
+
+    :param exhaustiveness: how many times Vina attempts to find a pose.
+        8 is typical, 32 is considered relatively careful.
+    """
+
+    exhaustiveness: int = 8
 
 
 class DockingWorkflow(MoleculeWorkflow):
@@ -41,8 +58,6 @@ class DockingWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     New:
-    :param molecules: Molecules to dock (optional)
-    :param smiles: SMILES strings of the ligands (optional)
     :param docking_engine: which docking method to use
     :param do_csearch: whether to csearch starting structures
     :param csearch_settings: settings for initial conformer search.
@@ -59,7 +74,6 @@ class DockingWorkflow(MoleculeWorkflow):
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
-    docking_engine: DockingEngine = DockingEngine.VINA
 
     target: PDB | None = None
     target_uuid: UUID | None = None
@@ -70,6 +84,8 @@ class DockingWorkflow(MoleculeWorkflow):
 
     do_optimization: bool = True
     # optimization_settings - here in future once we have a cleaner mode sol'n, ccw 7.9.25
+
+    docking_settings: DockingSettings = VinaSettings()
 
     do_pose_refinement: bool = True
 
@@ -94,7 +110,7 @@ class DockingWorkflow(MoleculeWorkflow):
     def check_protein(self) -> Self:
         """Check if protein is provided."""
         if not self.target and not self.target_uuid:
-            raise ValueError("Must provide either molecules or smiles")
+            raise ValueError("Must provide either target or target_uuid")
         return self
 
     @field_validator("pocket", mode="after")
