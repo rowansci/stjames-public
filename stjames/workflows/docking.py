@@ -7,6 +7,7 @@ from pydantic import AfterValidator, ConfigDict, field_validator, model_validato
 from ..base import Base, round_float
 from ..pdb import PDB
 from ..types import UUID, Vector3D
+from .conformer_search import ConformerGenSettings, ETKDGSettings
 from .workflow import MoleculeWorkflow
 
 
@@ -20,6 +21,28 @@ class Score(Base):
 
     pose: UUID | None  # for calculation
     score: Annotated[float, AfterValidator(round_float(3))]
+    posebusters_valid: bool
+
+
+class DockingSettings(Base):
+    """
+    Base class for controlling how docked poses are generated.
+
+    :param max_poses: the maximum number of poses generated per input molecule
+    """
+
+    max_poses: int = 4
+
+
+class VinaSettings(DockingSettings):
+    """
+    Controls how AutoDock Vina is run.
+
+    :param exhaustiveness: how many times Vina attempts to find a pose.
+        8 is typical, 32 is considered relatively careful.
+    """
+
+    exhaustiveness: int = 8
 
 
 class DockingWorkflow(MoleculeWorkflow):
@@ -35,31 +58,38 @@ class DockingWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     New:
-    :param molecules: Molecules to dock (optional)
-    :param smiles: SMILES strings of the ligands (optional)
+    :param docking_engine: which docking method to use
     :param do_csearch: whether to csearch starting structures
+    :param csearch_settings: settings for initial conformer search.
     :param do_optimization: whether to optimize starting structures
+    :param opt_settings: settings for conformer optimization.
     :param do_pose_refinement: whether to optimize non-rotatable bonds in output poses
-    :param conformers: UUIDs of optimized conformers
     :param target: PDB of the protein.
     :param target_uuid: UUID of the protein.
     :param pocket: center (x, y, z) and size (x, y, z) of the pocket
 
     Results:
+    :param conformers: UUIDs of optimized conformers
     :param scores: docked poses sorted by score
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    do_csearch: bool = True
-    do_optimization: bool = True
-    conformers: list[UUID] = []
-
     target: PDB | None = None
     target_uuid: UUID | None = None
     pocket: tuple[Vector3D, Vector3D]
 
+    do_csearch: bool = True
+    conformer_gen_settings: ConformerGenSettings = ETKDGSettings(mode="reckless")
+
+    do_optimization: bool = True
+    # optimization_settings - here in future once we have a cleaner mode sol'n, ccw 7.9.25
+
+    docking_settings: DockingSettings = VinaSettings()
+
     do_pose_refinement: bool = True
+
+    conformers: list[UUID] = []
     scores: list[Score] = []
 
     def __str__(self) -> str:
@@ -80,7 +110,7 @@ class DockingWorkflow(MoleculeWorkflow):
     def check_protein(self) -> Self:
         """Check if protein is provided."""
         if not self.target and not self.target_uuid:
-            raise ValueError("Must provide either molecules or smiles")
+            raise ValueError("Must provide either target or target_uuid")
         return self
 
     @field_validator("pocket", mode="after")

@@ -61,9 +61,9 @@ def test_docked(water: Molecule, gfp: str) -> None:
     )
 
     dwf.scores = [
-        Score(pose=None, score=0.0),
-        Score(pose=None, score=1.0),
+        Score(pose=None, score=0.0, posebusters_valid=True),
+        Score(pose=None, score=1.0, posebusters_valid=False),
     ]
 
     assert dwf.pocket == ((0.0, 0.0, 0.0), (10.0, 10.0, 10.0))
-    assert dwf.scores == [Score(pose=None, score=0.0), Score(pose=None, score=1.0)]
+    assert dwf.scores == [Score(pose=None, score=0.0, posebusters_valid=True), Score(pose=None, score=1.0, posebusters_valid=False)]
