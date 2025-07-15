@@ -448,6 +448,7 @@ def _format_atom_line(
         chg = "  "
 
     atom_name = atom.name if atom.name else atom.element
+
     occupancy = atom.occupancy if atom.occupancy else 1.0
 
     # Construct the line.
@@ -455,7 +456,7 @@ def _format_atom_line(
     line = (
         f"{record_type}"
         f"{serial:5d} "  # atom serial number (columns 7-11)
-        f"{atom_name:<4}"  # atom name (columns 13-16, left-justified in this snippet)
+        f"{(' ' + atom_name if len(atom_name) < 4 else atom_name):<4}"  # atom name (columns 13-16, left-justified in this snippet)
         f"{alt_loc_char}"  # altLoc (column 17)
         f"{residue_name:>3}"  # residue name (columns 18-20)
         f" {chain_char}"  # chain ID (column 22)
