@@ -20,7 +20,7 @@ class CofoldingModel(LowercaseStrEnum):
 class Token(BaseModel):
     """Either a atom in a ligand or a residue in a protein."""
 
-    type: Literal["ligand", "protein"]
+    input_type: Literal["ligand", "protein"]
     input_index: int
     token_index: int
 
@@ -30,17 +30,18 @@ class ContactConstraint(BaseModel):
 
     token_1: Token
     token_2: Token
-    max_distance: float
-    force: bool = False
+    max_distance: float  # Angstroms
+    force: bool = False  # Whether to use potentials to enforce the constraint
 
 
 class PocketConstraint(BaseModel):
     """Pocket constraint to be used for prediction."""
 
-    ligand_index: int
+    input_type: Literal["ligand", "protein"]
+    input_index: int
     contacts: list[Token]
-    max_distance: float
-    force: bool = False
+    max_distance: float  # Angstroms
+    force: bool = False  # Whether to use potentials to enforce the constraint
 
 
 class CofoldingScores(BaseModel):
