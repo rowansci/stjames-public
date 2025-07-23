@@ -78,8 +78,8 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     use_msa_server: bool = False
     use_templates_server: bool = False
     use_potentials: bool = False
-    contact_constraints: list[ContactConstraint] | None = None
-    pocket_constraints: list[PocketConstraint] | None = None
+    contact_constraints: list[ContactConstraint] = []
+    pocket_constraints: list[PocketConstraint] = []
 
     predicted_structure_uuid: UUID | None = None
     scores: CofoldingScores | None = None
