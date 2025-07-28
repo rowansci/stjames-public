@@ -1,6 +1,6 @@
 """Protein Cofolding Workflow."""
 
-from typing import Annotated
+from typing import Annotated, Literal
 
 from pydantic import AfterValidator, BaseModel, ConfigDict
 
@@ -15,6 +15,33 @@ class CofoldingModel(LowercaseStrEnum):
     CHAI_1R = "chai_1r"
     BOLTZ_1 = "boltz_1"
     BOLTZ_2 = "boltz_2"
+
+
+class Token(BaseModel):
+    """Either a atom in a ligand or a residue in a protein."""
+
+    input_type: Literal["ligand", "protein"]
+    input_index: int
+    token_index: int
+
+
+class ContactConstraint(BaseModel):
+    """Contact constraint to be used for prediction."""
+
+    token_1: Token
+    token_2: Token
+    max_distance: float  # Angstroms
+    force: bool = False  # Whether to use potentials to enforce the constraint
+
+
+class PocketConstraint(BaseModel):
+    """Pocket constraint to be used for prediction."""
+
+    input_type: Literal["ligand", "protein"]
+    input_index: int
+    contacts: list[Token]
+    max_distance: float  # Angstroms
+    force: bool = False  # Whether to use potentials to enforce the constraint
 
 
 class CofoldingScores(BaseModel):
@@ -52,6 +79,9 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     use_msa_server: bool = False
     use_templates_server: bool = False
     use_potentials: bool = False
+    contact_constraints: list[ContactConstraint] = []
+    pocket_constraints: list[PocketConstraint] = []
+
     predicted_structure_uuid: UUID | None = None
     scores: CofoldingScores | None = None
     model: CofoldingModel = CofoldingModel.BOLTZ_2

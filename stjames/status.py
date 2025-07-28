@@ -19,3 +19,6 @@ class Status(int, Enum):
 
     # Status if a user has exceeded their allowed max_concurrency
     AWAITING_QUEUE = 5
+
+    # Job is not yet submitted
+    DRAFT = 6

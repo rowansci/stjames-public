@@ -68,7 +68,6 @@ class Settings(Base):
         if self.mode == Mode.AUTO:
             self.mode = Mode.RAPID
 
-        self.scf_settings = _assign_scf_settings_by_mode(self.mode, self.scf_settings)
         self.opt_settings = _assign_opt_settings_by_mode(self.mode, self.opt_settings)
 
         return self
@@ -113,74 +112,6 @@ class Settings(Base):
     def remove_empty_string(cls, v: list[_T]) -> list[_T]:
         """Remove empty string values."""
         return [c for c in v if c] if v is not None else v
-
-
-def _assign_scf_settings_by_mode(mode: Mode, scf_settings: SCFSettings) -> SCFSettings:
-    """
-    Assign SCF settings based on the mode.
-
-    Values based off of the following sources:
-    QChem:
-        - https://manual.q-chem.com/5.2/Ch4.S3.SS2.html
-        - https://manual.q-chem.com/5.2/Ch4.S5.SS2.html
-
-    Gaussian:
-        - https://gaussian.com/integral/
-        - https://gaussian.com/overlay5/
-
-    Orca:
-        - manual 4.2.1, §9.6.1 and §9.7.3
-
-    Psi4:
-        - https://psicode.org/psi4manual/master/autodir_options_c/module__scf.html
-        - https://psicode.org/psi4manual/master/autodoc_glossary_options_c.html
-
-    TeraChem:
-        - Manual, it's easy to locate everything.
-
-    The below values are my best attempt at homogenizing various sources.
-    In general, eri_threshold should be 3 OOM lower than SCF convergence.
-    """
-    if mode == Mode.MANUAL:
-        return scf_settings
-
-    match mode:
-        case Mode.RECKLESS:
-            scf_settings.energy_threshold = 1e-5
-            scf_settings.rms_error_threshold = 1e-7
-            scf_settings.max_error_threshold = 1e-5
-            scf_settings.rebuild_frequency = 100
-            scf_settings.int_settings.eri_threshold = 1e-8
-            scf_settings.int_settings.csam_multiplier = 3.0
-            scf_settings.int_settings.pair_overlap_threshold = 1e-8
-        case Mode.RAPID | Mode.CAREFUL:
-            scf_settings.energy_threshold = 1e-6
-            scf_settings.rms_error_threshold = 1e-9
-            scf_settings.max_error_threshold = 1e-7
-            scf_settings.rebuild_frequency = 10
-            scf_settings.int_settings.eri_threshold = 1e-10
-            scf_settings.int_settings.csam_multiplier = 1.0
-            scf_settings.int_settings.pair_overlap_threshold = 1e-10
-        case Mode.METICULOUS:
-            scf_settings.energy_threshold = 1e-8
-            scf_settings.rms_error_threshold = 1e-9
-            scf_settings.max_error_threshold = 1e-7
-            scf_settings.rebuild_frequency = 5
-            scf_settings.int_settings.eri_threshold = 1e-12
-            scf_settings.int_settings.csam_multiplier = 1.0
-            scf_settings.int_settings.pair_overlap_threshold = 1e-12
-        case Mode.DEBUG:
-            scf_settings.energy_threshold = 1e-9
-            scf_settings.rms_error_threshold = 1e-10
-            scf_settings.max_error_threshold = 1e-9
-            scf_settings.rebuild_frequency = 1
-            scf_settings.int_settings.eri_threshold = 1e-14
-            scf_settings.int_settings.csam_multiplier = 1e10  # in other words, disable CSAM
-            scf_settings.int_settings.pair_overlap_threshold = 1e-14
-        case _:
-            raise ValueError(f"Unknown mode ``{mode.value}``!")
-
-    return scf_settings
 
 
 def _assign_opt_settings_by_mode(mode: Mode, opt_settings: OptimizationSettings) -> OptimizationSettings:
