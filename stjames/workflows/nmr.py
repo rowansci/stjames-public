@@ -29,8 +29,8 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
     New:
     :param nmr_method: how to run the NMR calculations
     :param solvent: the solvent in which to run the calculations
-    :param conf_gen_search: the conformer-search settings. if left blank, no conformer search will be performed
-    :param multistage_opt_settings: the optimization settings. if left blank, no optimization will be performed
+    :param conf_gen_settings : the conformer-search settings. if `None`, no conformer search will be performed
+    :param multistage_opt_settings: the optimization settings. if `None`, no optimization will be performed
 
     Results:
     :param conformers: list of conformer UUIDs
