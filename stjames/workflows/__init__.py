@@ -17,6 +17,7 @@ from .irc import *
 from .macropka import *
 from .molecular_dynamics import *
 from .multistage_opt import *
+from .nmr import *
 from .pka import *
 from .pose_analysis_md import *
 from .protein_cofolding import *
@@ -43,6 +44,7 @@ WORKFLOW_NAME = Literal[
     "macropka",
     "molecular_dynamics",
     "multistage_opt",
+    "nmr",
     "pka",
     "pose_analysis_md",
     "protein_cofolding",
@@ -69,6 +71,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "macropka": MacropKaWorkflow,  # type: ignore [dict-item]
     "molecular_dynamics": MolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "multistage_opt": MultiStageOptWorkflow,  # type: ignore [dict-item]
+    "nmr": NMRSpectroscopyWorkflow,  # type: ignore [dict-item]
     "pka": pKaWorkflow,  # type: ignore [dict-item]
     "pose_analysis_md": PoseAnalysisMolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "protein_cofolding": ProteinCofoldingWorkflow,  # type: ignore [dict-item]
