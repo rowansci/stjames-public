@@ -1,6 +1,11 @@
 """Ion mobility workflow."""
 
-from ..types import UUID
+from typing import Annotated
+
+from pydantic import AfterValidator
+
+from ..base import round_optional_float
+from ..types import UUID, round_list
 from .workflow import MoleculeWorkflow
 
 
@@ -34,9 +39,9 @@ class IonMobilityWorkflow(MoleculeWorkflow):
 
     conformers: list[UUID] = []
 
-    conformer_ccs: list[float] = []
-    conformer_ccs_stdev: list[float] = []
-    boltzmann_weights: list[float] = []
+    conformer_ccs: Annotated[list[float], AfterValidator(round_list(3))] = []
+    conformer_ccs_stdev: Annotated[list[float], AfterValidator(round_list(3))] = []
+    boltzmann_weights: Annotated[list[float], AfterValidator(round_list(3))] = []
 
-    average_ccs: float | None = None
-    average_ccs_stdev: float | None = None
+    average_ccs: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    average_ccs_stdev: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
