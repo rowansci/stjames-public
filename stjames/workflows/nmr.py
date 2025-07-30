@@ -34,9 +34,9 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
 
     Results:
     :param conformers: list of conformer UUIDs
-    :param isotopic_shieldings: the per-atom shieldings
-    :param per_conformer_isotopic_shieldings: the per-atom shieldings for each conformer
     :param boltzmann_weights: the boltzmann weights for each conformer
+    :param per_conformer_isotopic_shieldings: the per-atom shieldings for each conformer
+    :param isotopic_shieldings: the per-atom shieldings
     """
 
     nmr_method: NMRMethod = NMRMethod.MAGNETZERO
