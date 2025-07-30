@@ -28,13 +28,15 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
 
     New:
     :param nmr_method: how to run the NMR calculations
-    :param solvent: the solvent to run the calculations in
-    :param conf_gen_search: the conformer-search settings
-    :param multistage_opt_settings: the conformer-search settings
+    :param solvent: the solvent in which to run the calculations
+    :param conf_gen_search: the conformer-search settings. if left blank, no conformer search will be performed
+    :param multistage_opt_settings: the optimization settings. if left blank, no optimization will be performed
 
     Results:
     :param conformers: list of conformer UUIDs
     :param isotopic_shieldings: the per-atom shieldings
+    :param per_conformer_isotopic_shieldings: the per-atom shieldings for each conformer
+    :param boltzmann_weights: the boltzmann weights for each conformer
     """
 
     nmr_method: NMRMethod = NMRMethod.MAGNETZERO
@@ -47,7 +49,6 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
     )
 
     conformers: list[UUID] = []
-
     boltzmann_weights: Annotated[list[float], AfterValidator(round_list(3))] = []
     per_conformer_isotropic_shieldings: list[Annotated[list[float], AfterValidator(round_list(3))]] = []
     isotropic_shieldings: Annotated[list[float], AfterValidator(round_list(3))] = []
