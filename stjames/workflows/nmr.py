@@ -45,7 +45,7 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
     conf_gen_settings: ConformerGenSettings | None = iMTDSettings(mode="careful")
     multistage_opt_settings: MultiStageOptSettings | None = MultiStageOptSettings(
         mode=Mode.MANUAL,
-        optimization_settings=[Settings(method="aimnet2_wb97md3")],
+        optimization_settings=[Settings(method="aimnet2_wb97md3", tasks=["optimize"])],
     )
 
     conformers: list[UUID] = []
