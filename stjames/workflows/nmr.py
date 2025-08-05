@@ -35,8 +35,8 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
     Results:
     :param conformers: list of conformer UUIDs
     :param boltzmann_weights: the boltzmann weights for each conformer
-    :param per_conformer_isotopic_shieldings: the per-atom shieldings for each conformer
-    :param isotopic_shieldings: the per-atom shieldings
+    :param per_conformer_chemical_shifts: the per-atom shifts for each conformer
+    :param chemical_shifts: the per-atom shifts
     """
 
     nmr_method: NMRMethod = NMRMethod.MAGNETZERO
@@ -50,5 +50,5 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
 
     conformers: list[UUID] = []
     boltzmann_weights: Annotated[list[float], AfterValidator(round_list(3))] = []
-    per_conformer_isotropic_shieldings: list[Annotated[list[float], AfterValidator(round_list(3))]] = []
-    isotropic_shieldings: Annotated[list[float], AfterValidator(round_list(3))] = []
+    per_conformer_chemical_shifts: list[Annotated[list[float], AfterValidator(round_list(3))]] = []
+    chemical_shifts: Annotated[list[float], AfterValidator(round_list(3))] = []
