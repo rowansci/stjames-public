@@ -19,12 +19,12 @@ def test_basic(water: Molecule) -> None:
     assert nmr.mode == Mode.RAPID
     assert nmr.solvent == Solvent.CHLOROFORM
 
-    nmr.per_conformer_isotropic_shieldings = [
+    nmr.per_conformer_chemical_shifts = [
         [0.0, 10.0, 20.0],
         [6.0, 12.0, 24.0],
     ]
 
-    nmr.isotropic_shieldings = [3.0, 11.0, 22.0]
+    nmr.chemical_shifts = [3.0, 11.0, 22.0]
 
-    assert len(nmr.isotropic_shieldings) == 3
-    assert len(nmr.per_conformer_isotropic_shieldings) == 2
+    assert len(nmr.chemical_shifts) == 3
+    assert len(nmr.per_conformer_chemical_shifts) == 2
