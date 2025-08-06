@@ -37,6 +37,7 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
     :param boltzmann_weights: the boltzmann weights for each conformer
     :param per_conformer_chemical_shifts: the per-atom shifts for each conformer
     :param chemical_shifts: the per-atom shifts
+    :param symmetry_equivalent_nuclei: 0-indexed atoms which are equivalent to one another
     """
 
     nmr_method: NMRMethod = NMRMethod.MAGNETZERO
@@ -52,3 +53,5 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
     boltzmann_weights: Annotated[list[float], AfterValidator(round_list(3))] = []
     per_conformer_chemical_shifts: list[Annotated[list[float], AfterValidator(round_list(3))]] = []
     chemical_shifts: Annotated[list[float], AfterValidator(round_list(3))] = []
+
+    symmetry_equivalent_nuclei: list[list[int]] = []
