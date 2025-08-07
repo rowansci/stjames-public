@@ -4,11 +4,11 @@ from typing import Annotated
 
 from pydantic import AfterValidator
 
-from ..base import LowercaseStrEnum
+from ..base import Base, LowercaseStrEnum, round_float
 from ..mode import Mode
 from ..settings import Settings
 from ..solvent import Solvent
-from ..types import UUID, round_list
+from ..types import UUID, round_list, round_optional_list
 from .conformer_search import ConformerGenSettings, iMTDSettings
 from .multistage_opt import MultiStageOptSettings
 from .workflow import MoleculeWorkflow
@@ -16,6 +16,20 @@ from .workflow import MoleculeWorkflow
 
 class NMRMethod(LowercaseStrEnum):
     MAGNETZERO = "magnet-zero"
+
+
+class NMRPeak(Base):
+    """
+    Represents a single NMR peak.
+
+    :param nucleus: the atomic number of the nucleus in question
+    :param shift: the chemical shift of the peak
+    :param atom_indices: the zero-indices of the atoms giving rise to the peak
+    """
+
+    nucleus: int
+    shift: Annotated[float, AfterValidator(round_float(3))]
+    atom_indices: set[int]
 
 
 class NMRSpectroscopyWorkflow(MoleculeWorkflow):
@@ -38,6 +52,7 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
     :param per_conformer_chemical_shifts: the per-atom shifts for each conformer
     :param chemical_shifts: the per-atom shifts
     :param symmetry_equivalent_nuclei: 0-indexed atoms which are equivalent to one another
+    :param predicted_peaks: the predicted NMR peaks
     """
 
     nmr_method: NMRMethod = NMRMethod.MAGNETZERO
@@ -51,7 +66,8 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
 
     conformers: list[UUID] = []
     boltzmann_weights: Annotated[list[float], AfterValidator(round_list(3))] = []
-    per_conformer_chemical_shifts: list[Annotated[list[float], AfterValidator(round_list(3))]] = []
-    chemical_shifts: Annotated[list[float], AfterValidator(round_list(3))] = []
+    per_conformer_chemical_shifts: list[Annotated[list[float | None], AfterValidator(round_optional_list(3))]] = []
+    chemical_shifts: Annotated[list[float | None], AfterValidator(round_optional_list(3))] = []
+    symmetry_equivalent_nuclei: set[set[int]] = set()
 
-    symmetry_equivalent_nuclei: list[list[int]] = []
+    predicted_peaks: dict[int, list[NMRPeak]] = {}
