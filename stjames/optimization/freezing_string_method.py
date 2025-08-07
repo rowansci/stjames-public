@@ -1,10 +1,10 @@
 """Settings for the Freezing String Method (FSM)."""
 
-from typing import Self
+from typing import Annotated, Self
 
-from pydantic import BaseModel, PositiveFloat, PositiveInt, model_validator
+from pydantic import AfterValidator, BaseModel, PositiveFloat, PositiveInt, model_validator
 
-from stjames.base import LowercaseStrEnum
+from ..base import LowercaseStrEnum, round_float
 
 
 class FSMOptimizationCoordinates(LowercaseStrEnum):
@@ -43,12 +43,14 @@ class FSMSettings(BaseModel):
 
     max_optimizer_iterations: PositiveInt = 3
     max_line_search_steps: PositiveInt = 2
-    max_displacement: PositiveFloat = 0.3
+    max_displacement: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 0.3
 
     @model_validator(mode="after")
     def sanity_check(self) -> Self:
         """Sanity check for settings."""
         if self.min_num_nodes < 5:
             raise ValueError("Must have at least 5 nodes for the Freezing String Method.")
+        if self.max_displacement < 0.001:
+            raise ValueError("Maximum displacement must be at least 0.001 Å.")
 
         return self

@@ -1,14 +1,13 @@
 """Double ended transition-state-search workflow."""
 
-from typing import Self
+from typing import Annotated, Self
 
-from pydantic import model_validator
-
-from stjames.settings import Settings
+from pydantic import AfterValidator, PositiveFloat, model_validator
 
 from ..molecule import Molecule
 from ..optimization.freezing_string_method import FSMSettings
-from ..types import UUID
+from ..settings import Settings
+from ..types import UUID, round_list
 from .workflow import Workflow
 
 
@@ -42,8 +41,8 @@ class DoubleEndedTSSearchWorkflow(Workflow):
     optimize_ts: bool = True
 
     # Results
-    reactant_string_distances: list[float] = []
-    product_string_distances: list[float] = []
+    reactant_string_distances: Annotated[list[PositiveFloat], AfterValidator(round_list(5))] = []
+    product_string_distances: Annotated[list[PositiveFloat], AfterValidator(round_list(5))] = []
 
     reactant_calculation_uuids: list[UUID | None] = []
     product_calculation_uuids: list[UUID | None] = []
