@@ -22,13 +22,12 @@ class DoubleEndedTSSearchWorkflow(Workflow):
     :param search_settings: Settings for the search
     :param optimize_inputs: Whether to optimize the input reactant and product
     :param optimize_ts: Whether to optimize the guess transition state
-    :param reactant_string_distances: distances along the reactant string
 
     # Results
-    :param reactant_string_distances: distances along the string
-    :param product_string_distances: distances along the string (starting from the end of the reactant)
-    :param reactant_calculation_uuids: UUIDs of the calculations for the reactant string nodes
-    :param product_calculation_uuids: UUIDs of the calculations for the product string nodes
+    :param forward_string_distances: distances along the string
+    :param backward_string_distances: distances along the backward string (starting from the end of the forward string)
+    :param forward_calculation_uuids: UUIDs of the calculations for the forward string nodes
+    :param backward_calculation_uuids: UUIDs of the calculations for the backward string nodes
     :param ts_guess_calculation_uuid: UUID of the calculation for the guess (or optimized) transition state
     """
 
@@ -41,11 +40,11 @@ class DoubleEndedTSSearchWorkflow(Workflow):
     optimize_ts: bool = True
 
     # Results
-    reactant_string_distances: Annotated[list[PositiveFloat], AfterValidator(round_list(5))] = []
-    product_string_distances: Annotated[list[PositiveFloat], AfterValidator(round_list(5))] = []
+    forward_string_distances: Annotated[list[PositiveFloat], AfterValidator(round_list(5))] = []
+    backward_string_distances: Annotated[list[PositiveFloat], AfterValidator(round_list(5))] = []
 
-    reactant_calculation_uuids: list[UUID | None] = []
-    product_calculation_uuids: list[UUID | None] = []
+    forward_calculation_uuids: list[UUID | None] = []
+    backward_calculation_uuids: list[UUID | None] = []
 
     ts_guess_calculation_uuid: UUID | None = None
 
@@ -70,9 +69,9 @@ class DoubleEndedTSSearchWorkflow(Workflow):
     @property
     def path_uuids(self) -> list[UUID | None]:
         """Return the path from reactant to product."""
-        return self.reactant_calculation_uuids + self.product_calculation_uuids
+        return self.forward_calculation_uuids + self.backward_calculation_uuids
 
     @property
     def distances(self) -> list[float]:
         """Return the path from reactant to product."""
-        return self.reactant_string_distances + self.product_string_distances[::-1]
+        return self.forward_string_distances + self.backward_string_distances[::-1]
