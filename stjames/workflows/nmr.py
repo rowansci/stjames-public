@@ -68,6 +68,6 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
     boltzmann_weights: Annotated[list[float], AfterValidator(round_list(3))] = []
     per_conformer_chemical_shifts: list[Annotated[list[float | None], AfterValidator(round_optional_list(3))]] = []
     chemical_shifts: Annotated[list[float | None], AfterValidator(round_optional_list(3))] = []
-    symmetry_equivalent_nuclei: set[set[int]] = set()
+    symmetry_equivalent_nuclei: list[set[int]] = []
 
     predicted_peaks: dict[int, list[NMRPeak]] = {}
