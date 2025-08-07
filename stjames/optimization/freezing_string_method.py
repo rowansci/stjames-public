@@ -8,14 +8,14 @@ from stjames.base import LowercaseStrEnum
 
 
 class FSMOptimizationCoordinates(LowercaseStrEnum):
-    """Coordinate systems for FSM optimization."""
+    """Coordinate systems for FSM optimization step."""
 
     CARTESIAN = "cartesian"
     REDUNDANT_INTERNAL_COORDINATES = "redundant_internal_coordinates"
 
 
 class FSMInterpolation(LowercaseStrEnum):
-    """Interpolation methods for FSM."""
+    """Methods for FSM interpolation step."""
 
     CARTESIAN = "cartesian"
     LINEAR_SYNCHRONOUS_TRANSIT = "linear_synchronous_transit"
@@ -26,10 +26,10 @@ class FSMSettings(BaseModel):
     """
     Settings for the Freezing String Method (FSM) TS search.
 
-    :param opt_coords: coordinate system to use for optimization.
-    :param interpolation_method: method to use for interpolation between nodes.
-    :param min_num_nodes: minimum number of nodes to use in the string.
-    :param num_interpolation_points: number of interpolation points to use between end nodes.
+    :param opt_coords: coordinate system to use for optimization
+    :param interpolation_method: method to use for interpolation between nodes
+    :param min_num_nodes: minimum number of nodes to use in the string
+    :param num_interpolation_points: number of interpolation points to use between end nodes
     :param max_optimizer_iterations: maximum number of optimizer iterations to perform  (scipy.minimize maxiter)
     :param max_line_search_steps: maximum number of line search steps to perform (scipy.minimize maxls)
     :param max_displacement: maximum displacement for a single coordinate (Å for distances, internally converted for angles)

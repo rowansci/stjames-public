@@ -22,7 +22,7 @@ H 0 0 -1.1
 C 0 0 0
 N 0 0 1.2""")
 
-    with raises(ValueError, match="Reactants and products must have the same number of atoms."):
+    with raises(ValueError, match="Reactant and product must have the same number of atoms."):
         DoubleEndedTSSearchWorkflow(
             reactant=ammonia,
             product=hcn,
