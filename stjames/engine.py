@@ -1,7 +1,7 @@
 from .base import LowercaseStrEnum
 
 
-class Mode(LowercaseStrEnum):
+class Engine(LowercaseStrEnum):
     AIMNET2 = "aimnet2"
     MACE = "mace"
     OCP24 = "ocp24"
