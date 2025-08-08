@@ -9,6 +9,7 @@ from .conformer import *
 from .conformer_search import *
 from .descriptors import *
 from .docking import *
+from .double_ended_ts_search import DoubleEndedTSSearchWorkflow
 from .electronic_properties import *
 from .fukui import *
 from .hydrogen_bond_basicity import *
@@ -36,6 +37,7 @@ WORKFLOW_NAME = Literal[
     "conformer_search",
     "descriptors",
     "docking",
+    "double_ended_ts_search",
     "electronic_properties",
     "fukui",
     "hydrogen_bond_basicity",
@@ -63,6 +65,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "conformer_search": ConformerSearchWorkflow,  # type: ignore [dict-item]
     "descriptors": DescriptorsWorkflow,  # type: ignore [dict-item]
     "docking": DockingWorkflow,  # type: ignore [dict-item]
+    "double_ended_ts_search": DoubleEndedTSSearchWorkflow,  # type: ignore [dict-item]
     "electronic_properties": ElectronicPropertiesWorkflow,  # type: ignore [dict-item]
     "fukui": FukuiIndexWorkflow,  # type: ignore [dict-item]
     "hydrogen_bond_basicity": HydrogenBondBasicityWorkflow,  # type: ignore [dict-item]
