@@ -1,6 +1,6 @@
 """Fukui index workflow."""
 
-from typing import Annotated
+from typing import Annotated, Self
 
 from pydantic import AfterValidator, model_validator
 
@@ -49,7 +49,7 @@ class FukuiIndexWorkflow(MoleculeWorkflow):
     fukui_zero: Annotated[FloatPerAtom | None, AfterValidator(round_optional_float_per_atom(6))] = None
 
     @model_validator(mode="after")
-    def set_engines(self) -> "FukuiIndexWorkflow":
+    def set_engines(self) -> Self:
         """Set the engines for optimization and Fukui index calculations."""
         if self.opt_settings is not None and self.opt_engine is None:
             self.opt_engine = self.opt_settings.method.default_engine()
