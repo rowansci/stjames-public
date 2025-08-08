@@ -1,6 +1,7 @@
 from typing import Literal
 
 from .base import LowercaseStrEnum
+from .engine import Engine
 
 
 class Method(LowercaseStrEnum):
@@ -55,48 +56,42 @@ class Method(LowercaseStrEnum):
     EGRET_1E = "egret_1e"
     EGRET_1T = "egret_1t"
 
-    def default_engine(self, *, is_periodic: bool = False) -> str:
+    def default_engine(self, *, is_periodic: bool = False) -> Engine:
         """
-        Return the canonical engine name for this quantum-chemistry method.
+        Return the canonical Engine for this quantum-chemistry method.
 
         :param bool is_periodic:
             If ``True`` **and** the method is in the XTB family, return
             ``"tblite"`` (periodic-capable backend) instead of ``"xtb"``.
-        :returns: Lower-case engine identifier (e.g. ``"psi4"``, ``"mace"``).
+        :returns: lower-case engine identifier (e.g. ``"psi4"``, ``"mace"``).
 
-        **Examples**
-
-        .. code-block:: python
-
-           Method.MACE_MP_0B2_L.default_engine()
-           # 'mace'
-
-           Method.GFN2_XTB.default_engine()
-           # 'xtb'
-
-           Method.GFN2_XTB.default_engine(is_periodic=True)
-           # 'tblite'
+        >>> Method.MACE_MP_0B2_L.default_engine().value
+        'mace'
+        >>> Method.GFN2_XTB.default_engine().value
+        'xtb'
+        >>> Method.GFN2_XTB.default_engine(is_periodic=True).value
+        'tblite'
         """
         match self:
             case Method.AIMNET2_WB97MD3:
-                return "aimnet2"
+                return Engine.AIMNET2
             case Method.MACE_MP_0B2_L:
-                return "mace"
+                return Engine.MACE
             case Method.OCP24_S | Method.OCP24_L:
-                return "ocp24"
+                return Engine.OCP24
             case Method.OMOL25_CONSERVING_S | Method.UMA_M_OMOL | Method.UMA_S_OMOL:
-                return "omol25"
+                return Engine.OMOL25
             case Method.ORB_V3_CONSERVATIVE_INF_OMAT:
-                return "orb"
-            case _ if self in XTB_METHODS:
-                return "tblite" if is_periodic else "xtb"
+                return Engine.ORB
+            case method if method in XTB_METHODS:
+                return Engine.TBLITE if is_periodic else Engine.XTB
             case Method.OFF_SAGE_2_2_1:
-                return "openff"
+                return Engine.OPENFF
             case Method.EGRET_1 | Method.EGRET_1E | Method.EGRET_1T:
-                return "egret"
+                return Engine.EGRET
             case _:
                 # All remaining methods (HF, DFT, composite, etc.) fall back to Psi4
-                return "psi4"
+                return Engine.PSI4
 
 
 PrepackagedNNPMethod = Literal[
