@@ -6,6 +6,7 @@ from pydantic import PositiveFloat, PositiveInt, computed_field, model_validator
 
 from ..base import Base, LowercaseStrEnum
 from ..constraint import PairwiseHarmonicConstraint, SphericalHarmonicConstraint
+from ..engine import Engine
 from ..settings import Settings
 from ..types import UUID
 from .workflow import MoleculeWorkflow
@@ -87,7 +88,7 @@ class MolecularDynamicsWorkflow(MoleculeWorkflow):
     New:
     :param settings: settings for the molecular dynamics simulation
     :param calc_settings: settings for the gradient calculation
-    :param calc_engine: engine to use for the gradient calculation
+    :param calc_engine: engine to use for the gradient calculation [uses calc_settings.method.default_engine() if not set]
 
     Results:
     :param frames: Frames from the MD
@@ -95,6 +96,13 @@ class MolecularDynamicsWorkflow(MoleculeWorkflow):
 
     settings: MolecularDynamicsSettings
     calc_settings: Settings
-    calc_engine: str | None = None
+    calc_engine: Engine = None  # type: ignore[assignment]
 
     frames: list[Frame] = []
+
+    @model_validator(mode="after")
+    def validate_calc_engine(self) -> Self:
+        """Ensure that the calc_engine is set."""
+        self.calc_engine = self.calc_engine or self.calc_settings.method.default_engine()
+
+        return self

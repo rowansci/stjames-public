@@ -58,11 +58,10 @@ class DockingWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     New:
-    :param docking_engine: which docking method to use
     :param do_csearch: whether to csearch starting structures
-    :param csearch_settings: settings for initial conformer search.
+    :param conformer_gen_settings: settings for initial conformer search.
     :param do_optimization: whether to optimize starting structures
-    :param opt_settings: settings for conformer optimization.
+    :param optimization_settings: settings for conformer optimization.
     :param do_pose_refinement: whether to optimize non-rotatable bonds in output poses
     :param target: PDB of the protein.
     :param target_uuid: UUID of the protein.
