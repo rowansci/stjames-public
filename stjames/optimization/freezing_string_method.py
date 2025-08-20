@@ -1,6 +1,6 @@
 """Settings for the Freezing String Method (FSM)."""
 
-from typing import Annotated, Self
+from typing import Annotated, Literal, Self
 
 from pydantic import AfterValidator, BaseModel, PositiveFloat, PositiveInt, model_validator
 
@@ -34,6 +34,8 @@ class FSMSettings(BaseModel):
     :param max_line_search_steps: maximum number of line search steps to perform (scipy.minimize maxls)
     :param max_displacement: maximum displacement for a single coordinate (Å for distances, internally converted for angles)
     """
+
+    own_class: Literal["FSMSettings"] = "FSMSettings"
 
     optimization_coordinates: FSMOptimizationCoordinates = FSMOptimizationCoordinates.CARTESIAN
     interpolation_method: FSMInterpolation = FSMInterpolation.REDUNDANT_INTERNAL_COORDINATES
