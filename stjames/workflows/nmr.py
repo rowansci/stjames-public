@@ -29,7 +29,7 @@ class NMRPeak(Base):
 
     nucleus: int
     shift: Annotated[float, AfterValidator(round_float(3))]
-    atom_indices: set[int]
+    atom_indices: list[int]
 
 
 class NMRSpectroscopyWorkflow(MoleculeWorkflow):
@@ -68,6 +68,6 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
     boltzmann_weights: Annotated[list[float], AfterValidator(round_list(3))] = []
     per_conformer_chemical_shifts: list[Annotated[list[float | None], AfterValidator(round_optional_list(3))]] = []
     chemical_shifts: Annotated[list[float | None], AfterValidator(round_optional_list(3))] = []
-    symmetry_equivalent_nuclei: list[set[int]] = []
+    symmetry_equivalent_nuclei: list[list[int]] = []
 
     predicted_peaks: dict[int, list[NMRPeak]] = {}
