@@ -24,7 +24,7 @@ class SolubilityResult(BaseModel):
     """
 
     solubilities: Annotated[list[float], AfterValidator(round_list(6))]
-    uncertainties: Annotated[list[float], AfterValidator(round_list(6))]
+    uncertainties: Annotated[list[float | None], AfterValidator(round_optional_list(6))]
 
     @model_validator(mode="after")
     def check_size(self) -> Self:
@@ -50,8 +50,8 @@ class SolubilityWorkflow(SMILESWorkflow):
 
     solubility_method: SolubilityMethod = SolubilityMethod.FASTSOLV
     initial_smiles: str
-    solvents: list[str]
-    temperatures: list[float] = [273.15, 298.15, 323.15, 348.15, 373.15, 398.15, 423.15]  # 0–150 °C
+    solvents: list[str] = ["O"]
+    temperatures: list[float | Literal["RoomTemp"]] = [298.15]
 
     solubilities: dict[str, SolubilityResult] = {}
 
