@@ -4,7 +4,7 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, BaseModel, model_validator
 
-from ..base import Base, LowercaseStrEnum, round_float
+from ..base import Base, LowercaseStrEnum
 from ..types import round_list
 from .workflow import SMILESWorkflow
 
