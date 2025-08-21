@@ -4,8 +4,15 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, BaseModel, model_validator
 
+from ..base import Base, LowercaseStrEnum, round_float
 from ..types import round_list
 from .workflow import SMILESWorkflow
+
+
+class SolubilityMethod(LowercaseStrEnum):
+    FASTSOLV = "fastsolv"
+    KINGFISHER = "kingfisher"
+    ESOL = "esol"
 
 
 class SolubilityResult(BaseModel):
@@ -41,6 +48,7 @@ class SolubilityWorkflow(SMILESWorkflow):
     :param solubilities: {solvent: SolubilityResult}
     """
 
+    solubility_method: SolubilityMethod = FASTSOLV
     initial_smiles: str
     solvents: list[str]
     temperatures: list[float] = [273.15, 298.15, 323.15, 348.15, 373.15, 398.15, 423.15]  # 0–150 °C
