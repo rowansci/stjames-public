@@ -1,6 +1,6 @@
 """Solubility prediction workflow."""
 
-from typing import Annotated, Self
+from typing import Annotated, Self, Literal
 
 from pydantic import AfterValidator, BaseModel, model_validator
 
