@@ -1,11 +1,11 @@
 """Solubility prediction workflow."""
 
-from typing import Annotated, Self, Literal
+from typing import Annotated, Literal, Self
 
 from pydantic import AfterValidator, BaseModel, model_validator
 
 from ..base import LowercaseStrEnum
-from ..types import round_list
+from ..types import round_list, round_optional_list
 from .workflow import SMILESWorkflow
 
 
