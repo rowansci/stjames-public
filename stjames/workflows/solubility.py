@@ -48,7 +48,7 @@ class SolubilityWorkflow(SMILESWorkflow):
     :param solubilities: {solvent: SolubilityResult}
     """
 
-    solubility_method: SolubilityMethod = FASTSOLV
+    solubility_method: SolubilityMethod = SolubilityMethod.FASTSOLV
     initial_smiles: str
     solvents: list[str]
     temperatures: list[float] = [273.15, 298.15, 323.15, 348.15, 373.15, 398.15, 423.15]  # 0–150 °C
