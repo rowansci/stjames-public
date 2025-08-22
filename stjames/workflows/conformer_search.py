@@ -1,11 +1,11 @@
 """Conformer search workflow."""
 
 from abc import ABC
-from typing import Annotated, Literal, Self, Sequence, TypeVar
+from typing import Annotated, Self, Sequence, TypeVar
 
 from pydantic import AfterValidator, BaseModel, Field, field_validator, model_validator
 
-from ..base import LowercaseStrEnum
+from ..base import ClassNameMixin, LowercaseStrEnum
 from ..constraint import Constraint
 from ..method import Method, XTBMethod
 from ..mode import Mode
@@ -70,7 +70,7 @@ class ConformerGenSettings(BaseModel):
         return f"<{type(self).__name__} {self.mode.name}>"
 
 
-class ETKDGSettings(ConformerGenSettings):
+class ETKDGSettings(ConformerGenSettings, ClassNameMixin):
     """
     Settings for ETKDG conformer generation.
 
@@ -83,15 +83,12 @@ class ETKDGSettings(ConformerGenSettings):
     :param max_confs: maximum number of conformers to keep
 
     New:
-    :param own_class: so we can track what sort of settings object this is. should never be modified.
     :param num_initial_confs: number of initial conformers to generate
     :param num_confs_considered: number of conformers to consider for optimization
     :param num_confs_taken: number of final conformers to take
     :param max_mmff_energy: MMFF energy cutoff
     :param max_mmff_iterations: MMFF optimization iterations
     """
-
-    own_class: Literal["ETKDGSettings"] = "ETKDGSettings"
 
     num_initial_confs: int = 300
     num_confs_considered: int = 100
@@ -139,7 +136,7 @@ class iMTDSpeeds(LowercaseStrEnum):
     EXTENSIVE = "extensive"
 
 
-class iMTDSettings(ConformerGenSettings, ABC):
+class iMTDSettings(ConformerGenSettings, ABC, ClassNameMixin):
     """
     Settings for iMTD style conformer generation.
 
@@ -200,14 +197,11 @@ class iMTDSettings(ConformerGenSettings, ABC):
     :param max_confs: maximum number of conformers to keep
 
     New:
-    :param own_class: so we can track what sort of settings object this is. should never be modified.
     :param mtd_method: method for the metadynamics
     :param speed: speed of the calculations (CREST specific setting)
     :param reopt: re-optimize conformers (corrects for the lack of rotamer metadynamics and GC)
     :param free_energy_weights: calculate frequencies and re-weight based on free energies
     """
-
-    own_class: Literal["iMTDSettings"] = "iMTDSettings"
 
     mtd_method: XTBMethod = Method.GFN_FF
     mtd_runtype: str = "imtd-gc"
