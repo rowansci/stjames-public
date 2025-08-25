@@ -5,7 +5,7 @@ from typing import Annotated, Literal
 from pydantic import AfterValidator, BaseModel, ConfigDict
 
 from ..base import LowercaseStrEnum, round_float
-from ..types import UUID, round_optional_list
+from ..types import UUID, round_list
 from .workflow import FASTAWorkflow
 
 
@@ -86,4 +86,4 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     scores: CofoldingScores | None = None
     model: CofoldingModel = CofoldingModel.BOLTZ_2
     affinity_score: AffinityScore | None = None
-    lddt: Annotated[list[float] | None, AfterValidator(round_optional_list(3))] = None
+    lddt: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
