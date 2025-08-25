@@ -30,6 +30,15 @@ def round_optional_list(round_to: int = 6) -> Callable[[Iterable[float] | None],
     return rounder
 
 
+def round_list_of_optionals(round_to: int = 6) -> Callable[[Iterable[float | None]], list[float | None]]:
+    """Create a validator that rounds each float in a list of Nones or floats to a given number of decimal places."""
+
+    def rounder(values: Iterable[float | None]) -> list[float | None]:
+        return [round(value, round_to) if value is not None else None for value in values]
+
+    return rounder
+
+
 def round_vector3d(round_to: int = 6) -> Callable[[Vector3D], Vector3D]:
     """Create a validator that rounds each component of a Vector3D to a given number of decimal places."""
 

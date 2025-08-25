@@ -5,7 +5,7 @@ from typing import Annotated, Self
 from pydantic import AfterValidator, BaseModel, model_validator
 
 from ..base import LowercaseStrEnum
-from ..types import round_list, round_optional_list
+from ..types import round_list, round_list_of_optionals
 from .workflow import SMILESWorkflow
 
 
@@ -24,7 +24,7 @@ class SolubilityResult(BaseModel):
     """
 
     solubilities: Annotated[list[float], AfterValidator(round_list(6))]
-    uncertainties: Annotated[list[float | None], AfterValidator(round_optional_list(6))]
+    uncertainties: Annotated[list[float | None], AfterValidator(round_list_of_optionals(6))]
 
     @model_validator(mode="after")
     def check_size(self) -> Self:
