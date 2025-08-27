@@ -40,6 +40,7 @@ class Method(LowercaseStrEnum):
     UMA_M_OMOL = "uma_m_omol"
     UMA_S_OMOL = "uma_s_omol"
     ORB_V3_CONSERVATIVE_INF_OMAT = "orb_v3_conservative_inf_omat"
+    ORB_V3_CONSERVATIVE_OMOL = "orb_v3_conservative_omol"
 
     GFN_FF = "gfn_ff"
     GFN0_XTB = "gfn0_xtb"
@@ -81,7 +82,7 @@ class Method(LowercaseStrEnum):
                 return Engine.OCP24
             case Method.OMOL25_CONSERVING_S | Method.UMA_M_OMOL | Method.UMA_S_OMOL:
                 return Engine.OMOL25
-            case Method.ORB_V3_CONSERVATIVE_INF_OMAT:
+            case Method.ORB_V3_CONSERVATIVE_INF_OMAT | Method.ORB_V3_CONSERVATIVE_OMOL:
                 return Engine.ORB
             case method if method in XTB_METHODS:
                 return Engine.TBLITE if is_periodic else Engine.XTB
@@ -102,6 +103,7 @@ PrepackagedNNPMethod = Literal[
     Method.UMA_M_OMOL,
     Method.UMA_S_OMOL,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
+    Method.ORB_V3_CONSERVATIVE_OMOL,
     Method.EGRET_1,
     Method.EGRET_1E,
     Method.EGRET_1T,
@@ -115,6 +117,7 @@ PREPACKAGED_NNP_METHODS = [
     Method.UMA_M_OMOL,
     Method.UMA_S_OMOL,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
+    Method.ORB_V3_CONSERVATIVE_OMOL,
     Method.EGRET_1,
     Method.EGRET_1E,
     Method.EGRET_1T,
