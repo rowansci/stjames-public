@@ -1,7 +1,7 @@
 """Conformer search workflow."""
 
 from abc import ABC
-from typing import Annotated, Self, Sequence, TypeVar
+from typing import Annotated, ClassVar, Self, Sequence, TypeVar, Union
 
 from pydantic import AfterValidator, BaseModel, Field, field_validator, model_validator
 
@@ -60,6 +60,7 @@ class ConformerGenSettings(BaseModel):
     constraints: Sequence[Constraint] = tuple()
     nci: bool = False
     max_confs: int | None = None
+    settings_type: ClassVar[str] = "base"
 
     def __str__(self) -> str:
         """Return a string representation of the ConformerGenSettings."""
@@ -94,6 +95,7 @@ class ETKDGSettings(ConformerGenSettings, ClassNameMixin):
     num_confs_considered: int = 100
     max_mmff_iterations: int = 500
     max_mmff_energy: float | None = 30
+    settings_type: ClassVar[str] = "etkdg"
 
     @field_validator("constraints")
     def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:
@@ -209,6 +211,7 @@ class iMTDSettings(ConformerGenSettings, ABC, ClassNameMixin):
     speed: iMTDSpeeds = iMTDSpeeds.QUICK
     reopt: bool = _sentinel  # type: ignore [assignment]
     free_energy_weights: bool = False
+    settings_type: ClassVar[str] = "imtd"
 
     @model_validator(mode="after")
     def validate_and_build_imtdgc_settings(self) -> Self:
@@ -251,6 +254,9 @@ class iMTDGCSettings(iMTDSettings):
 
 class iMTDsMTDSettings(iMTDSettings):
     run_type: str = "imtd-smtd"
+
+
+ConformerGenSettingsUnion = Annotated[Union[ETKDGSettings, iMTDSettings, ConformerGenSettings], Field(discriminator="settings_type")]
 
 
 class ConformerGenMixin(BaseModel):
