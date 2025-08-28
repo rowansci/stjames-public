@@ -1,12 +1,11 @@
-"""Scan workflow."""
-
-from typing import Annotated
+from typing import Annotated, Self
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import AfterValidator, field_validator
+from pydantic import AfterValidator, field_validator, model_validator
 
 from ..base import Base, round_optional_float
+from ..engine import Engine
 from ..molecule import Molecule
 from ..settings import Settings
 from ..types import UUID
@@ -75,7 +74,9 @@ class ScanWorkflow(MoleculeWorkflow):
     scan_settings: ScanSettings | list[ScanSettings]
     scan_settings_2d: ScanSettings | list[ScanSettings] = []
     calc_settings: Settings
-    calc_engine: str
+
+    # DEPRECATED - will be removed in future
+    calc_engine: str | Engine = None  # type: ignore [assignment]
 
     wavefront_propagation: bool = True
 
@@ -94,3 +95,9 @@ class ScanWorkflow(MoleculeWorkflow):
                 raise ValueError("Concerted scan settings must have same number of steps!")
 
         return val
+
+    @model_validator(mode="after")
+    def set_calc_engine(self) -> Self:
+        """Set the calculation engine."""
+        self.calc_engine = self.calc_engine or self.calc_settings.engine
+        return self
