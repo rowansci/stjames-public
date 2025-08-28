@@ -1,4 +1,6 @@
-from typing import Optional
+from typing import Optional, Self
+
+from pydantic import model_validator
 
 from .base import Base, LowercaseStrEnum, UniqueList
 from .message import Message
@@ -38,3 +40,10 @@ class Calculation(Base):
 
     # not to be changed by end users, diff. versions will have diff. defaults
     json_format: str = StJamesVersion.V0
+
+    @model_validator(mode="after")
+    def populate_tasks(self) -> Self:
+        """Set the tasks from the settings, so that we don't have to migrate old entries."""
+        if len(self.tasks) == 0:
+            self.tasks = self.settings.tasks
+        return self
