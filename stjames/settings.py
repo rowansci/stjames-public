@@ -6,6 +6,7 @@ from .base import Base, UniqueList
 from .basis_set import BasisSet
 from .compute_settings import ComputeSettings
 from .correction import Correction
+from .engine import Engine
 from .method import CORRECTABLE_NNP_METHODS, METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, Method
 from .mode import Mode
 from .opt_settings import OptimizationSettings
@@ -20,11 +21,13 @@ _T = TypeVar("_T")
 class Settings(Base):
     mode: Mode = Mode.AUTO
 
+    # DEPRECATED - specify tasks only in BasicCalculationWorkflow or Calculation now
+    tasks: UniqueList[Task] = [Task.ENERGY, Task.CHARGE, Task.DIPOLE]
+
     method: Method = Method.HARTREE_FOCK
     basis_set: Optional[BasisSet] = None
-    tasks: UniqueList[Task] = [Task.ENERGY, Task.CHARGE, Task.DIPOLE]
+    engine: Engine = None  # type: ignore [assignment]
     corrections: UniqueList[Correction] = []
-
     solvent_settings: Optional[SolventSettings] = None
 
     # scf/opt settings will be set automatically based on mode, but can be overridden manually
@@ -32,6 +35,12 @@ class Settings(Base):
     opt_settings: OptimizationSettings = OptimizationSettings()
     thermochem_settings: ThermochemistrySettings = ThermochemistrySettings()
     compute_settings: ComputeSettings = ComputeSettings()
+
+    @model_validator(mode="after")
+    def set_engine(self) -> Self:
+        """Set the calculation engine."""
+        self.engine = self.engine or self.method.default_engine()
+        return self
 
     # mypy has this dead wrong (https://docs.pydantic.dev/2.0/usage/computed_fields/)
     # Python 3.12 narrows the reason for the ignore to prop-decorator

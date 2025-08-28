@@ -1,10 +1,11 @@
 from typing import Optional
 
-from .base import Base, LowercaseStrEnum
+from .base import Base, LowercaseStrEnum, UniqueList
 from .message import Message
 from .molecule import Molecule
 from .settings import Settings
 from .status import Status
+from .task import Task
 from .types import UUID
 
 
@@ -20,6 +21,7 @@ class StJamesVersion(LowercaseStrEnum):
 class Calculation(Base):
     molecules: list[Molecule]
 
+    tasks: UniqueList[Task] = []
     settings: Settings = Settings()
 
     status: Status = Status.QUEUED
@@ -29,7 +31,9 @@ class Calculation(Base):
     logfile: Optional[str] = None
     messages: list[Message] = []
 
+    # DEPRECATED - moving into tasks
     engine: Optional[str] = "peregrine"
+
     uuids: list[UUID | None] | None = None
 
     # not to be changed by end users, diff. versions will have diff. defaults
