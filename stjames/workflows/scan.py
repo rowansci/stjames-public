@@ -76,7 +76,7 @@ class ScanWorkflow(MoleculeWorkflow):
     calc_settings: Settings
 
     # DEPRECATED - will be removed in future
-    calc_engine: str | Engine = None  # type: ignore [assignment]
+    calc_engine: Engine = None  # type: ignore [assignment]
 
     wavefront_propagation: bool = True
 

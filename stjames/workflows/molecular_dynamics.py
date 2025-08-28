@@ -96,6 +96,8 @@ class MolecularDynamicsWorkflow(MoleculeWorkflow):
 
     settings: MolecularDynamicsSettings
     calc_settings: Settings
+
+    # DEPRECATED - will remove later
     calc_engine: Engine = None  # type: ignore[assignment]
 
     frames: list[Frame] = []
@@ -103,6 +105,6 @@ class MolecularDynamicsWorkflow(MoleculeWorkflow):
     @model_validator(mode="after")
     def validate_calc_engine(self) -> Self:
         """Ensure that the calc_engine is set."""
-        self.calc_engine = self.calc_engine or self.calc_settings.method.default_engine()
+        self.calc_engine = self.calc_engine or self.calc_settings.engine
 
         return self
