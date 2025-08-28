@@ -9,7 +9,7 @@ class Engine(LowercaseStrEnum):
     ORB = "orb"
     TBLITE = "tblite"
     XTB = "xtb"
-    TERRACHEM = "terrachem"
+    TERACHEM = "terachem"
     PYSCF = "pyscf"
     PSI4 = "psi4"
     OPENFF = "openff"
