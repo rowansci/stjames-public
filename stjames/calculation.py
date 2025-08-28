@@ -33,7 +33,7 @@ class Calculation(Base):
     logfile: Optional[str] = None
     messages: list[Message] = []
 
-    # DEPRECATED - moving into tasks
+    # DEPRECATED - moving into settings
     engine: Optional[str] = "peregrine"
 
     uuids: list[UUID | None] | None = None
