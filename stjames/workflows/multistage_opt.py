@@ -112,7 +112,7 @@ class MultiStageOptSettings(BaseModel):
                 pass
 
             case (mode, True):
-                logger.warning(f"Mode {mode=} specified with optimization_settings or singlepoint_settings, ignoring")
+                logger.debug(f"Mode {mode=} specified with optimization_settings or singlepoint_settings, ignoring")
                 pass
 
             case (mode, False):
