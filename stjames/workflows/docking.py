@@ -84,7 +84,7 @@ class DockingWorkflow(MoleculeWorkflow):
     do_optimization: bool = True
     # optimization_settings - here in future once we have a cleaner mode sol'n, ccw 7.9.25
 
-    docking_settings: DockingSettings = VinaSettings()
+    docking_settings: VinaSettings = VinaSettings()
 
     do_pose_refinement: bool = True
 

@@ -257,7 +257,8 @@ class MultiStageOptMixin(BaseModel):
                 pass
 
             case (mso_mode, msos) if msos is not _sentinel_msos:
-                raise ValueError(f"Cannot specify multistage_opt_settings with {mso_mode=}, {msos=}")
+                logger.debug(f"Mode {mso_mode=} specified with multistage_opt_settings, ignoring")
+                pass
 
             case (mso_mode, _):
                 self.multistage_opt_settings = MultiStageOptSettings(
