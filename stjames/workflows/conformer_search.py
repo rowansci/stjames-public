@@ -1,7 +1,7 @@
 """Conformer search workflow."""
 
 from abc import ABC
-from typing import Annotated, Literal, Self, Sequence, TypeVar, Union
+from typing import Annotated, Literal, Self, Sequence, TypeVar
 
 from pydantic import AfterValidator, BaseModel, Field, field_validator, model_validator
 
@@ -255,7 +255,7 @@ class iMTDsMTDSettings(iMTDSettings):
     run_type: str = "imtd-smtd"
 
 
-ConformerGenSettingsUnion = Annotated[Union[ETKDGSettings, iMTDSettings], Field(discriminator="settings_type")]
+ConformerGenSettingsUnion = Annotated[ETKDGSettings | iMTDSettings, Field(discriminator="settings_type")]
 
 
 class ConformerGenMixin(BaseModel):
