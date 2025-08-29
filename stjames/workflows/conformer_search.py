@@ -1,11 +1,11 @@
 """Conformer search workflow."""
 
 from abc import ABC
-from typing import Annotated, Self, Sequence, TypeVar
+from typing import Annotated, Literal, Self, Sequence, TypeVar
 
 from pydantic import AfterValidator, BaseModel, Field, field_validator, model_validator
 
-from ..base import ClassNameMixin, LowercaseStrEnum
+from ..base import LowercaseStrEnum
 from ..constraint import Constraint
 from ..method import Method, XTBMethod
 from ..mode import Mode
@@ -70,7 +70,7 @@ class ConformerGenSettings(BaseModel):
         return f"<{type(self).__name__} {self.mode.name}>"
 
 
-class ETKDGSettings(ConformerGenSettings, ClassNameMixin):
+class ETKDGSettings(ConformerGenSettings):
     """
     Settings for ETKDG conformer generation.
 
@@ -94,6 +94,7 @@ class ETKDGSettings(ConformerGenSettings, ClassNameMixin):
     num_confs_considered: int = 100
     max_mmff_iterations: int = 500
     max_mmff_energy: float | None = 30
+    settings_type: Literal["etkdg"] = "etkdg"
 
     @field_validator("constraints")
     def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:
@@ -136,7 +137,7 @@ class iMTDSpeeds(LowercaseStrEnum):
     EXTENSIVE = "extensive"
 
 
-class iMTDSettings(ConformerGenSettings, ABC, ClassNameMixin):
+class iMTDSettings(ConformerGenSettings, ABC):
     """
     Settings for iMTD style conformer generation.
 
@@ -209,6 +210,7 @@ class iMTDSettings(ConformerGenSettings, ABC, ClassNameMixin):
     speed: iMTDSpeeds = iMTDSpeeds.QUICK
     reopt: bool = _sentinel  # type: ignore [assignment]
     free_energy_weights: bool = False
+    settings_type: Literal["imtd"] = "imtd"
 
     @model_validator(mode="after")
     def validate_and_build_imtdgc_settings(self) -> Self:
@@ -253,6 +255,9 @@ class iMTDsMTDSettings(iMTDSettings):
     run_type: str = "imtd-smtd"
 
 
+ConformerGenSettingsUnion = Annotated[ETKDGSettings | iMTDSettings, Field(discriminator="settings_type")]
+
+
 class ConformerGenMixin(BaseModel):
     """
     Mixin for workflows that need conformer generation.
@@ -265,7 +270,7 @@ class ConformerGenMixin(BaseModel):
     """
 
     conf_gen_mode: Mode = Mode.RAPID
-    conf_gen_settings: ConformerGenSettings = _sentinel  # type: ignore [assignment]
+    conf_gen_settings: ConformerGenSettingsUnion = _sentinel  # type: ignore [assignment]
     constraints: Sequence[Constraint] = tuple()
     nci: bool = False
     max_confs: int | None = None
@@ -273,8 +278,8 @@ class ConformerGenMixin(BaseModel):
     @model_validator(mode="after")
     def validate_and_build_conf_gen_settings(self) -> Self:
         """Validate and build the ConformerGenSettings."""
-        if self.conf_gen_settings is not _sentinel and self.conf_gen_mode != Mode.MANUAL:
-            raise ValueError("Cannot specify conf_gen_settings with non-MANUAL mode")
+        if self.conf_gen_settings is not _sentinel:
+            return self
 
         match self.conf_gen_mode:
             case Mode.MANUAL:

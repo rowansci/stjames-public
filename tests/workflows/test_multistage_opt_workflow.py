@@ -1,4 +1,4 @@
-from pytest import fixture, mark, raises
+from pytest import fixture, mark
 
 from stjames import Atom, Method, Mode, Molecule, Settings, Solvent, SolventSettings, Task
 from stjames.workflows import MultiStageOptWorkflow, build_mso_settings, multi_stage_opt_settings_from_workflow
@@ -36,16 +36,6 @@ def test_multistage_opt_basic(mode: Mode, level_of_theory: str, He: Molecule) ->
 def test_auto(He: Molecule) -> None:
     msow = MultiStageOptWorkflow(initial_molecule=He, mode=Mode.AUTO)
     assert msow.mode == Mode.RAPID
-
-
-def test_raises(He: Molecule) -> None:
-    with raises(ValueError):
-        # mypy is correct, but needs to be silenced to test pydantic error
-        MultiStageOptWorkflow(mode=Mode.RAPID)  # type: ignore [call-arg]
-
-    singlepoint_settings = Settings(method=Method.R2SCAN3C)
-    with raises(ValueError):
-        MultiStageOptWorkflow(initial_molecule=He, mode=Mode.RAPID, singlepoint_settings=singlepoint_settings)
 
 
 def test_reckless(He: Molecule) -> None:

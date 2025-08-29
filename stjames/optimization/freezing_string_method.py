@@ -4,7 +4,7 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, BaseModel, PositiveFloat, PositiveInt, model_validator
 
-from ..base import ClassNameMixin, LowercaseStrEnum, round_float
+from ..base import LowercaseStrEnum, round_float
 
 
 class FSMOptimizationCoordinates(LowercaseStrEnum):
@@ -22,7 +22,7 @@ class FSMInterpolation(LowercaseStrEnum):
     REDUNDANT_INTERNAL_COORDINATES = "redundant_internal_coordinates"
 
 
-class FSMSettings(BaseModel, ClassNameMixin):
+class FSMSettings(BaseModel):
     """
     Settings for the Freezing String Method (FSM) TS search.
 

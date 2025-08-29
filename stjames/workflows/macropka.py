@@ -4,7 +4,7 @@ from typing import Annotated, Optional, Self
 
 from pydantic import AfterValidator, model_validator
 
-from ..base import Base, round_float
+from ..base import Base, round_float, round_optional_float
 from ..types import round_list
 from .workflow import SMILESWorkflow
 
@@ -72,9 +72,9 @@ class MacropKaWorkflow(SMILESWorkflow):
 
     microstates: list[MacropKaMicrostate] = []
     pKa_values: list[MacropKaValue] = []
-    isoelectric_point: Annotated[Optional[float], AfterValidator(round_float(3))] = None
-    solvation_energy: Annotated[Optional[float], AfterValidator(round_float(3))] = None
-    kpuu_probability: Annotated[Optional[float], AfterValidator(round_float(3))] = None
+    isoelectric_point: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
+    solvation_energy: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
+    kpuu_probability: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
 
     microstate_weights_by_pH: list[
         tuple[
