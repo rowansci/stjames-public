@@ -60,10 +60,3 @@ def _validate_unique_list(v: list[_H]) -> list[_H]:
 
 
 UniqueList = Annotated[list[_H], pydantic.AfterValidator(_validate_unique_list)]
-
-
-class ClassNameMixin:
-    @pydantic.computed_field  # type: ignore[misc, prop-decorator, unused-ignore]
-    @property
-    def class_name(self) -> str:
-        return self.__class__.__name__

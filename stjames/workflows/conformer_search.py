@@ -5,7 +5,7 @@ from typing import Annotated, Literal, Self, Sequence, TypeVar
 
 from pydantic import AfterValidator, BaseModel, Field, field_validator, model_validator
 
-from ..base import ClassNameMixin, LowercaseStrEnum
+from ..base import LowercaseStrEnum
 from ..constraint import Constraint
 from ..method import Method, XTBMethod
 from ..mode import Mode
@@ -70,7 +70,7 @@ class ConformerGenSettings(BaseModel):
         return f"<{type(self).__name__} {self.mode.name}>"
 
 
-class ETKDGSettings(ConformerGenSettings, ClassNameMixin):
+class ETKDGSettings(ConformerGenSettings):
     """
     Settings for ETKDG conformer generation.
 
@@ -137,7 +137,7 @@ class iMTDSpeeds(LowercaseStrEnum):
     EXTENSIVE = "extensive"
 
 
-class iMTDSettings(ConformerGenSettings, ABC, ClassNameMixin):
+class iMTDSettings(ConformerGenSettings, ABC):
     """
     Settings for iMTD style conformer generation.
 
