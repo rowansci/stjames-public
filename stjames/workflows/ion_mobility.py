@@ -2,11 +2,35 @@
 
 from typing import Annotated
 
-from pydantic import AfterValidator
+from pydantic import AfterValidator, computed_field
 
-from ..base import round_optional_float
+from ..base import Base, round_optional_float
+from ..data import ELEMENT_SYMBOL
 from ..types import UUID, round_list
 from .workflow import MoleculeWorkflow
+
+
+class IonMobilityForcefieldElement(Base):
+    """
+    A single atom specification for the ion-mobility forcefield.
+
+    :param name: the name of the element (e.g. "Hydrogen")
+    :param atomic_number: the element's atomic number
+    :param mass: the mass of the element in Daltons (e.g. 1.00794)
+    :param sigma: the sigma Lennard-Jones parameter, in Å
+    :param epsilon: the epsilon Lennard-Jones parameter, in kcal/mol
+    """
+
+    name: str
+    atomic_number: int
+    mass: float
+    sigma: float
+    epsilon: float
+
+    @computed_field  # type: ignore[misc, prop-decorator, unused-ignore]
+    @property
+    def symbol(self) -> str:
+        return ELEMENT_SYMBOL[self.atomic_number]
 
 
 class IonMobilityWorkflow(MoleculeWorkflow):
@@ -22,6 +46,8 @@ class IonMobilityWorkflow(MoleculeWorkflow):
     :param temperature: the temperature, in Kelvin
     :param do_csearch: whether to perform a conformational search
     :param do_optimization: whether to perform an optimization
+    :param forcefield: the forcefield used to describe atom–gas interactions.
+        if None, the default forcefield will be used.
 
     Results:
     :param conformers: the UUIDs of the conformers
@@ -36,6 +62,8 @@ class IonMobilityWorkflow(MoleculeWorkflow):
     temperature: float = 300
     do_csearch: bool = True
     do_optimization: bool = True
+
+    forcefield: list[IonMobilityForcefieldElement] | None = None
 
     conformers: list[UUID] = []
 
