@@ -1,8 +1,8 @@
 """Ion mobility workflow."""
 
-from typing import Annotated
+from typing import Annotated, Self
 
-from pydantic import AfterValidator, computed_field
+from pydantic import AfterValidator, computed_field, model_validator
 
 from ..base import Base, round_optional_float
 from ..data import ELEMENT_SYMBOL
@@ -73,3 +73,13 @@ class IonMobilityWorkflow(MoleculeWorkflow):
 
     average_ccs: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
     average_ccs_stdev: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+
+    @model_validator(mode="after")
+    def check_supported_atoms(self) -> Self:
+        """Validate that user-supplied forcefields have correct atoms."""
+        if self.forcefield is not None:
+            supported_atoms = set(e.atomic_number for e in self.forcefield)
+            if not all(z in supported_atoms for z in self.initial_molecule.atomic_numbers):
+                raise ValueError("Provided forcefield does not support all elements in input structure!")
+
+        return self
