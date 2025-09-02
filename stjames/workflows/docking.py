@@ -7,7 +7,7 @@ from pydantic import AfterValidator, ConfigDict, field_validator, model_validato
 from ..base import Base, round_float
 from ..pdb import PDB
 from ..types import UUID, Vector3D
-from .conformer_search import ConformerGenSettings, ETKDGSettings
+from .conformer_search import ConformerGenSettingsUnion, ETKDGSettings
 from .workflow import MoleculeWorkflow
 
 
@@ -79,12 +79,12 @@ class DockingWorkflow(MoleculeWorkflow):
     pocket: tuple[Vector3D, Vector3D]
 
     do_csearch: bool = True
-    conformer_gen_settings: ConformerGenSettings = ETKDGSettings(mode="reckless")
+    conformer_gen_settings: ConformerGenSettingsUnion = ETKDGSettings(mode="reckless")
 
     do_optimization: bool = True
     # optimization_settings - here in future once we have a cleaner mode sol'n, ccw 7.9.25
 
-    docking_settings: DockingSettings = VinaSettings()
+    docking_settings: VinaSettings = VinaSettings()
 
     do_pose_refinement: bool = True
 

@@ -4,12 +4,11 @@ from .base import LowercaseStrEnum
 class Engine(LowercaseStrEnum):
     AIMNET2 = "aimnet2"
     MACE = "mace"
-    OCP24 = "ocp24"
     OMOL25 = "omol25"
     ORB = "orb"
     TBLITE = "tblite"
     XTB = "xtb"
-    TERRACHEM = "terrachem"
+    TERACHEM = "terachem"
     PYSCF = "pyscf"
     PSI4 = "psi4"
     OPENFF = "openff"

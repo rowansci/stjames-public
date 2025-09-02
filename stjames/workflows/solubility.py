@@ -4,8 +4,15 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, BaseModel, model_validator
 
+from ..base import LowercaseStrEnum
 from ..types import round_list
 from .workflow import SMILESWorkflow
+
+
+class SolubilityMethod(LowercaseStrEnum):
+    FASTSOLV = "fastsolv"
+    KINGFISHER = "kingfisher"
+    ESOL = "esol"
 
 
 class SolubilityResult(BaseModel):
@@ -17,7 +24,7 @@ class SolubilityResult(BaseModel):
     """
 
     solubilities: Annotated[list[float], AfterValidator(round_list(6))]
-    uncertainties: Annotated[list[float], AfterValidator(round_list(6))]
+    uncertainties: Annotated[list[float | None], AfterValidator(round_list(6))]
 
     @model_validator(mode="after")
     def check_size(self) -> Self:
@@ -41,9 +48,10 @@ class SolubilityWorkflow(SMILESWorkflow):
     :param solubilities: {solvent: SolubilityResult}
     """
 
+    solubility_method: SolubilityMethod = SolubilityMethod.FASTSOLV
     initial_smiles: str
-    solvents: list[str]
-    temperatures: list[float] = [273.15, 298.15, 323.15, 348.15, 373.15, 398.15, 423.15]  # 0–150 °C
+    solvents: list[str] = ["O"]
+    temperatures: list[float] = [298.15]
 
     solubilities: dict[str, SolubilityResult] = {}
 
@@ -55,6 +63,22 @@ class SolubilityWorkflow(SMILESWorkflow):
                 raise ValueError(f"Solubilities for {solvent} must have the same length as temperatures.")
 
             if solvent not in self.solvents:
-                raise ValueError(f"Solvent {solvent} not in initial list of solvents")
+                raise ValueError(f"Solvent {solvent} not in initial list of solvents.")
+
+        return self
+
+    @model_validator(mode="after")
+    def check_solvent_temperature(self) -> Self:
+        """Check that models with limited domain of applicability are predicting within correct domain."""
+        match self.solubility_method:
+            case SolubilityMethod.KINGFISHER | SolubilityMethod.ESOL:
+                if (len(self.solvents) > 1) or (self.solvents[0] != "O"):
+                    raise ValueError(f"Method `{self.solubility_method}` can only predict aqueous solubility, so `solvents` must be [`O`] only.")
+                if (len(self.temperatures) > 1) or (abs(self.temperatures[0] - 298.15) > 0.1):
+                    raise ValueError(
+                        f"Method `{self.solubility_method}` can only predict solubility at room temperature, so `temperatures` must be [298.15] only."
+                    )
+            case _:
+                pass
 
         return self

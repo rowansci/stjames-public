@@ -158,10 +158,18 @@ class Molecule(Base):
         return self.energy + self.thermal_enthalpy_corr
 
     @property
+    def enthalpy(self) -> Optional[float]:
+        return self.sum_energy_enthalpy
+
+    @property
     def sum_energy_free_energy(self) -> Optional[float]:
         if (self.energy is None) or (self.thermal_free_energy_corr is None):
             return None
         return self.energy + self.thermal_free_energy_corr
+
+    @property
+    def gibbs_free_energy(self) -> Optional[float]:
+        return self.sum_energy_free_energy
 
     @pydantic.model_validator(mode="after")
     def check_electron_sanity(self) -> Self:

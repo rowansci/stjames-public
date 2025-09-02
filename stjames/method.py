@@ -34,12 +34,11 @@ class Method(LowercaseStrEnum):
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
     MACE_MP_0 = "mace_mp_0"
     MACE_MP_0B2_L = "mace_mp_0b2_l"
-    OCP24_S = "ocp24_s"
-    OCP24_L = "ocp24_l"
     OMOL25_CONSERVING_S = "omol25_conserving_s"
     UMA_M_OMOL = "uma_m_omol"
     UMA_S_OMOL = "uma_s_omol"
     ORB_V3_CONSERVATIVE_INF_OMAT = "orb_v3_conservative_inf_omat"
+    ORB_V3_CONSERVATIVE_OMOL = "orb_v3_conservative_omol"
 
     GFN_FF = "gfn_ff"
     GFN0_XTB = "gfn0_xtb"
@@ -77,11 +76,9 @@ class Method(LowercaseStrEnum):
                 return Engine.AIMNET2
             case Method.MACE_MP_0B2_L:
                 return Engine.MACE
-            case Method.OCP24_S | Method.OCP24_L:
-                return Engine.OCP24
             case Method.OMOL25_CONSERVING_S | Method.UMA_M_OMOL | Method.UMA_S_OMOL:
                 return Engine.OMOL25
-            case Method.ORB_V3_CONSERVATIVE_INF_OMAT:
+            case Method.ORB_V3_CONSERVATIVE_INF_OMAT | Method.ORB_V3_CONSERVATIVE_OMOL:
                 return Engine.ORB
             case method if method in XTB_METHODS:
                 return Engine.TBLITE if is_periodic else Engine.XTB
@@ -96,12 +93,11 @@ class Method(LowercaseStrEnum):
 
 PrepackagedNNPMethod = Literal[
     Method.AIMNET2_WB97MD3,
-    Method.OCP24_S,
-    Method.OCP24_L,
     Method.OMOL25_CONSERVING_S,
     Method.UMA_M_OMOL,
     Method.UMA_S_OMOL,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
+    Method.ORB_V3_CONSERVATIVE_OMOL,
     Method.EGRET_1,
     Method.EGRET_1E,
     Method.EGRET_1T,
@@ -109,12 +105,11 @@ PrepackagedNNPMethod = Literal[
 
 PREPACKAGED_NNP_METHODS = [
     Method.AIMNET2_WB97MD3,
-    Method.OCP24_S,
-    Method.OCP24_L,
     Method.OMOL25_CONSERVING_S,
     Method.UMA_M_OMOL,
     Method.UMA_S_OMOL,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
+    Method.ORB_V3_CONSERVATIVE_OMOL,
     Method.EGRET_1,
     Method.EGRET_1E,
     Method.EGRET_1T,

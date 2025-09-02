@@ -1,4 +1,4 @@
-from typing import Callable, Iterable, TypeAlias
+from typing import Callable, Iterable, Protocol, TypeAlias, overload
 
 UUID: TypeAlias = str
 
@@ -10,22 +10,32 @@ FloatPerAtom: TypeAlias = list[float]
 Matrix3x3: TypeAlias = tuple[Vector3D, Vector3D, Vector3D]
 
 
-def round_list(round_to: int = 6) -> Callable[[Iterable[float]], list[float]]:
-    """Create a validator that rounds each float in a list to a given number of decimal places."""
+class _Iterable_Rounder(Protocol):
+    """Callable with return types conditioned on the input type(s)."""
 
-    def rounder(values: Iterable[float]) -> list[float]:
-        return [round(value, round_to) for value in values]
+    @overload
+    def __call__(self, values: None, /) -> None: ...
+    @overload
+    def __call__(self, values: Iterable[float], /) -> list[float]: ...
+    @overload
+    def __call__(self, values: Iterable[float | None], /) -> list[float | None]: ...
 
-    return rounder
 
+def round_list(round_to: int = 6) -> _Iterable_Rounder:
+    """Round values (even if Nones), preserving types."""
 
-def round_optional_list(round_to: int = 6) -> Callable[[Iterable[float] | None], list[float] | None]:
-    """Create a validator that rounds each float in a list to a given number of decimal places."""
+    @overload
+    def rounder(values: None, /) -> None: ...
+    @overload
+    def rounder(values: Iterable[float], /) -> list[float]: ...
+    @overload
+    def rounder(values: Iterable[float | None], /) -> list[float | None]: ...
 
-    def rounder(values: Iterable[float] | None) -> list[float] | None:
+    def rounder(values: Iterable[float] | Iterable[float | None] | None, /) -> list[float] | list[float | None] | None:
         if values is None:
             return None
-        return [round(value, round_to) for value in values]
+
+        return [round(v, round_to) if v is not None else None for v in values]
 
     return rounder
 

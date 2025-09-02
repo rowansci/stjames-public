@@ -8,7 +8,7 @@ from ..base import Base, LowercaseStrEnum, round_float
 from ..mode import Mode
 from ..settings import Settings
 from ..solvent import Solvent
-from ..types import UUID, round_list, round_optional_list
+from ..types import UUID, round_list
 from .conformer_search import ConformerGenSettings, iMTDSettings
 from .multistage_opt import MultiStageOptSettings
 from .workflow import MoleculeWorkflow
@@ -29,7 +29,7 @@ class NMRPeak(Base):
 
     nucleus: int
     shift: Annotated[float, AfterValidator(round_float(3))]
-    atom_indices: set[int]
+    atom_indices: list[int]
 
 
 class NMRSpectroscopyWorkflow(MoleculeWorkflow):
@@ -66,8 +66,8 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
 
     conformers: list[UUID] = []
     boltzmann_weights: Annotated[list[float], AfterValidator(round_list(3))] = []
-    per_conformer_chemical_shifts: list[Annotated[list[float | None], AfterValidator(round_optional_list(3))]] = []
-    chemical_shifts: Annotated[list[float | None], AfterValidator(round_optional_list(3))] = []
-    symmetry_equivalent_nuclei: list[set[int]] = []
+    per_conformer_chemical_shifts: list[Annotated[list[float | None], AfterValidator(round_list(3))]] = []
+    chemical_shifts: Annotated[list[float | None], AfterValidator(round_list(3))] = []
+    symmetry_equivalent_nuclei: list[list[int]] = []
 
     predicted_peaks: dict[int, list[NMRPeak]] = {}

@@ -1,5 +1,6 @@
 """Multi-stage optimization workflow."""
 
+import logging
 import re
 from typing import Self, Sequence
 
@@ -17,6 +18,8 @@ from ..solvent import Solvent, SolventModel, SolventSettings
 from ..task import Task
 from ..types import UUID
 from .workflow import MoleculeWorkflow
+
+logger = logging.getLogger(__name__)
 
 
 class MultiStageOptSettings(BaseModel):
@@ -109,7 +112,8 @@ class MultiStageOptSettings(BaseModel):
                 pass
 
             case (mode, True):
-                raise ValueError(f"Cannot specify optimization_settings or singlepoint_settings with {mode=}")
+                logger.debug(f"Mode {mode=} specified with optimization_settings or singlepoint_settings, ignoring")
+                pass
 
             case (mode, False):
                 self._assign_settings_by_mode(mode)
@@ -253,7 +257,8 @@ class MultiStageOptMixin(BaseModel):
                 pass
 
             case (mso_mode, msos) if msos is not _sentinel_msos:
-                raise ValueError(f"Cannot specify multistage_opt_settings with {mso_mode=}, {msos=}")
+                logger.debug(f"Mode {mso_mode=} specified with multistage_opt_settings, ignoring")
+                pass
 
             case (mso_mode, _):
                 self.multistage_opt_settings = MultiStageOptSettings(
