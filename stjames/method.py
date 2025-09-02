@@ -34,8 +34,6 @@ class Method(LowercaseStrEnum):
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
     MACE_MP_0 = "mace_mp_0"
     MACE_MP_0B2_L = "mace_mp_0b2_l"
-    OCP24_S = "ocp24_s"
-    OCP24_L = "ocp24_l"
     OMOL25_CONSERVING_S = "omol25_conserving_s"
     UMA_M_OMOL = "uma_m_omol"
     UMA_S_OMOL = "uma_s_omol"
@@ -78,8 +76,6 @@ class Method(LowercaseStrEnum):
                 return Engine.AIMNET2
             case Method.MACE_MP_0B2_L:
                 return Engine.MACE
-            case Method.OCP24_S | Method.OCP24_L:
-                return Engine.OCP24
             case Method.OMOL25_CONSERVING_S | Method.UMA_M_OMOL | Method.UMA_S_OMOL:
                 return Engine.OMOL25
             case Method.ORB_V3_CONSERVATIVE_INF_OMAT | Method.ORB_V3_CONSERVATIVE_OMOL:
@@ -97,8 +93,6 @@ class Method(LowercaseStrEnum):
 
 PrepackagedNNPMethod = Literal[
     Method.AIMNET2_WB97MD3,
-    Method.OCP24_S,
-    Method.OCP24_L,
     Method.OMOL25_CONSERVING_S,
     Method.UMA_M_OMOL,
     Method.UMA_S_OMOL,
@@ -111,8 +105,6 @@ PrepackagedNNPMethod = Literal[
 
 PREPACKAGED_NNP_METHODS = [
     Method.AIMNET2_WB97MD3,
-    Method.OCP24_S,
-    Method.OCP24_L,
     Method.OMOL25_CONSERVING_S,
     Method.UMA_M_OMOL,
     Method.UMA_S_OMOL,
