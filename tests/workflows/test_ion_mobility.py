@@ -10,7 +10,7 @@ def water() -> Molecule:
 
 
 def test_basic(water: Molecule) -> None:
-    _ = IonMobilityWorkflow(
+    wf = IonMobilityWorkflow(
         initial_molecule=water,
         forcefield=[
             {"name": "oxygen", "atomic_number": 8, "mass": 16.00, "sigma": 0.5, "epsilon": 0.5},
@@ -18,8 +18,11 @@ def test_basic(water: Molecule) -> None:
         ],
     )
 
+    assert wf.forcefield is not None
+    assert len(wf.forcefield) == 2
+
     with raises(ValueError):
-        _ = IonMobilityWorkflow(
+        IonMobilityWorkflow(
             initial_molecule=water,
             forcefield=[
                 {"name": "oxygen", "atomic_number": 8, "mass": 16.00, "sigma": 0.5, "epsilon": 0.5},
