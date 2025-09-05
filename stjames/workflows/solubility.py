@@ -48,7 +48,7 @@ class SolubilityWorkflow(SMILESWorkflow):
     Results:
     :param solubilities: {solvent: SolubilityResult}
     """
-    
+
     initial_smiles: str
     solubility_method: SolubilityMethod = SolubilityMethod.FASTSOLV
     solvents: list[str] = ["O"]
