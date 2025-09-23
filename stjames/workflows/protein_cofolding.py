@@ -79,6 +79,7 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     :param use_potentials: whether to use the potentials (inference-time steering) with Boltz
     :param contact_constraints: Boltz contact constraints
     :param pocket_constraints: Boltz pocket constraints
+    :param do_pose_refinement: whether to optimize non-rotatable bonds in output poses
     :param model: which cofolding model to use
     :param affinity_score: the affinity score
     :param lddt: the local distance different test result
@@ -94,6 +95,7 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     use_potentials: bool = False
     contact_constraints: list[ContactConstraint] = []
     pocket_constraints: list[PocketConstraint] = []
+    do_pose_refinement: bool = False
 
     model: CofoldingModel = CofoldingModel.BOLTZ_2
     affinity_score: AffinityScore | None = None
