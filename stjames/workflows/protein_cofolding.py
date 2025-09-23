@@ -102,3 +102,5 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     predicted_structure_uuid: ProteinUUID | None = None
     scores: CofoldingScores | None = None
     pose: CalculationUUID | None = None
+    posebusters_valid: bool | None = None
+    strain: float | None = None
