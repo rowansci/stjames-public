@@ -21,7 +21,7 @@ CHEMPROP_NEVOLIANUS2025_ALLOWED_SOLVENTS = {
 }
 
 
-class microscopicpKaMethod(LowecaseStrEnum):
+class microscopicpKaMethod(LowercaseStrEnum):
     AIMNET2_WAGEN2024 = "aimnet2_wagen2024"
     CHEMPROP_NEVOLIANUS2025 = "chemprop_nevolianus2025"
 
