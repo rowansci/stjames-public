@@ -21,7 +21,7 @@ CHEMPROP_NEVOLIANUS2025_ALLOWED_SOLVENTS = {
 }
 
 
-class microscopicpKaMethod(LowercaseStrEnum):
+class MicroscopicpKaMethod(LowercaseStrEnum):
     AIMNET2_WAGEN2024 = "aimnet2_wagen2024"
     CHEMPROP_NEVOLIANUS2025 = "chemprop_nevolianus2025"
 
@@ -56,7 +56,7 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
     :param initial_smiles: SMILES of the molecule of interest
 
     New:
-    :param microscopic_pKa_method: method used for pka prediciton
+    :param microscopic_pka_method: method used for pka prediciton
     :param solvent: solvent for the pka prediction
     :param pka_range: range of pKa values to consider
     :param deprotonate_elements: elements to deprotonate
@@ -75,7 +75,7 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
 
     mode: Mode = Mode.CAREFUL
 
-    microscopic_pKa_method: microscopicpKaMethod = microscopicpKaMethod.CHEMPROP_NEVOLIANUS2025
+    microscopic_pka_method: microscopicpKaMethod = microscopicpKaMethod.CHEMPROP_NEVOLIANUS2025
     solvent: Solvent = Solvent.WATER
     pka_range: tuple[float, float] = (2, 12)
     deprotonate_elements: list[int] = [7, 8, 16]
@@ -94,7 +94,7 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
     @model_validator(mode="after")
     def check_method_settings(self) -> Self:
         """Check that models with limited domain of applicability are predicting within correct domain."""
-        match self.microscopic_pKa_method:
+        match self.microscopic_pka_method:
             case microscopicpKaMethod.AIMNET2_WAGEN2024:
                 if self.solvent is not Solvent.WATER:
                     raise ValueError(f"{self.microscopic_pKa_method} only supports water")
