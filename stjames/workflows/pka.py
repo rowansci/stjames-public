@@ -97,11 +97,19 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
         match self.microscopic_pKa_method:
             case microscopicpKaMethod.AIMNET2_WAGEN2024:
                 if self.solvent is not Solvent.WATER:
-                    raise ValueError(f"Method `{self.microscopic_pKa_method}` can only predict microscopic pKa for water so `solvent` must be `water` only.")
-                if len(self.protonate_atoms) > 0 or len(self.deprotonate_atoms) > 0:
-                    raise ValueError(f"Method `{self.microscopic_pKa_method}` does not support selecting atoms by number.")
+                    raise ValueError(f"{self.microscopic_pKa_method} only supports water")
             case microscopicpKaMethod.CHEMPROP_NEVOLIANUS2025:
                 if self.solvent not in CHEMPROP_NEVOLIANUS2025_ALLOWED_SOLVENTS:
-                    raise ValueError(f"Solvent `{self.solvent}` is invalid for method `{self.microscopic_pKa_method}`.")
+                    raise ValueError(f"Solvent `{self.solvent}` is not supported by method `{self.microscopic_pKa_method}`.")
+                if len(self.protonate_atoms) or len(self.deprotonate_atoms):
+                    raise ValueError(f"Method `{self.microscopic_pKa_method}` does not support selecting atoms by number.")
+        return self
+
+    @model_validator(mode="after")
+    def validate_mol_input(self) -> Self:
+        """Ensure that only one of initial_molecule or initial_smiles is set."""
+
+        if not (bool(self.initial_smiles) ^ bool(self.initial_molecule)):
+            raise ValueError("Can only set one of initial_molecule should and initial_smiles")
 
         return self
