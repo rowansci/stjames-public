@@ -4,7 +4,7 @@ from typing import Annotated, Optional, Self
 
 from pydantic import AfterValidator, model_validator
 
-from ..base import Base, round_float, round_optional_float, LowercaseStrEnum
+from ..base import Base, LowercaseStrEnum, round_float, round_optional_float
 from ..mode import Mode
 from ..solvent import Solvent
 from .workflow import DBCalculation, MoleculeWorkflow, SMILESWorkflow
