@@ -56,8 +56,8 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
     :param initial_smiles: SMILES of the molecule of interest
 
     New:
-    :param microscopic_pKa_method: the method used for pka prediciton
-    :param solvent: the solvent for the pka prediction
+    :param microscopic_pKa_method: method used for pka prediciton
+    :param solvent: solvent for the pka prediction
     :param pka_range: range of pKa values to consider
     :param deprotonate_elements: elements to deprotonate
     :param deprotonate_atoms: atoms to deprotonate
