@@ -39,11 +39,11 @@ class pKaMicrostate(Base):
     """
 
     atom_index: int
-    smiles = Optional[str]
+    smiles: Optional[str]
     structures: list[DBCalculation] = []
-    deltaG: Annotated[Optional[float, AfterValidator(round_float(3))]]
+    deltaG: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
     pka: Annotated[float, AfterValidator(round_float(3))]
-    uncertainty: Annotated[Optional[float, AfterValidator(round_float(3))]]
+    uncertainty: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
 
 
 class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
@@ -103,3 +103,5 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
             case microscopicpKaMethod.CHEMPROP_NEVOLIANUS2025:
                 if self.solvent not in CHEMPROP_NEVOLIANUS2025_ALLOWED_SOLVENTS:
                     raise ValueError(f"Solvent `{self.solvent}` is invalid for method `{self.microscopic_pKa_method}`.")
+
+        return self
