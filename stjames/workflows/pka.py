@@ -75,7 +75,7 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
 
     mode: Mode = Mode.CAREFUL
 
-    microscopic_pka_method: microscopicpKaMethod = microscopicpKaMethod.CHEMPROP_NEVOLIANUS2025
+    microscopic_pka_method: MicroscopicpKaMethod = MicroscopicpKaMethod.CHEMPROP_NEVOLIANUS2025
     solvent: Solvent = Solvent.WATER
     pka_range: tuple[float, float] = (2, 12)
     deprotonate_elements: list[int] = [7, 8, 16]
@@ -95,14 +95,14 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
     def check_method_settings(self) -> Self:
         """Check that models with limited domain of applicability are predicting within correct domain."""
         match self.microscopic_pka_method:
-            case microscopicpKaMethod.AIMNET2_WAGEN2024:
+            case MicroscopicpKaMethod.AIMNET2_WAGEN2024:
                 if self.solvent is not Solvent.WATER:
-                    raise ValueError(f"{self.microscopic_pKa_method} only supports water")
-            case microscopicpKaMethod.CHEMPROP_NEVOLIANUS2025:
+                    raise ValueError(f"{self.microscopic_pka_method} only supports water")
+            case MicroscopicpKaMethod.CHEMPROP_NEVOLIANUS2025:
                 if self.solvent not in CHEMPROP_NEVOLIANUS2025_ALLOWED_SOLVENTS:
-                    raise ValueError(f"Solvent `{self.solvent}` is not supported by method `{self.microscopic_pKa_method}`.")
+                    raise ValueError(f"Solvent `{self.solvent}` is not supported by method `{self.microscopic_pka_method}`.")
                 if len(self.protonate_atoms) or len(self.deprotonate_atoms):
-                    raise ValueError(f"Method `{self.microscopic_pKa_method}` does not support selecting atoms by number.")
+                    raise ValueError(f"Method `{self.microscopic_pka_method}` does not support selecting atoms by number.")
         return self
 
     @model_validator(mode="after")
