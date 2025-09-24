@@ -1,12 +1,15 @@
-"""Protein Cofolding Workflow."""
+"""Protein cofolding Workflow."""
 
-from typing import Annotated, Literal
+from typing import Annotated, Literal, TypeAlias
 
 from pydantic import AfterValidator, BaseModel, ConfigDict
 
-from ..base import LowercaseStrEnum, round_float
+from ..base import LowercaseStrEnum, round_float, round_optional_float
 from ..types import UUID, round_list
 from .workflow import FASTAWorkflow
+
+ProteinUUID: TypeAlias = UUID
+CalculationUUID: TypeAlias = UUID
 
 
 class CofoldingModel(LowercaseStrEnum):
@@ -45,6 +48,8 @@ class PocketConstraint(BaseModel):
 
 
 class CofoldingScores(BaseModel):
+    """The output scores from co-folding scores."""
+
     confidence_score: Annotated[float, AfterValidator(round_float(3))]
     ptm: Annotated[float, AfterValidator(round_float(3))]  # predicted template modeling score
     iptm: Annotated[float, AfterValidator(round_float(3))]  # interface predicted template modeling score
@@ -71,7 +76,17 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     New:
     :param use_msa_server: whether to use the MSA server
     :param use_templates_server: whether to use the templates server
+    :param use_potentials: whether to use the potentials (inference-time steering) with Boltz
+    :param contact_constraints: Boltz contact constraints
+    :param pocket_constraints: Boltz pocket constraints
+    :param do_pose_refinement: whether to optimize non-rotatable bonds in output poses
+    :param compute_strain: whether to compute the strain of the pose (if `pose_refinement` is enabled)
+    :param model: which cofolding model to use
+    :param affinity_score: the affinity score
+    :param lddt: the local distance different test result
     :param predicted_structure_uuid: UUID of the predicted structure
+    :param scores: the output cofolding scores
+    :param pose: the UUID of the calculation pose
     """
 
     model_config = ConfigDict(validate_assignment=True)
@@ -81,9 +96,15 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     use_potentials: bool = False
     contact_constraints: list[ContactConstraint] = []
     pocket_constraints: list[PocketConstraint] = []
+    do_pose_refinement: bool = False
+    compute_strain: bool = False
 
-    predicted_structure_uuid: UUID | None = None
-    scores: CofoldingScores | None = None
     model: CofoldingModel = CofoldingModel.BOLTZ_2
     affinity_score: AffinityScore | None = None
     lddt: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
+
+    predicted_structure_uuid: ProteinUUID | None = None
+    scores: CofoldingScores | None = None
+    pose: CalculationUUID | None = None
+    posebusters_valid: bool | None = None
+    strain: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
