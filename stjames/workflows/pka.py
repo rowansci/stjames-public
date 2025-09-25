@@ -1,6 +1,6 @@
 """pKa workflow."""
 
-from typing import Annotated, Optional, Self
+from typing import Annotated, Self
 
 from pydantic import AfterValidator, model_validator
 
