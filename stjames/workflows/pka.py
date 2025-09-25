@@ -33,17 +33,17 @@ class pKaMicrostate(Base):
     :param atom_index: index of the atom
     :param smiles: SMILES of the microstate
     :param structures: DBCalculation for the microstate
-    :param deltaG: relative free energy
-    :param pka: pKa
-    :uncertainty: uncertainty
+    :param deltaG: relative free energy (where applicable)
+    :param pka: pKa value associated with this microstate
+    :uncertainty: uncertainty in the pKa prediction
     """
 
     atom_index: int
-    smiles: Optional[str]
+    smiles: str | None = None
     structures: list[DBCalculation] = []
-    deltaG: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
+    deltaG: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
     pka: Annotated[float, AfterValidator(round_float(3))]
-    uncertainty: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
+    uncertainty: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
 
 
 class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
