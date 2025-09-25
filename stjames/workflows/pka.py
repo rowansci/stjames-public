@@ -6,6 +6,7 @@ from pydantic import AfterValidator, model_validator
 
 from ..base import Base, LowercaseStrEnum, round_float, round_optional_float
 from ..mode import Mode
+from ..molecule import Molecule
 from ..solvent import Solvent
 from .workflow import DBCalculation, MoleculeWorkflow, SMILESWorkflow
 
@@ -72,6 +73,9 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
     :param strongest_acid: pKa of the strongest acid
     :param strongest_base: pKa of the strongest base
     """
+
+    initial_smiles: str = ""
+    initial_molecule: Molecule | None = None  # type: ignore [assignment]
 
     mode: Mode = Mode.CAREFUL
 
