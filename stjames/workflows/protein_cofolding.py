@@ -87,6 +87,8 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     :param predicted_structure_uuid: UUID of the predicted structure
     :param scores: the output cofolding scores
     :param pose: the UUID of the calculation pose
+    :param strain: the strain of the ligand, in kcal/mol
+    :param predicted_refined_structure_uuid: if the structure has been refined, the UUID of the predicted structure after refinement
     """
 
     model_config = ConfigDict(validate_assignment=True)
@@ -108,3 +110,4 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     pose: CalculationUUID | None = None
     posebusters_valid: bool | None = None
     strain: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    predicted_refined_structure_uuid: ProteinUUID | None = None
