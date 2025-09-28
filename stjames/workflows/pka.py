@@ -79,7 +79,7 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
 
     mode: Mode = Mode.CAREFUL
 
-    microscopic_pka_method: MicroscopicpKaMethod = MicroscopicpKaMethod.CHEMPROP_NEVOLIANUS2025
+    microscopic_pka_method: MicroscopicpKaMethod = MicroscopicpKaMethod.AIMNET2_WAGEN2024
     solvent: Solvent = Solvent.WATER
     pka_range: tuple[float, float] = (2, 12)
     deprotonate_elements: list[int] = [7, 8, 16]
