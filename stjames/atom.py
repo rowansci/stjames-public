@@ -15,7 +15,7 @@ class Atom(Base):
     :param position: the Cartesian coordinates in Å
     :param mass: the mass, in Daltons. If `None` the most common isotopologue will be employed.
     """
-    
+
     atomic_number: NonNegativeInt
     position: Annotated[Vector3D, AfterValidator(round_vector3d(8))]
     mass: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
