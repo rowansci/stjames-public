@@ -26,7 +26,7 @@ class Atom(Base):
         Atom(2, [0.00000, 1.00000, 2.00000])
         """
         x, y, z = self.position
-        if mass is not None:
+        if self.mass is not None:
             return f"Atom({self.atomic_number}, [{x:.5f}, {y:.5f}, {z:.5f}], mass={self.mass:.3f})"
         return f"Atom({self.atomic_number}, [{x:.5f}, {y:.5f}, {z:.5f}])"
 
