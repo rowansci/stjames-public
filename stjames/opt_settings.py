@@ -20,3 +20,5 @@ class OptimizationSettings(Base):
     optimize_cell: bool = False
 
     constraints: Sequence[Constraint] = tuple()
+
+    save_intermediate_steps: bool = True
