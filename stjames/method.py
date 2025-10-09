@@ -8,7 +8,10 @@ class Method(LowercaseStrEnum):
     HARTREE_FOCK = "hf"
     HF3C = "hf_3c"
 
+    # DFT methods
+    ## Pure functionals
     PBE = "pbe"
+    BP86 = "bp86"
     B973C = "b97_3c"
     B97D3BJ = "b97_d3bj"
     R2SCAN = "r2scan"
@@ -16,44 +19,52 @@ class Method(LowercaseStrEnum):
     TPSS = "tpss"
     M06L = "m06l"
 
+    ## Hybrid functionals
     PBE0 = "pbe0"
     B3LYP = "b3lyp"
     TPSSH = "tpssh"
     M06 = "m06"
     M062X = "m062x"
 
+    ## Range-separated hybrid functionals
     CAMB3LYP = "camb3lyp"
     WB97XD3 = "wb97x_d3"
     WB97XV = "wb97x_v"
+    WB97X3C = "wb97x_3c"
     WB97MV = "wb97m_v"
     WB97MD3BJ = "wb97m_d3bj"
-    WB97X3C = "wb97x_3c"
 
+    ## Double hybrid functionals
     DSDBLYPD3BJ = "dsd_blyp_d3bj"
 
+    ## ML functionals
+    SKALA = "skala"
+
+    # NNPs
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
+
     MACE_MP_0 = "mace_mp_0"
     MACE_MP_0B2_L = "mace_mp_0b2_l"
+
     OMOL25_CONSERVING_S = "omol25_conserving_s"
     UMA_M_OMOL = "uma_m_omol"
     UMA_S_OMOL = "uma_s_omol"
     ORB_V3_CONSERVATIVE_INF_OMAT = "orb_v3_conservative_inf_omat"
     ORB_V3_CONSERVATIVE_OMOL = "orb_v3_conservative_omol"
 
+    EGRET_1 = "egret_1"
+    EGRET_1E = "egret_1e"
+    EGRET_1T = "egret_1t"
+
+    # Semiempirical methods
     GFN_FF = "gfn_ff"
     GFN0_XTB = "gfn0_xtb"
     GFN1_XTB = "gfn1_xtb"
     GFN2_XTB = "gfn2_xtb"
     G_XTB = "g_xtb"
 
-    # this was going to be removed, but Jonathon wrote such a nice basis set test... it's off the front end.
-    BP86 = "bp86"
-
+    # Force fields
     OFF_SAGE_2_2_1 = "off_sage_2_2_1"
-
-    EGRET_1 = "egret_1"
-    EGRET_1E = "egret_1e"
-    EGRET_1T = "egret_1t"
 
     def default_engine(self, *, is_periodic: bool = False) -> Engine:
         """
@@ -86,6 +97,8 @@ class Method(LowercaseStrEnum):
                 return Engine.OPENFF
             case Method.EGRET_1 | Method.EGRET_1E | Method.EGRET_1T:
                 return Engine.EGRET
+            case Method.SKALA:
+                return Engine.PYSCF
             case _:
                 # All remaining methods (HF, DFT, composite, etc.) fall back to Psi4
                 return Engine.PSI4
