@@ -255,7 +255,41 @@ class iMTDsMTDSettings(iMTDSettings):
     run_type: str = "imtd-smtd"
 
 
-ConformerGenSettingsUnion = Annotated[ETKDGSettings | iMTDSettings, Field(discriminator="settings_type")]
+class LyrebirdSettings(ConformerGenSettings):
+    """
+    Settings for Lyrebird-based conformer generation.
+
+    Inherited:
+    :param mode: Mode for calculations
+    :param conf_opt_method: method for the optimization
+    :param screening: post-generation screening settings
+    :param constraints: constraints for conformer generation
+    :param nci: add a constraining potential for non-covalent interactions (not supported in ETKDG)
+    :param max_confs: maximum number of conformers to keep
+
+    New:
+    :param num_initial_confs: number of initial conformers to generate
+    """
+
+    num_initial_confs: int = 300
+    settings_type: Literal["lyrebird"] = "lyrebird"
+
+    @field_validator("constraints")
+    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:
+        if constraints:
+            raise ValueError("Lyrebird does not support constraints")
+
+        return tuple(constraints)
+
+    @field_validator("nci")
+    def check_nci(cls, nci: bool) -> bool:
+        if nci:
+            raise ValueError("Lyrebird does not support NCI")
+
+        return nci
+
+
+ConformerGenSettingsUnion = Annotated[ETKDGSettings | iMTDSettings | LyrebirdSettings, Field(discriminator="settings_type")]
 
 
 class ConformerGenMixin(BaseModel):

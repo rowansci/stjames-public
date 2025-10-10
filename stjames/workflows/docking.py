@@ -1,6 +1,6 @@
 """Docking workflow."""
 
-from typing import Annotated, Self
+from typing import Annotated, Self, TypeAlias
 
 from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
 
@@ -10,18 +10,26 @@ from ..types import UUID, Vector3D
 from .conformer_search import ConformerGenSettingsUnion, ETKDGSettings
 from .workflow import MoleculeWorkflow
 
+ProteinUUID: TypeAlias = UUID
+CalculationUUID: TypeAlias = UUID
+
 
 class Score(Base):
     """
     Pose with its score.
 
-    :param pose: conformation of the ligand when docked
+    :param pose: conformation of the ligand when docked (calculation UUID)
+    :param complex_pdb: the UUID of the protein–ligand complex (protein UUID)
     :param score: score of the pose, in kcal/mol
+    :param posebusters_valid: whether or not the ligand pose passes the PoseBusters tests
+    :param strain: strain in kcal/mol
     """
 
-    pose: UUID | None  # for calculation
+    pose: CalculationUUID | None
+    complex_pdb: ProteinUUID | None
     score: Annotated[float, AfterValidator(round_float(3))]
     posebusters_valid: bool
+    strain: float | None
 
 
 class DockingSettings(Base):
@@ -78,17 +86,14 @@ class DockingWorkflow(MoleculeWorkflow):
     target_uuid: UUID | None = None
     pocket: tuple[Vector3D, Vector3D]
 
-    do_csearch: bool = True
-    conformer_gen_settings: ConformerGenSettingsUnion = ETKDGSettings(mode="reckless")
-
-    do_optimization: bool = True
-    # optimization_settings - here in future once we have a cleaner mode sol'n, ccw 7.9.25
-
     docking_settings: VinaSettings = VinaSettings()
 
+    do_csearch: bool = True
+    conformer_gen_settings: ConformerGenSettingsUnion = ETKDGSettings(mode="reckless")
+    do_optimization: bool = True
     do_pose_refinement: bool = True
 
-    conformers: list[UUID] = []
+    conformers: list[CalculationUUID] = []
     scores: list[Score] = []
 
     def __str__(self) -> str:

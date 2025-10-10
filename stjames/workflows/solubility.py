@@ -41,6 +41,7 @@ class SolubilityWorkflow(SMILESWorkflow):
 
     Inputs:
     :param initial_smiles: SMILES string of the molecule
+    :param solubility_method: model used for solubility prediction
     :param solvents: list of solvent SMILES strings
     :param temperatures: temperatures in K
 
@@ -48,8 +49,8 @@ class SolubilityWorkflow(SMILESWorkflow):
     :param solubilities: {solvent: SolubilityResult}
     """
 
-    solubility_method: SolubilityMethod = SolubilityMethod.FASTSOLV
     initial_smiles: str
+    solubility_method: SolubilityMethod = SolubilityMethod.FASTSOLV
     solvents: list[str] = ["O"]
     temperatures: list[float] = [298.15]
 
