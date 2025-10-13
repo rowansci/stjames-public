@@ -17,9 +17,9 @@ def gfp() -> PDB:
 
 
 def test_raises(water: Molecule, gfp: str) -> None:
-    PoseAnalysisMolecularDynamicsWorkflow(protein=gfp, initial_molecule=water, mode=Mode.RAPID)
+    PoseAnalysisMolecularDynamicsWorkflow(protein=gfp, initial_smiles="O", mode=Mode.RAPID)
 
-    PoseAnalysisMolecularDynamicsWorkflow(protein=gfp, initial_molecule=water, mode=Mode.RAPID, protein_restraint_cutoff=5.0, protein_prune_cutoff=7.0)
+    PoseAnalysisMolecularDynamicsWorkflow(protein=gfp, initial_smiles="O", mode=Mode.RAPID, protein_restraint_cutoff=5.0, protein_prune_cutoff=7.0)
 
     with raises(ValueError):
-        PoseAnalysisMolecularDynamicsWorkflow(protein=gfp, initial_molecule=water, mode=Mode.RAPID, protein_restraint_cutoff=5.0, protein_prune_cutoff=3.0)
+        PoseAnalysisMolecularDynamicsWorkflow(protein=gfp, initial_smiles="O", mode=Mode.RAPID, protein_restraint_cutoff=5.0, protein_prune_cutoff=3.0)
