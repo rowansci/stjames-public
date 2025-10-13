@@ -45,12 +45,13 @@ class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
     If, for whatever reason, the workflow is initialized with both a `target_uuid` and a `target`, the UUID will be ignored.
 
     Inherited:
-    :param initial_molecule: Molecule of interest
+    :param initial_molecule: Molecule (currently unused)
     :param mode: Mode for workflow (currently unused)
 
     New:
     :param protein: PDB of the protein.
     :param protein_uuid: UUID of the protein.
+    :param ligand_residue_name: ligand's residue name
     :param num_trajectories: how many trajectories to run
     :param equilibration_time_ns: how long to equilibrate trajectories for, in nanoseconds
     :param simulation_time_ns: how long to run trajectories for, in nanoseconds
@@ -73,6 +74,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
 
     protein: PDB | None = None
     protein_uuid: UUID | None = None
+    ligand_residue_name: str = "LIG"
 
     num_trajectories: PositiveInt = 4
     equilibration_time_ns: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 5
