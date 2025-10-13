@@ -5,7 +5,7 @@ from pydantic import AfterValidator, PositiveFloat, PositiveInt, model_validator
 from ..base import Base, round_float
 from ..pdb import PDB
 from ..types import UUID, round_list
-from .workflow import MoleculeWorkflow
+from .workflow import SMILESWorkflow
 
 
 class BindingPoseContact(Base):
@@ -36,7 +36,7 @@ class BindingPoseTrajectory(Base):
     contacts: list[BindingPoseContact] = []
 
 
-class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
+class PoseAnalysisMolecularDynamicsWorkflow(SMILESWorkflow):
     """
     Pose analysis molecular dynamics workflow.
 
@@ -45,7 +45,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
     If, for whatever reason, the workflow is initialized with both a `target_uuid` and a `target`, the UUID will be ignored.
 
     Inherited:
-    :param initial_molecule: Molecule (currently unused)
+    :param initial_smiles: ligand's SMILES
     :param mode: Mode for workflow (currently unused)
 
     New:
