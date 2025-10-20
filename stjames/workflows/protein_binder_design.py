@@ -52,7 +52,7 @@ class BoltzGenSettings(Base):
     """
     The settings for running BoltzGen.
 
-    :param num_samples: how many designs to generate
+    :param num_designs: how many designs to generate
     :param protocol: which protocol to use
     :param binding_residue: a dict mapping the chain ID to which residues should bind.
         the string follows the BoltzGen format of specifying ranges of residue indices (refer to their documentation).
@@ -60,7 +60,7 @@ class BoltzGenSettings(Base):
     """
 
     protocol: BoltzGenProtocol = BoltzGenProtocol.PROTEIN_ANYTHING
-    num_samples: int = 100
+    num_designs: int = 100
     binding_residues: dict[int, str] = {}
 
 
