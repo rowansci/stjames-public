@@ -14,7 +14,7 @@ class ProteinGenerationResult(Base):
     """The output scores from co-folding scores."""
 
     sequence: str
-    isolated_structure: ProteinUUID
+    isolated_structure: ProteinUUID | None = None
     bound_structure: ProteinUUID
     affinity_score: AffinityScore | None = None
     scores: CofoldingScores | None = None
