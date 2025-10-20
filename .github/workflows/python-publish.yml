@@ -6,20 +6,18 @@
 # separate terms of service, privacy policy, and support
 # documentation.
 
-name: Upload Python Package
+name: Publish
 
 on:
   release:
     types: [published]
   workflow_dispatch:
 
-
 permissions:
   contents: read
 
 jobs:
   deploy:
-
     runs-on: ubuntu-latest
 
     steps:

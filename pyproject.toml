@@ -1,9 +1,9 @@
 [project]
 name = "stjames"
-version = "0.0.40"
+version = "0.0.114"
 description = "standardized JSON atom/molecule encoding scheme"
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.11"
 authors = [
     { name = "Corin Wagen", email = "corin@rowansci.com" },
 ]
@@ -11,6 +11,9 @@ authors = [
 dependencies = [
     "pydantic>=2.4",
     "numpy",
+    "requests",
+    "rdkit",
+    "more-itertools",
 ]
 
 [build-system]
@@ -28,20 +31,34 @@ include = ["stjames", "stjames.*"]  # package names should match these glob patt
 exclude = []  # exclude packages matching these glob patterns (empty by default)
 namespaces = false  # to disable scanning PEP 420 namespaces (true by default)
 
+[tool.setuptools.package-data]
+"*" = ["*.json"]
+
 [tool.ruff]
 line-length = 160
 
 [tool.ruff.lint]
 select = [
-    "E",  # pycodestyle errors
-    "F",  # pyflakes
-    "I",  # isort
-    "W",  # pycodestyle warnings
+  "E",  # pycodestyle errors
+  "F",  # pyflakes
+  "I",  # isort
+  "W",  # pycodestyle warnings
 ]
 ignore = ["E741"]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]
 
+[tool.pytest.ini_options]
+testpaths = ["stjames", "tests"]
+addopts = "--doctest-modules --durations=5 -m 'not regression'"
+doctest_optionflags = "NORMALIZE_WHITESPACE"
+markers = [
+  "smoke: sanity tests to reveal simple failures",
+  "regression: tests to make sure bugs stay closed",
+]
+
 [tool.mypy]
 plugins = ["pydantic.mypy"]
+strict = true
+warn_unused_ignores = true

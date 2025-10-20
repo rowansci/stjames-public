@@ -2,7 +2,7 @@ from enum import Enum
 
 
 class Status(int, Enum):
-    # what a job gets when it's created
+    # what a job gets when it's created if user is below max_concurrency
     QUEUED = 0
 
     # still running...
@@ -16,3 +16,9 @@ class Status(int, Enum):
 
     # job was stopped externally, maybe timed out or something
     STOPPED = 4
+
+    # Status if a user has exceeded their allowed max_concurrency
+    AWAITING_QUEUE = 5
+
+    # Job is not yet submitted
+    DRAFT = 6

@@ -28,6 +28,8 @@ class Solvent(LowercaseStrEnum):
     ISOPROPANOL = "isopropanol"
     DIMETHYLACETAMIDE = "dimethylacetamide"
     DIMETHYLFORMAMIDE = "dimethylformamide"
+    N_METHYLPYRROLIDONE = "n_methylpyrrolidone"
+    ETHYLENE_GLYCOL = "ethylene_glycol"
 
 
 class SolventModel(LowercaseStrEnum):
@@ -35,6 +37,7 @@ class SolventModel(LowercaseStrEnum):
     CPCM = "cpcm"
     ALPB = "alpb"
     COSMO = "cosmo"
+    GBSA = "gbsa"
     CPCMX = "cpcmx"
 
 

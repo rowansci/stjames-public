@@ -5,6 +5,7 @@ from .message import Message
 from .molecule import Molecule
 from .settings import Settings
 from .status import Status
+from .types import UUID
 
 
 class StJamesVersion(LowercaseStrEnum):
@@ -29,6 +30,7 @@ class Calculation(Base):
     messages: list[Message] = []
 
     engine: Optional[str] = "peregrine"
+    uuids: list[UUID | None] | None = None
 
     # not to be changed by end users, diff. versions will have diff. defaults
     json_format: str = StJamesVersion.V0

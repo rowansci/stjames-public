@@ -1,11 +1,15 @@
-from typing import Any, Optional
+"""Deprecated conformer search workflow, use ConformerSearchWorkflow instead."""
 
-from ..base import Base
+from typing import Annotated, Any, Optional
+
+from pydantic import AfterValidator
+
+from ..base import Base, round_float, round_optional_float
 from ..constraint import Constraint
 from ..method import Method
 from ..mode import Mode
 from ..solvent import Solvent
-from .workflow import Workflow
+from .workflow import MoleculeWorkflow
 
 
 class ConformerSettings(Base):
@@ -33,14 +37,14 @@ class CrestConformerSettings(ConformerSettings):
 
 
 class Conformer(Base):
-    energy: float
-    weight: Optional[float] = None
+    energy: Annotated[float, AfterValidator(round_float(6))]
+    weight: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
 
     # uuid, optionally
     uuid: Optional[str] = None
 
 
-class ConformerWorkflow(Workflow):
+class ConformerWorkflow(MoleculeWorkflow):
     mode: Mode = Mode.RAPID
     settings: ConformerSettings = ConformerSettings()
     conformers: list[Conformer] = []
