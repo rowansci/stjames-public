@@ -1,4 +1,4 @@
-"""Protein generation workflow."""
+"""Protein-binder-design workflow."""
 
 from typing import TypeAlias
 
@@ -10,12 +10,20 @@ from .workflow import FASTAWorkflow
 ProteinUUID: TypeAlias = UUID
 
 
-class ProteinGenerationResult(Base):
-    """The output scores from co-folding scores."""
+class ProteinBinderDesignResult(Base):
+    """
+    The output; a designed binder.
+
+    :param sequence: the sequence
+    :param isolated_structure: the PDB of the structure on its own
+    :param bound_structure: the PDB of the structure bound to the target
+    :param affinity_score: the predicted affinity
+    :param scores: the co-folding scores for the generated structure
+    """
 
     sequence: str
     isolated_structure: ProteinUUID | None = None
-    bound_structure: ProteinUUID
+    bound_structure: ProteinUUID | None = None
     affinity_score: AffinityScore | None = None
     scores: CofoldingScores | None = None
 
@@ -56,9 +64,9 @@ class BoltzGenSettings(Base):
     binding_residues: dict[int, str] = {}
 
 
-class ProteinGenerationWorkflow(FASTAWorkflow):
+class ProteinBinderDesignWorkflow(FASTAWorkflow):
     """
-    A workflow for generating protein structures.
+    A workflow for generating proteins or peptides that bind to something.
 
     Inherited:
     :param initial_protein_sequences: protein sequences of interest
@@ -66,14 +74,14 @@ class ProteinGenerationWorkflow(FASTAWorkflow):
 
     New:
     :param input_protein_uuid: the input protein structure, if requested
-    :param protein_generation_settings: the settings for the protein generation method employed
+    :param binder_design_settings: the settings for the protein generation method employed
     :param bond_constraints: BoltzGen bond constraints
-    :param protein_generation_results: the output structures
+    :param generated_binders: the output structures
     """
 
     input_protein_uuid: ProteinUUID | None = None
 
-    protein_generation_settings: BoltzGenSettings = BoltzGenSettings()
+    binder_design_settings: BoltzGenSettings = BoltzGenSettings()
     bond_constraints: list[BondConstraint] = []
 
-    protein_generation_results: list[ProteinGenerationResult] = []
+    generated_binders: list[ProteinBinderDesignResult] = []
