@@ -56,7 +56,7 @@ class BoltzGenSettings(Base):
     binding_residues: dict[int, str] = {}
 
 
-class ProteinCofoldingWorkflow(FASTAWorkflow):
+class ProteinGenerationWorkflow(FASTAWorkflow):
     """
     A workflow for generating protein structures.
 
