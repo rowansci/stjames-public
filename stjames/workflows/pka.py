@@ -10,7 +10,7 @@ from ..molecule import Molecule
 from ..solvent import Solvent
 from .workflow import DBCalculation, MoleculeWorkflow, SMILESWorkflow
 
-CHEMPROP_NEVOLIANUS2025_ALLOWED_SOLVENTS = {
+CHEMPROP_NEVOLIANIS2025_ALLOWED_SOLVENTS = {
     Solvent.WATER,
     Solvent.DIMETHYLSULFOXIDE,
     Solvent.DIMETHYLFORMAMIDE,
@@ -24,7 +24,7 @@ CHEMPROP_NEVOLIANUS2025_ALLOWED_SOLVENTS = {
 
 class MicroscopicpKaMethod(LowercaseStrEnum):
     AIMNET2_WAGEN2024 = "aimnet2_wagen2024"
-    CHEMPROP_NEVOLIANUS2025 = "chemprop_nevolianus2025"
+    CHEMPROP_NEVOLIANIS2025 = "chemprop_nevolianis2025"
 
 
 class pKaMicrostate(Base):
@@ -102,8 +102,8 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
             case MicroscopicpKaMethod.AIMNET2_WAGEN2024:
                 if self.solvent is not Solvent.WATER:
                     raise ValueError(f"{self.microscopic_pka_method} only supports water")
-            case MicroscopicpKaMethod.CHEMPROP_NEVOLIANUS2025:
-                if self.solvent not in CHEMPROP_NEVOLIANUS2025_ALLOWED_SOLVENTS:
+            case MicroscopicpKaMethod.CHEMPROP_NEVOLIANIS2025:
+                if self.solvent not in CHEMPROP_NEVOLIANIS2025_ALLOWED_SOLVENTS:
                     raise ValueError(f"Solvent `{self.solvent}` is not supported by method `{self.microscopic_pka_method}`.")
                 if len(self.protonate_atoms) or len(self.deprotonate_atoms):
                     raise ValueError(f"Method `{self.microscopic_pka_method}` does not support selecting atoms by number.")
