@@ -15,7 +15,7 @@ def test_chemprop_invalid_solvent(water: Molecule) -> None:
         "protonate_elements": [7],
         "deprotonate_elements": [7],
         "pka_range": (5, 15),
-        "microscopic_pka_method": "chemprop_nevolianus2025",
+        "microscopic_pka_method": "chemprop_nevolianis2025",
         "solvent": "dimethylsulfoxide",
     }
 
@@ -38,7 +38,7 @@ def test_chemprop_invalid_solvent(water: Molecule) -> None:
         "protonate_elements": [7],
         "deprotonate_elements": [7],
         "pka_range": (5, 15),
-        "microscopic_pka_method": "chemprop_nevolianus2025",
+        "microscopic_pka_method": "chemprop_nevolianis2025",
         "solvent": "invalid_solvent",
     }
 
@@ -54,7 +54,7 @@ def test_chemprop_extra_input(water: Molecule) -> None:
         "protonate_elements": [7],
         "deprotonate_elements": [7],
         "pka_range": (5, 15),
-        "microscopic_pka_method": "chemprop_nevolianus2025",
+        "microscopic_pka_method": "chemprop_nevolianis2025",
     }
 
     with raises(ValueError):
@@ -67,7 +67,7 @@ def test_chemprop_missing_required_field() -> None:
         "protonate_elements": [7],
         "deprotonate_elements": [7],
         "pka_range": (5, 15),
-        "microscopic_pka_method": "chemprop_nevolianus2025",
+        "microscopic_pka_method": "chemprop_nevolianis2025",
     }
 
     with raises(ValueError):
@@ -81,7 +81,7 @@ def test_chemprop_wrong_input_type() -> None:
         "protonate_elements": [7],
         "deprotonate_elements": [7],
         "pka_range": (5, 15),
-        "microscopic_pka_method": "chemprop_nevolianus2025",
+        "microscopic_pka_method": "chemprop_nevolianis2025",
     }
 
     with raises(ValueError):
@@ -95,7 +95,7 @@ def test_chemprop_atoms_by_index_instead_of_element() -> None:
         "protonate_atoms": [1, 3],
         "deprotonate_atoms": [1, 3],
         "pka_range": (5, 15),
-        "microscopic_pka_method": "chemprop_nevolianus2025",
+        "microscopic_pka_method": "chemprop_nevolianis2025",
     }
 
     with raises(ValueError):
