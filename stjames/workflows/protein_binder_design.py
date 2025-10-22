@@ -79,7 +79,7 @@ class ProteinBinderDesignWorkflow(FASTAWorkflow):
     :param generated_binders: the output structures
     """
 
-    input_protein_uuid: list[ProteinUUID] = []
+    input_protein_uuids: list[ProteinUUID] = []
 
     binder_design_settings: BoltzGenSettings = BoltzGenSettings()
     bond_constraints: list[BondConstraint] = []
