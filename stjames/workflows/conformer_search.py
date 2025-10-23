@@ -9,9 +9,10 @@ from ..base import LowercaseStrEnum
 from ..constraint import Constraint
 from ..method import Method, XTBMethod
 from ..mode import Mode
+from ..molecule import Molecule
 from ..types import UUID, FloatPerAtom, round_float_per_atom
 from .multistage_opt import MultiStageOptMixin
-from .workflow import MoleculeWorkflow
+from .workflow import MoleculeWorkflow, SMILESWorkflow
 
 _sentinel = object()
 
@@ -377,12 +378,13 @@ class ConformerSearchMixin(ConformerGenMixin, MultiStageOptMixin):
         return self
 
 
-class ConformerSearchWorkflow(ConformerSearchMixin, MoleculeWorkflow):
+class ConformerSearchWorkflow(ConformerSearchMixin, SMILESWorkflow, MoleculeWorkflow):
     """
     ConformerSearch Workflow.
 
     Inherited:
     :param initial_molecule: Molecule of interest
+    :param initial_smiles: SMILES of the molecule of interest
     :param conf_gen_mode: Mode for calculations
     :param conf_gen_settings: settings for conformer generation
     :param mso_mode: Mode for MultiStageOptSettings
@@ -401,6 +403,21 @@ class ConformerSearchWorkflow(ConformerSearchMixin, MoleculeWorkflow):
     :param energies: energies of the molecules
     """
 
+    initial_smiles: str = ""
+    initial_molecule: Molecule | None = None  # type: ignore [assignment]
+
     # Results
     conformer_uuids: list[list[UUID | None]] = Field(default_factory=list)
     energies: Annotated[FloatPerAtom, AfterValidator(round_float_per_atom(6))] = Field(default_factory=list)
+
+    @model_validator(mode="after")
+    def validate_mol_input(self) -> Self:
+        """Ensure that only one of initial_molecule or initial_smiles is set."""
+
+        if not (bool(self.initial_smiles) ^ bool(self.initial_molecule)):
+            raise ValueError("Can only set one of initial_molecule and initial_smiles")
+
+        if isinstance(self.conf_gen_settings, iMTDSettings) and (self.initial_molecule is None):
+            raise ValueError("iMTDSettings requires `initial_molecule` to be set")
+
+        return self
