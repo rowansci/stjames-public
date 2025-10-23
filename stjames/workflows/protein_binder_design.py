@@ -111,6 +111,7 @@ class BoltzGenSettings(Base):
 
     protocol: BoltzGenProtocol = BoltzGenProtocol.PROTEIN_ANYTHING
     num_designs: int = 100
+    budget: int = 20
     binding_residues: dict[int, str] = {}
 
 
