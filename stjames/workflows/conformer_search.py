@@ -382,6 +382,9 @@ class ConformerSearchWorkflow(ConformerSearchMixin, SMILESWorkflow, MoleculeWork
     """
     ConformerSearch Workflow.
 
+    This workflow supports both SMILES and 3D molecular input. Some conformer generation settings
+    support both methods; others (like CREST) require 3D information. Only one should be supplied.
+
     Inherited:
     :param initial_molecule: Molecule of interest
     :param initial_smiles: SMILES of the molecule of interest
