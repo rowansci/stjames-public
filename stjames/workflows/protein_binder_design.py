@@ -1,8 +1,10 @@
 """Protein-binder-design workflow."""
 
-from typing import TypeAlias
+from typing import Annotated, TypeAlias
 
-from ..base import Base, LowercaseStrEnum
+from pydantic import AfterValidator
+
+from ..base import Base, LowercaseStrEnum, round_optional_float
 from ..types import UUID
 from .protein_cofolding import AffinityScore, Token
 from .workflow import FASTAWorkflow
@@ -35,28 +37,30 @@ class ProteinBinderScores(Base):
     :param num_tokens: sequence length / token count
     """
 
-    quality_score: float | None = None
+    quality_score: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
     num_filters_passed: int | None = None
 
-    iptm: float | None = None
-    design_ptm: float | None = None
-    min_interaction_pae: float | None = None
+    iptm: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    design_ptm: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    min_design_to_target_pae: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    design_to_target_iptm: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    min_interaction_pae: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
 
-    bb_rmsd: float | None = None
-    delta_sasa_refolded: float | None = None
+    bb_rmsd: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    delta_sasa_refolded: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
 
     plip_hbonds_refolded: int | None = None
     plip_saltbridge_refolded: int | None = None
 
-    liability_score: float | None = None
+    liability_score: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
     liability_high_severity_violations: int | None = None
     liability_num_violations: int | None = None
 
-    helix: float | None = None
-    sheet: float | None = None
-    loop: float | None = None
-    design_largest_hydrophobic_patch_refolded: float | None = None
-    design_hydrophobicity: float | None = None
+    helix: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    sheet: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    loop: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    design_largest_hydrophobic_patch_refolded: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    design_hydrophobicity: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
     num_tokens: int | None = None
 
 
