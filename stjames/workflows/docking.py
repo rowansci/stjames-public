@@ -56,6 +56,13 @@ class VinaSettings(DockingSettings):
     scoring_function: Literal["vinardo", "vina"] = "vinardo"
     exhaustiveness: int = 8
 
+    @model_validator(mode="after")
+    def check_executable_scoring_function(self) -> Self:
+        """Check if the combination of exectuable and scoring function is supported."""
+        if (self.executable == "qvina2") and (self.scoring_function == "vinardo"):
+            raise ValueError("qvina2 does not implement the vinardo scoring function!")
+        return self
+
 
 class DockingWorkflow(MoleculeWorkflow):
     """
