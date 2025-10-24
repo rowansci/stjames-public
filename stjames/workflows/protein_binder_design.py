@@ -1,6 +1,7 @@
 """Protein-binder-design workflow."""
 
-from typing import Annotated, Literal, TypeAlias
+from enum import Enum
+from typing import Annotated, TypeAlias
 
 from pydantic import AfterValidator
 
@@ -99,6 +100,13 @@ class BoltzGenBindingType(Base):
     not_binding: str | None = None
 
 
+class BoltzGenSecondaryStructureOptions(str, Enum):
+    UNSPECIFIED = "UNSPECIFIED"
+    LOOP = "LOOP"
+    HELIX = "HELIX"
+    SHEET = "SHEET"
+
+
 class BoltzGenDesignInsertion(Base):
     """
     Represents an insertion site for protein design in a specific chain.
@@ -113,7 +121,7 @@ class BoltzGenDesignInsertion(Base):
     chain_id: str
     residue_index: int
     number_of_residues: str
-    secondary_structure: Literal["UNSPECIFIED", "LOOP", "HELIX", "SHEET"] | None = None
+    secondary_structure: BoltzGenSecondaryStructureOptions | None = None
 
 
 class BoltzGenFileEntity(Base):
