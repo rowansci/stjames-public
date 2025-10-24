@@ -1,6 +1,6 @@
 """Docking workflow."""
 
-from typing import Annotated, Self, TypeAlias
+from typing import Annotated, Literal, Self, TypeAlias
 
 from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
 
@@ -46,10 +46,14 @@ class VinaSettings(DockingSettings):
     """
     Controls how AutoDock Vina is run.
 
+    :param executable: which Vina implementation is run.
+    :param scoring_function: which scoring function is employed.
     :param exhaustiveness: how many times Vina attempts to find a pose.
         8 is typical, 32 is considered relatively careful.
     """
 
+    executable: Literal["qvina2", "vina"] = "vina"
+    scoring_function: Literal["vinardo", "vina"] = "vinardo"
     exhaustiveness: int = 8
 
 
