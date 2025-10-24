@@ -512,7 +512,7 @@ def add_atom_to_polymer(atom: dict[str, Any], aniso: dict[int, Any], model: dict
     try:
         model["polymer"][mol_id]["residues"][res_id]["atoms"][int(atom["id"])] = atom_dict_to_atom_dict(atom, aniso)
     except Exception:
-        name = atom["auth_comp_id"]
+        name = atom.get("auth_comp_id") or atom.get("label_comp_id") or "UNKNOWN"
         try:
             model["polymer"][mol_id]["residues"][res_id] = {
                 "name": name,
@@ -553,7 +553,7 @@ def add_atom_to_non_polymer(atom: dict[str, Any], aniso: dict[int, Any], model: 
     try:
         model[mol_type][mol_id]["atoms"][int(atom["id"])] = atom_dict_to_atom_dict(atom, aniso)
     except Exception:
-        name = atom["auth_comp_id"]
+        name = atom.get("auth_comp_id") or atom.get("label_comp_id") or "UNKNOWN"
         model[mol_type][mol_id] = {
             "name": name,
             "full_name": names.get(name).upper() if names.get(name) is not None and names.get(name).lower() != "water" else None,  # type: ignore [union-attr]
