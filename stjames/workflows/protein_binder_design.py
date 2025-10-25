@@ -254,7 +254,7 @@ class ProteinBinderDesignResult(Base):
     :param scores: the scores for the generated structure
     """
 
-    sequence: str | None = None
+    binder_sequence: str | None = None
     bound_structure: ProteinUUID | None = None
     scores: BoltzGenScores | None = None
 
