@@ -1,6 +1,6 @@
 [project]
 name = "stjames"
-version = "0.0.116"
+version = "0.0.117"
 description = "standardized JSON atom/molecule encoding scheme"
 readme = "README.md"
 requires-python = ">=3.11"

@@ -21,6 +21,7 @@ from .multistage_opt import *
 from .nmr import *
 from .pka import *
 from .pose_analysis_md import *
+from .protein_binder_design import *
 from .protein_cofolding import *
 from .redox_potential import *
 from .scan import *
@@ -51,6 +52,7 @@ WORKFLOW_NAME = Literal[
     "pka",
     "pose_analysis_md",
     "protein_cofolding",
+    "protein_binder_design",
     "redox_potential",
     "scan",
     "solubility",
@@ -80,6 +82,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "pka": pKaWorkflow,  # type: ignore [dict-item]
     "pose_analysis_md": PoseAnalysisMolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "protein_cofolding": ProteinCofoldingWorkflow,  # type: ignore [dict-item]
+    "protein_binder_design": ProteinBinderDesignWorkflow,  # type: ignore [dict-item]
     "redox_potential": RedoxPotentialWorkflow,  # type: ignore [dict-item]
     "scan": ScanWorkflow,  # type: ignore [dict-item]
     "solubility": SolubilityWorkflow,  # type: ignore [dict-item]
