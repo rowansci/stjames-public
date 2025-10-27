@@ -27,10 +27,12 @@ class FASTAWorkflow(Workflow):
     Base class for Workflows that operate on protein sequences and SMILES.
 
     :param initial_protein_sequences: protein sequences of interest
+    :param cyclic: Whether the protein is cyclic (True/False). Optional.
     :param initial_smiles_list: SMILES strings of interest
     """
 
     initial_protein_sequences: list[str]
+    cyclic: bool | None = None
     initial_smiles_list: list[str] | None = None
     ligand_binding_affinity_index: int | None = None
 
