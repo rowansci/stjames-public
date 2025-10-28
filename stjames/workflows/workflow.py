@@ -22,22 +22,38 @@ class Workflow(Base):
         return repr(self)
 
 
+class ProteinSequence(Base):
+    """
+    Protein sequence metadata including cyclic flag.
+
+    :param sequence: amino-acid sequence string
+    :param cyclic: whether this sequence forms a cyclic peptide (defaults to False)
+    """
+
+    sequence: str
+    cyclic: bool = False
+
+
 class FASTAWorkflow(Workflow):
     """
     Base class for Workflows that operate on protein sequences and SMILES.
 
-    :param initial_protein_sequences: protein sequences of interest
-    :param cyclic: Whether the protein is cyclic (True/False). Optional.
+    :param initial_protein_sequences: proteins to evaluate, either plain sequence strings or ProteinSequence objects with cyclic flags
     :param initial_smiles_list: SMILES strings of interest
+    :param ligand_binding_affinity_index: optional index selecting which ligand affinity to evaluate
     """
 
-    initial_protein_sequences: list[str]
-    cyclic: bool | None = None
+    initial_protein_sequences: list[ProteinSequence] | list[str]
     initial_smiles_list: list[str] | None = None
     ligand_binding_affinity_index: int | None = None
 
     def __repr__(self) -> str:
-        return f"<{type(self).__name__} {self.initial_protein_sequences} {self.initial_smiles_list}>"
+        seqs_source = self.initial_protein_sequences
+        if seqs_source and isinstance(seqs_source[0], ProteinSequence):
+            seqs = [protein.sequence for protein in seqs_source]
+        else:
+            seqs = seqs_source
+        return f"<{type(self).__name__} {seqs} {self.initial_smiles_list}>"
 
 
 class SMILESWorkflow(Workflow):
