@@ -1,8 +1,8 @@
 """High-throughput docking workflow."""
 
-from typing import Annotated, Self
+from typing import Annotated
 
-from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
+from pydantic import AfterValidator, ConfigDict, field_validator
 
 from ..pdb import PDB
 from ..types import UUID, Vector3D, round_list
@@ -22,8 +22,7 @@ class BatchDockingWorkflow(BatchSMILESWorkflow):
     :param smiles_list: list of SMILES
 
     New:
-    :param target: PDB of the protein.
-    :param target_uuid: UUID of the protein.
+    :param target: PDB of the protein, or the UUID of the protein.
     :param pocket: center (x, y, z) and size (x, y, z) of the pocket
     :param docking_settings: how to run each docking calculation
 
@@ -33,19 +32,11 @@ class BatchDockingWorkflow(BatchSMILESWorkflow):
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
 
-    target: PDB | None = None
-    target_uuid: UUID | None = None
+    target: PDB | UUID
     pocket: tuple[Vector3D, Vector3D]
 
     docking_settings: VinaSettings = VinaSettings()
-    best_scores: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
-
-    @model_validator(mode="after")
-    def check_protein(self) -> Self:
-        """Check if protein is provided."""
-        if not self.target and not self.target_uuid:
-            raise ValueError("Must provide either target or target_uuid")
-        return self
+    best_scores: Annotated[list[float | None], AfterValidator(round_list(3))] = []
 
     @field_validator("pocket", mode="after")
     def validate_pocket(cls, pocket: tuple[Vector3D, Vector3D]) -> tuple[Vector3D, Vector3D]:
