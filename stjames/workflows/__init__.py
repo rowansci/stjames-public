@@ -4,6 +4,7 @@ from typing import Literal
 
 from .admet import *
 from .basic_calculation import *
+from .batch_docking import *
 from .bde import *
 from .conformer import *
 from .conformer_search import *
@@ -33,6 +34,7 @@ from .workflow import *
 WORKFLOW_NAME = Literal[
     "admet",
     "basic_calculation",
+    "batch_docking",
     "bde",
     "conformers",
     "conformer_search",
@@ -62,6 +64,7 @@ WORKFLOW_NAME = Literal[
 WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "admet": ADMETWorkflow,  # type: ignore [dict-item]
     "basic_calculation": BasicCalculationWorkflow,  # type: ignore [dict-item]
+    "batch_docking": BatchDockingWorkflow,  # type: ignore [dict-item]
     "bde": BDEWorkflow,  # type: ignore [dict-item]
     "conformers": ConformerWorkflow,  # type: ignore [dict-item]
     "conformer_search": ConformerSearchWorkflow,  # type: ignore [dict-item]
