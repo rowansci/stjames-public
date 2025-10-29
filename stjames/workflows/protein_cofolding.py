@@ -1,4 +1,4 @@
-"""Protein cofolding Workflow."""
+"""Protein cofolding workflow."""
 
 from typing import Annotated, Literal, TypeAlias
 
@@ -26,6 +26,7 @@ class Token(BaseModel):
     input_type: Literal["ligand", "protein"]
     input_index: int
     token_index: int
+    atom_name: str | None = None
 
 
 class ContactConstraint(BaseModel):

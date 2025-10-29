@@ -5,7 +5,7 @@ from pydantic import AfterValidator, PositiveFloat, PositiveInt, model_validator
 from ..base import Base, round_float
 from ..pdb import PDB
 from ..types import UUID, round_list
-from .workflow import MoleculeWorkflow
+from .workflow import SMILESWorkflow
 
 
 class BindingPoseContact(Base):
@@ -36,7 +36,7 @@ class BindingPoseTrajectory(Base):
     contacts: list[BindingPoseContact] = []
 
 
-class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
+class PoseAnalysisMolecularDynamicsWorkflow(SMILESWorkflow):
     """
     Pose analysis molecular dynamics workflow.
 
@@ -45,12 +45,13 @@ class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
     If, for whatever reason, the workflow is initialized with both a `target_uuid` and a `target`, the UUID will be ignored.
 
     Inherited:
-    :param initial_molecule: Molecule of interest
+    :param initial_smiles: ligand's SMILES
     :param mode: Mode for workflow (currently unused)
 
     New:
     :param protein: PDB of the protein.
     :param protein_uuid: UUID of the protein.
+    :param ligand_residue_name: ligand's residue name
     :param num_trajectories: how many trajectories to run
     :param equilibration_time_ns: how long to equilibrate trajectories for, in nanoseconds
     :param simulation_time_ns: how long to run trajectories for, in nanoseconds
@@ -73,9 +74,10 @@ class PoseAnalysisMolecularDynamicsWorkflow(MoleculeWorkflow):
 
     protein: PDB | None = None
     protein_uuid: UUID | None = None
+    ligand_residue_name: str = "LIG"
 
-    num_trajectories: PositiveInt = 4
-    equilibration_time_ns: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 5
+    num_trajectories: PositiveInt = 1
+    equilibration_time_ns: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 1
     simulation_time_ns: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 10
 
     temperature: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 300
