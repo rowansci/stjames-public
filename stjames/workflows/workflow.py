@@ -49,15 +49,6 @@ class FASTAWorkflow(Workflow):
     initial_smiles_list: list[str] | None = None
     ligand_binding_affinity_index: int | None = None
 
-    def __repr__(self) -> str:
-        seqs_source = self.initial_protein_sequences
-        if seqs_source and isinstance(seqs_source[0], ProteinSequence):
-            protein_sequences = cast(list[ProteinSequence], seqs_source)
-            seqs = [protein.sequence for protein in protein_sequences]
-        else:
-            seqs = cast(list[str], seqs_source)
-        return f"<{type(self).__name__} {seqs} {self.initial_smiles_list}>"
-
 
 class SMILESWorkflow(Workflow):
     """
