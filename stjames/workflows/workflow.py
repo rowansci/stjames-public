@@ -1,7 +1,5 @@
 """Base classes for workflows."""
 
-from typing import cast
-
 from pydantic import field_validator
 
 from ..base import Base
