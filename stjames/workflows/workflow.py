@@ -61,6 +61,16 @@ class SMILESWorkflow(Workflow):
         return f"<{type(self).__name__} {self.initial_smiles}>"
 
 
+class BatchSMILESWorkflow(Workflow):
+    """
+    Base class for Workflows that operate on a list of SMILES strings.
+
+    :param smiles_list: SMILES strings of interest
+    """
+
+    smiles_list: list[str]
+
+
 class MoleculeWorkflow(Workflow):
     """
     Base class for Workflows that operate on a single molecule.
