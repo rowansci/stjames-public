@@ -1,5 +1,7 @@
 """Base classes for workflows."""
 
+from typing import cast
+
 from pydantic import field_validator
 
 from ..base import Base
@@ -50,9 +52,10 @@ class FASTAWorkflow(Workflow):
     def __repr__(self) -> str:
         seqs_source = self.initial_protein_sequences
         if seqs_source and isinstance(seqs_source[0], ProteinSequence):
-            seqs = [protein.sequence for protein in seqs_source]
+            protein_sequences = cast(list[ProteinSequence], seqs_source)
+            seqs = [protein.sequence for protein in protein_sequences]
         else:
-            seqs = seqs_source
+            seqs = cast(list[str], seqs_source)
         return f"<{type(self).__name__} {seqs} {self.initial_smiles_list}>"
 
 
