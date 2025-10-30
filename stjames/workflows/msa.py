@@ -2,14 +2,14 @@ from ..base import LowercaseStrEnum
 from .workflow import ProteinSequenceWorkflow
 
 
-class MsaFormat(LowercaseStrEnum):
+class MSAFormat(LowercaseStrEnum):
     """Format of the MSA."""
 
     COLABFOLD_DEFAULT = "colabfold_default"
     AF3_JSON = "af3_json"
 
 
-class MsaWorkflow(ProteinSequenceWorkflow):
+class MSAWorkflow(ProteinSequenceWorkflow):
     """
     Workflow for generating a MSA from protein sequences.
 
@@ -19,6 +19,14 @@ class MsaWorkflow(ProteinSequenceWorkflow):
     New:
     :param format: the format of the MSA return files
 
+    Results:
+    :param a3m_file: the A3M file
+    :param m8_file: the M8 file
+    :param af3_json_file: the AF3 JSON file
+
     """
 
-    format: MsaFormat = MsaFormat.COLABFOLD_DEFAULT
+    format: MSAFormat = MSAFormat.COLABFOLD_DEFAULT
+    a3m_file: str | None = None
+    m8_file: str | None = None
+    af3_json_file: str | None = None

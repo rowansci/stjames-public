@@ -83,7 +83,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "macropka": MacropKaWorkflow,  # type: ignore [dict-item]
     "molecular_dynamics": MolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "multistage_opt": MultiStageOptWorkflow,  # type: ignore [dict-item]
-    "msa": MsaWorkflow,  # type: ignore [dict-item]
+    "msa": MSAWorkflow,  # type: ignore [dict-item]
     "nmr": NMRSpectroscopyWorkflow,  # type: ignore [dict-item]
     "pka": pKaWorkflow,  # type: ignore [dict-item]
     "pose_analysis_md": PoseAnalysisMolecularDynamicsWorkflow,  # type: ignore [dict-item]
