@@ -18,6 +18,7 @@ from .ion_mobility import *
 from .irc import *
 from .macropka import *
 from .molecular_dynamics import *
+from .msa import *
 from .multistage_opt import *
 from .nmr import *
 from .pka import *
@@ -49,6 +50,7 @@ WORKFLOW_NAME = Literal[
     "irc",
     "macropka",
     "molecular_dynamics",
+    "msa",
     "multistage_opt",
     "nmr",
     "pka",
@@ -81,6 +83,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "macropka": MacropKaWorkflow,  # type: ignore [dict-item]
     "molecular_dynamics": MolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "multistage_opt": MultiStageOptWorkflow,  # type: ignore [dict-item]
+    "msa": MSAWorkflow,  # type: ignore [dict-item]
     "nmr": NMRSpectroscopyWorkflow,  # type: ignore [dict-item]
     "pka": pKaWorkflow,  # type: ignore [dict-item]
     "pose_analysis_md": PoseAnalysisMolecularDynamicsWorkflow,  # type: ignore [dict-item]
