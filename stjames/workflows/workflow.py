@@ -55,8 +55,7 @@ class FASTAWorkflow(Workflow):
 
         if not any(seq for seq in sequence_lists if seq):
             raise ValueError(
-                "Provide at least one of `initial_protein_sequences`, `initial_dna_sequences`, "
-                "or `initial_rna_sequences`.",
+                "Provide at least one of `initial_protein_sequences`, `initial_dna_sequences`, or `initial_rna_sequences`.",
             )
 
         return values
