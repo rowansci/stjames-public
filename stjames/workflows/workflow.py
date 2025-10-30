@@ -95,6 +95,16 @@ class MoleculeWorkflow(Workflow):
         return mode
 
 
+class ProteinSequenceWorkflow(Workflow):
+    """
+    Base class for Workflows that operate on protein sequences.
+
+    :param initial_protein_sequences: protein sequences of interest
+    """
+
+    initial_protein_sequences: list[str]
+
+
 class DBCalculation(Base):
     """Encodes a calculation that's in the database. This isn't terribly useful by itself."""
 
