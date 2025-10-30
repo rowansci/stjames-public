@@ -44,13 +44,14 @@ class FASTAWorkflow(Workflow):
     ligand_binding_affinity_index: int | None = None
 
     @model_validator(mode="after")
-    def _require_sequence(cls, values: "FASTAWorkflow") -> "FASTAWorkflow":
+    @classmethod
+    def _require_sequence(cls, model: "FASTAWorkflow") -> "FASTAWorkflow":
         """Ensure at least one biological sequence list is populated."""
 
         sequence_lists = (
-            values.initial_protein_sequences,
-            values.initial_dna_sequences,
-            values.initial_rna_sequences,
+            model.initial_protein_sequences,
+            model.initial_dna_sequences,
+            model.initial_rna_sequences,
         )
 
         if not any(seq for seq in sequence_lists if seq):
@@ -58,7 +59,7 @@ class FASTAWorkflow(Workflow):
                 "Provide at least one of `initial_protein_sequences`, `initial_dna_sequences`, or `initial_rna_sequences`.",
             )
 
-        return values
+        return model
 
 
 class SMILESWorkflow(Workflow):
