@@ -20,10 +20,9 @@ class MSAWorkflow(ProteinSequenceWorkflow):
     :param format: the format of the MSA return files
 
     Results:
-    :param a3m_file: the A3M file
-    :param m8_file: the M8 file
-    :param af3_json_file: the AF3 JSON file
-
+    :param a3m_file: A3M file string
+    :param m8_file: M8 file string
+    :param af3_json_file: AF3 JSON file string
     """
 
     format: MSAFormat = MSAFormat.COLABFOLD_DEFAULT
