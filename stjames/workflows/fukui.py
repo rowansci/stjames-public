@@ -36,9 +36,13 @@ class FukuiIndexWorkflow(MoleculeWorkflow):
     """
 
     opt_settings: Settings | None = None
+
+    # DEPRECATED - will be removed
     opt_engine: Engine | None = None
 
     fukui_settings: Settings = Settings(method=Method.GFN1_XTB)
+
+    # DEPRECATED - will be removed
     fukui_engine: Engine = None  # type: ignore [assignment]
 
     optimization: UUID | None = None
@@ -52,7 +56,6 @@ class FukuiIndexWorkflow(MoleculeWorkflow):
     def set_engines(self) -> Self:
         """Set the engines for optimization and Fukui index calculations."""
         if self.opt_settings is not None and self.opt_engine is None:
-            self.opt_engine = self.opt_settings.method.default_engine()
-        self.fukui_engine = self.fukui_engine or self.fukui_settings.method.default_engine()
-
+            self.opt_engine = self.opt_settings.engine
+        self.fukui_engine = self.fukui_engine or self.fukui_settings.engine
         return self
