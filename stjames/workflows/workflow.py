@@ -1,12 +1,15 @@
 """Base classes for workflows."""
 
-from pydantic import field_validator
+from pydantic import field_validator, model_validator
 
 from ..base import Base
 from ..message import Message
 from ..mode import Mode
 from ..molecule import Molecule
 from ..types import UUID
+from .dna import DNASequence
+from .protein import ProteinSequence
+from .rna import RNASequence
 
 
 class Workflow(Base):
@@ -22,30 +25,41 @@ class Workflow(Base):
         return repr(self)
 
 
-class ProteinSequence(Base):
-    """
-    Protein sequence metadata including cyclic flag.
-
-    :param sequence: amino-acid sequence string
-    :param cyclic: whether this sequence forms a cyclic peptide (defaults to False)
-    """
-
-    sequence: str
-    cyclic: bool = False
-
-
 class FASTAWorkflow(Workflow):
     """
-    Base class for Workflows that operate on protein sequences and SMILES.
+    Base class for Workflows that operate on biological sequences and SMILES.
 
-    :param initial_protein_sequences: proteins to evaluate, either plain sequence strings or ProteinSequence objects with cyclic flags
+    :param initial_protein_sequences: protein sequences to evaluate, either plain sequence strings or ProteinSequence objects with metadata (optional)
+    :param initial_dna_sequences: DNA sequences to evaluate, either plain sequence strings or DNASequence objects with metadata (optional)
+    :param initial_rna_sequences: RNA sequences to evaluate, either plain sequence strings or RNASequence objects with metadata (optional)
     :param initial_smiles_list: SMILES strings of interest
     :param ligand_binding_affinity_index: optional index selecting which ligand affinity to evaluate
+    :raises ValueError: if none of the sequence lists are provided
     """
 
-    initial_protein_sequences: list[ProteinSequence] | list[str]
+    initial_protein_sequences: list[ProteinSequence | str] | None = None
+    initial_dna_sequences: list[DNASequence | str] | None = None
+    initial_rna_sequences: list[RNASequence | str] | None = None
     initial_smiles_list: list[str] | None = None
     ligand_binding_affinity_index: int | None = None
+
+    @model_validator(mode="after")
+    def _require_sequence(cls, values: "FASTAWorkflow") -> "FASTAWorkflow":
+        """Ensure at least one biological sequence list is populated."""
+
+        sequence_lists = (
+            values.initial_protein_sequences,
+            values.initial_dna_sequences,
+            values.initial_rna_sequences,
+        )
+
+        if not any(seq for seq in sequence_lists if seq):
+            raise ValueError(
+                "Provide at least one of `initial_protein_sequences`, `initial_dna_sequences`, "
+                "or `initial_rna_sequences`.",
+            )
+
+        return values
 
 
 class SMILESWorkflow(Workflow):
@@ -99,7 +113,7 @@ class ProteinSequenceWorkflow(Workflow):
     """
     Base class for Workflows that operate on protein sequences.
 
-    :param initial_protein_sequences: protein sequences of interest
+    :param protein_sequences: protein sequences of interest
     """
 
     protein_sequences: list[str]
