@@ -15,9 +15,6 @@ class MSAWorkflow(ProteinSequenceWorkflow):
 
     Inherited:
     :param initial_protein_sequences: protein sequences of interest
-    :param initial_dna_sequences: DNA sequences of interest
-    :param initial_rna_sequences: RNA sequences of interest
-    :raises ValueError: if none of the sequence lists are provided.
 
     New:
     :param format: the format of the MSA return files

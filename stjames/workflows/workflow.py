@@ -109,10 +109,10 @@ class ProteinSequenceWorkflow(Workflow):
     """
     Base class for Workflows that operate on protein sequences.
 
-    :param protein_sequences: protein sequences of interest
+    :param initial_protein_sequences: protein sequences to evaluate, either plain sequence strings or ProteinSequence objects with metadata
     """
 
-    protein_sequences: list[str]
+    initial_protein_sequences: list[ProteinSequence] | list[str] = []
 
 
 class DBCalculation(Base):
