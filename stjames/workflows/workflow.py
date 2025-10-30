@@ -1,6 +1,8 @@
 """Base classes for workflows."""
 
-from pydantic import field_validator, model_validator
+from typing import Any
+
+from pydantic import field_validator
 
 from ..base import Base
 from ..message import Message
@@ -43,23 +45,17 @@ class FASTAWorkflow(Workflow):
     initial_smiles_list: list[str] | None = None
     ligand_binding_affinity_index: int | None = None
 
-    @model_validator(mode="after")
-    @classmethod
-    def _require_sequence(cls, model: "FASTAWorkflow") -> "FASTAWorkflow":
-        """Ensure at least one biological sequence list is populated."""
-
+    def model_post_init(self, __context: Any) -> None:
         sequence_lists = (
-            model.initial_protein_sequences,
-            model.initial_dna_sequences,
-            model.initial_rna_sequences,
+            self.initial_protein_sequences,
+            self.initial_dna_sequences,
+            self.initial_rna_sequences,
         )
 
         if not any(seq for seq in sequence_lists if seq):
             raise ValueError(
                 "Provide at least one of `initial_protein_sequences`, `initial_dna_sequences`, or `initial_rna_sequences`.",
             )
-
-        return model
 
 
 class SMILESWorkflow(Workflow):
