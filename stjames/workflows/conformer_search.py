@@ -3,9 +3,9 @@
 from abc import ABC
 from typing import Annotated, Literal, Self, Sequence, TypeVar
 
-from pydantic import AfterValidator, BaseModel, Field, field_validator, model_validator
+from pydantic import AfterValidator, BaseModel, Field, PositiveInt, field_validator, model_validator
 
-from ..base import LowercaseStrEnum
+from ..base import Base, LowercaseStrEnum
 from ..constraint import Constraint
 from ..method import Method, XTBMethod
 from ..mode import Mode
@@ -39,6 +39,28 @@ class ScreeningSettings(BaseModel):
     rotational_constants_threshold: float | None = 0.02
     rmsd: float | None = 0.25
     max_confs: int | None = None
+
+
+class ConformerClusteringSettings(Base):
+    """
+    Settings for (optionally) clustering conformers based on three-dimensional properties.
+
+    The properties used for clustering are:
+    - Solvent-accessible surface area
+    - Polar solvent-accessible surface area
+    - Radius of gyration
+    - Plane of best fit
+    - Normalized principal moment ratios 1 and 2
+
+    Rowan uses k-means clustering to identify representative conformers.
+    This loosely follows Wilcken and co-workers (10.1007/s10822-020-00337-7).
+
+    :param num_clusters: the number of clusters to include
+    :param conformers_per_cluster: the number of compounds to pick from each cluster
+    """
+
+    num_clusters: PositiveInt = 5
+    conformers_per_cluster: PositiveInt = 3
 
 
 class ConformerGenSettings(BaseModel):
@@ -309,6 +331,8 @@ class ConformerGenMixin(BaseModel):
     constraints: Sequence[Constraint] = tuple()
     nci: bool = False
     max_confs: int | None = None
+
+    conformer_clustering_settings: ConformerClusteringSettings | None = None
 
     @model_validator(mode="after")
     def validate_and_build_conf_gen_settings(self) -> Self:
