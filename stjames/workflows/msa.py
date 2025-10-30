@@ -14,9 +14,9 @@ class MSAWorkflow(ProteinSequenceWorkflow):
     Workflow for generating a MSA from protein sequences.
 
     Inherited:
-    :param initial_protein_sequences: protein sequences of interest (optional)
-    :param initial_dna_sequences: DNA sequences of interest (optional)
-    :param initial_rna_sequences: RNA sequences of interest (optional)
+    :param initial_protein_sequences: protein sequences of interest
+    :param initial_dna_sequences: DNA sequences of interest
+    :param initial_rna_sequences: RNA sequences of interest
     :raises ValueError: if none of the sequence lists are provided.
 
     New:

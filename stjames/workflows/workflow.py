@@ -31,18 +31,18 @@ class FASTAWorkflow(Workflow):
     """
     Base class for Workflows that operate on biological sequences and SMILES.
 
-    :param initial_protein_sequences: protein sequences to evaluate, either plain sequence strings or ProteinSequence objects with metadata (optional)
-    :param initial_dna_sequences: DNA sequences to evaluate, either plain sequence strings or DNASequence objects with metadata (optional)
-    :param initial_rna_sequences: RNA sequences to evaluate, either plain sequence strings or RNASequence objects with metadata (optional)
+    :param initial_protein_sequences: protein sequences to evaluate, either plain sequence strings or ProteinSequence objects with metadata
+    :param initial_dna_sequences: DNA sequences to evaluate, either plain sequence strings or DNASequence objects with metadata
+    :param initial_rna_sequences: RNA sequences to evaluate, either plain sequence strings or RNASequence objects with metadata
     :param initial_smiles_list: SMILES strings of interest
     :param ligand_binding_affinity_index: optional index selecting which ligand affinity to evaluate
     :raises ValueError: if none of the sequence lists are provided
     """
 
-    initial_protein_sequences: list[ProteinSequence | str] | None = None
-    initial_dna_sequences: list[DNASequence | str] | None = None
-    initial_rna_sequences: list[RNASequence | str] | None = None
-    initial_smiles_list: list[str] | None = None
+    initial_protein_sequences: list[ProteinSequence] | list[str] = []
+    initial_dna_sequences: list[DNASequence] = []
+    initial_rna_sequences: list[RNASequence] = []
+    initial_smiles_list: list[str] = []
     ligand_binding_affinity_index: int | None = None
 
     def model_post_init(self, __context: Any) -> None:
