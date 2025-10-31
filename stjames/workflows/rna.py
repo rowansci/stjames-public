@@ -7,7 +7,7 @@ class RNASequence(Base):
     """
     RNA sequence metadata.
 
-    :param sequence: nucleotide sequence string
+    :param sequence: nucleotide string
     """
 
     sequence: str

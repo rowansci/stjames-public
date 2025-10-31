@@ -46,13 +46,7 @@ class FASTAWorkflow(Workflow):
     ligand_binding_affinity_index: int | None = None
 
     def model_post_init(self, __context: Any) -> None:
-        sequence_lists = (
-            self.initial_protein_sequences,
-            self.initial_dna_sequences,
-            self.initial_rna_sequences,
-        )
-
-        if not any(seq for seq in sequence_lists if seq):
+        if not (self.initial_protein_sequences or self.initial_dna_sequences or self.initial_rna_sequences):
             raise ValueError(
                 "Provide at least one of `initial_protein_sequences`, `initial_dna_sequences`, or `initial_rna_sequences`.",
             )
