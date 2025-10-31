@@ -3,9 +3,9 @@
 from abc import ABC
 from typing import Annotated, Literal, Self, Sequence, TypeVar
 
-from pydantic import AfterValidator, BaseModel, Field, field_validator, model_validator
+from pydantic import AfterValidator, BaseModel, Field, PositiveInt, field_validator, model_validator
 
-from ..base import LowercaseStrEnum
+from ..base import Base, LowercaseStrEnum
 from ..constraint import Constraint
 from ..method import Method, XTBMethod
 from ..mode import Mode
@@ -39,6 +39,50 @@ class ScreeningSettings(BaseModel):
     rotational_constants_threshold: float | None = 0.02
     rmsd: float | None = 0.25
     max_confs: int | None = None
+
+
+class ConformerClusteringDescriptor(LowercaseStrEnum):
+    """
+    Potential descriptors to employ in conformer clustering.
+    """
+
+    SOLVENT_ACCESSIBLE_SURFACE_AREA = "solvent_accessible_surface_area"
+    POLAR_SOLVENT_ACCESSIBLE_SURACE_AREA = "polar_solvent_accessible_surface_area"
+    RADIUS_OF_GYRATION = "radius_of_gyration"
+    PLANE_OF_BEST_FIT = "plane_of_best_fit"
+    NORMALIZED_PRINCIPAL_MOMENT_RATIO_1 = "normalized_principal_moment_ratio_1"
+    NORMALIZED_PRINCIPAL_MOMENT_RATIO_2 = "normalized_principal_moment_ratio_2"
+
+
+class ConformerClusteringSettings(Base):
+    """
+    Settings for clustering conformers based on their three-dimensional properties.
+
+    The properties used for clustering by default are:
+    - Solvent-accessible surface area
+    - Polar solvent-accessible surface area
+    - Radius of gyration
+    - Plane of best fit
+    - Normalized principal moment ratios 1 and 2
+
+    Rowan uses k-means clustering to identify representative conformers.
+    This loosely follows Wilcken and co-workers (10.1007/s10822-020-00337-7).
+
+    :param num_clusters: the number of clusters to include
+    :param conformers_per_cluster: the number of compounds to pick from each cluster
+    """
+
+    descriptors: list[ConformerClusteringDescriptor] = [
+        ConformerClusteringDescriptor.SOLVENT_ACCESSIBLE_SURFACE_AREA,
+        ConformerClusteringDescriptor.POLAR_SOLVENT_ACCESSIBLE_SURACE_AREA,
+        ConformerClusteringDescriptor.RADIUS_OF_GYRATION,
+        ConformerClusteringDescriptor.PLANE_OF_BEST_FIT,
+        ConformerClusteringDescriptor.NORMALIZED_PRINCIPAL_MOMENT_RATIO_1,
+        ConformerClusteringDescriptor.NORMALIZED_PRINCIPAL_MOMENT_RATIO_2,
+    ]
+
+    num_clusters: PositiveInt = 5
+    conformers_per_cluster: PositiveInt = 3
 
 
 class ConformerGenSettings(BaseModel):
@@ -302,6 +346,7 @@ class ConformerGenMixin(BaseModel):
     :param constraints: constraints to add
     :param nci: add a constraining potential for non-covalent interactions
     :param max_confs: maximum number of conformers to keep
+    :param clustering_settings: how to cluster the conformers (if at all)
     """
 
     conf_gen_mode: Mode = Mode.RAPID
@@ -309,6 +354,8 @@ class ConformerGenMixin(BaseModel):
     constraints: Sequence[Constraint] = tuple()
     nci: bool = False
     max_confs: int | None = None
+
+    conformer_clustering_settings: ConformerClusteringSettings | None = None
 
     @model_validator(mode="after")
     def validate_and_build_conf_gen_settings(self) -> Self:
