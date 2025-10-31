@@ -308,8 +308,8 @@ class LyrebirdSettings(ConformerGenSettings):
     :param mode: Mode for calculations
     :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings
-    :param constraints: constraints for conformer generation
-    :param nci: add a constraining potential for non-covalent interactions (not supported in ETKDG)
+    :param constraints: constraints for conformer generation (not supported)
+    :param nci: add a constraining potential for non-covalent interactions (not supported)
     :param max_confs: maximum number of conformers to keep
 
     New:
@@ -334,7 +334,47 @@ class LyrebirdSettings(ConformerGenSettings):
         return nci
 
 
-ConformerGenSettingsUnion = Annotated[ETKDGSettings | iMTDSettings | LyrebirdSettings, Field(discriminator="settings_type")]
+class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
+    """
+    Settings for Monte-Carlo-multiple-minimum-based conformer generation.
+    Default values recommended by Nick Casetti.
+
+    Inherited:
+    :param mode: Mode for calculations
+    :param conf_opt_method: method for the optimization
+    :param screening: post-generation screening settings
+    :param constraints: constraints for conformer generation (not supported)
+    :param nci: add a constraining potential for non-covalent interactions (not supported)
+    :param max_confs: maximum number of conformers to keep
+
+    New:
+    :param num_monte_carlo_iterations: number of Monte Carlo iterations to run
+    :param rmsd_threshold: the threshold to determine if MCMM output structures are identical
+    :param energy_window: maximum energy window above the minimum-energy conformer above which to retain (kcal/mol)
+    """
+
+    num_monte_carlo_iterations: int = 100
+    rmsd_threshold: float = 0.5
+    energy_window: float = 200.0
+
+    settings_type: Literal["monte_carlo_multiple_minimum"] = "monte_carlo_multiple_minimum"
+
+    @field_validator("constraints")
+    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:
+        if constraints:
+            raise ValueError("MCMM does not support constraints")
+
+        return tuple(constraints)
+
+    @field_validator("nci")
+    def check_nci(cls, nci: bool) -> bool:
+        if nci:
+            raise ValueError("MCMM does not support NCI")
+
+        return nci
+
+
+ConformerGenSettingsUnion = Annotated[ETKDGSettings | iMTDSettings | LyrebirdSettings | MonteCarloMultipleMinimumSettings, Field(discriminator="settings_type")]
 
 
 class ConformerGenMixin(BaseModel):
