@@ -54,7 +54,7 @@ class ConformerClusteringDescriptor(LowercaseStrEnum):
     NORMALIZED_PRINCIPAL_MOMENT_RATIO_2 = "normalized_principal_moment_ratio_2"
 
 
-class ClusteringSettings(Base):
+class ConformerClusteringSettings(Base):
     """
     Settings for clustering conformers based on their three-dimensional properties.
 
@@ -355,7 +355,7 @@ class ConformerGenMixin(BaseModel):
     nci: bool = False
     max_confs: int | None = None
 
-    conformer_clustering_settings: ClusteringSettings | None = None
+    conformer_clustering_settings: ConformerClusteringSettings | None = None
 
     @model_validator(mode="after")
     def validate_and_build_conf_gen_settings(self) -> Self:
