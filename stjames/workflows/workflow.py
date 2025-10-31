@@ -102,7 +102,7 @@ class ProteinSequenceWorkflow(Workflow):
     :param initial_protein_sequences: protein sequences of interest
     """
 
-    protein_sequences: list[str]
+    initial_protein_sequences: list[str]
 
 
 class DBCalculation(Base):
