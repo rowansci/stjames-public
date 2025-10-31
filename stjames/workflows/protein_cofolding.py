@@ -21,9 +21,9 @@ class CofoldingModel(LowercaseStrEnum):
 
 
 class Token(BaseModel):
-    """Either a atom in a ligand or a residue in a protein."""
+    """Either an atom in a ligand or a residue in a protein or nucleotide chain."""
 
-    input_type: Literal["ligand", "protein"]
+    input_type: Literal["ligand", "protein", "dna", "rna"]
     input_index: int
     token_index: int
     atom_name: str | None = None
@@ -41,7 +41,7 @@ class ContactConstraint(BaseModel):
 class PocketConstraint(BaseModel):
     """Pocket constraint to be used for prediction."""
 
-    input_type: Literal["ligand", "protein"]
+    input_type: Literal["ligand", "protein", "dna", "rna"]
     input_index: int
     contacts: list[Token]
     max_distance: float  # Angstroms
