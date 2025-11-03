@@ -5,10 +5,10 @@ from .base import Base
 
 class ProteinSequence(Base):
     """
-    Protein sequence metadata including cyclic flag.
+    Protein sequence data.
 
     :param sequence: amino-acid sequence string
-    :param cyclic: whether this sequence forms a cyclic peptide (defaults to False)
+    :param cyclic: whether this sequence forms a cyclic peptide
     """
 
     sequence: str
