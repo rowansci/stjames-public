@@ -131,9 +131,9 @@ class Molecule(Base):
         def translated(position: Vector3D) -> Vector3D:
             return tuple(q + v for q, v in zip(position, vector, strict=True))  # type: ignore [return-value]
 
-        atoms = [atom.copy(update={"position": translated(atom.position)}) for atom in self.atoms]
+        atoms = [atom.model_copy(update={"position": translated(atom.position)}) for atom in self.atoms]
 
-        return self.copy(update={"atoms": atoms})
+        return self.model_copy(update={"atoms": atoms})
 
     @property
     def atomic_numbers(self) -> list[NonNegativeInt]:
