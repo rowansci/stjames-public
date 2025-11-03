@@ -19,7 +19,7 @@ class BatchDockingWorkflow(BatchSMILESWorkflow):
     If, for whatever reason, the workflow is initialized with both a `target_uuid` and a `target`, the UUID will be ignored.
 
     Inherited:
-    :param smiles_list: list of SMILES
+    :param initial_smiles_list: list of SMILES
 
     New:
     :param target: PDB of the protein, or the UUID of the protein.

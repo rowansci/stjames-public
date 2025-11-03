@@ -1,11 +1,11 @@
-"""DNA-related workflow data models."""
+"""DNA-related data models."""
 
-from ..base import Base
+from .base import Base
 
 
 class DNASequence(Base):
     """
-    DNA sequence metadata.
+    DNA sequence data.
 
     :param sequence: nucleotide string
     """

@@ -1,11 +1,11 @@
-"""RNA-related workflow data models."""
+"""RNA-related data models."""
 
-from ..base import Base
+from .base import Base
 
 
 class RNASequence(Base):
     """
-    RNA sequence metadata.
+    RNA sequence data.
 
     :param sequence: nucleotide string
     """
