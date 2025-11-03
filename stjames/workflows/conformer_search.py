@@ -10,6 +10,7 @@ from ..constraint import Constraint
 from ..method import Method, XTBMethod
 from ..mode import Mode
 from ..molecule import Molecule
+from ..settings import Settings
 from ..types import UUID, FloatPerAtom, round_float_per_atom
 from .multistage_opt import MultiStageOptMixin
 from .workflow import MoleculeWorkflow, SMILESWorkflow
@@ -351,7 +352,10 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
     :param num_monte_carlo_iterations: number of Monte Carlo iterations to run
     :param rmsd_threshold: the threshold to determine if MCMM output structures are identical
     :param energy_window: maximum energy window above the minimum-energy conformer above which to retain (kcal/mol)
+    :param monte_carlo_settings: the way the actual energy will be computed for the Monte-Carlo steps
     """
+
+    monte_carlo_settings: Settings = Settings(method=Method.AIMNET2_WB97MD3)
 
     num_monte_carlo_iterations: int = 100
     rmsd_threshold: float = 0.5
