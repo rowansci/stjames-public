@@ -1,6 +1,6 @@
-"""Protein-related workflow data models."""
+"""Protein-related data models."""
 
-from ..base import Base
+from .base import Base
 
 
 class ProteinSequence(Base):

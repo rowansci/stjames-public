@@ -1,6 +1,6 @@
-"""DNA-related workflow data models."""
+"""DNA-related tdata models."""
 
-from ..base import Base
+from .base import Base
 
 
 class DNASequence(Base):

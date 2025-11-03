@@ -1,6 +1,6 @@
-"""RNA-related workflow data models."""
+"""RNA-related data models."""
 
-from ..base import Base
+from .base import Base
 
 
 class RNASequence(Base):

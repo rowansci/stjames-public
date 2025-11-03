@@ -5,13 +5,13 @@ from typing import Any
 from pydantic import field_validator
 
 from ..base import Base
+from ..dna import DNASequence
 from ..message import Message
 from ..mode import Mode
 from ..molecule import Molecule
+from ..protein import ProteinSequence
+from ..rna import RNASequence
 from ..types import UUID
-from .dna import DNASequence
-from .protein import ProteinSequence
-from .rna import RNASequence
 
 
 class Workflow(Base):
@@ -69,10 +69,10 @@ class BatchSMILESWorkflow(Workflow):
     """
     Base class for Workflows that operate on a list of SMILES strings.
 
-    :param smiles_list: SMILES strings of interest
+    :param initial_smiles_list: SMILES strings of interest
     """
 
-    smiles_list: list[str]
+    initial_smiles_list: list[str]
 
 
 class MoleculeWorkflow(Workflow):
