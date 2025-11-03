@@ -5,8 +5,10 @@ from .workflow import ProteinSequenceWorkflow
 class MSAFormat(LowercaseStrEnum):
     """Format of the MSA."""
 
-    COLABFOLD_DEFAULT = "colabfold_default"
-    AF3_JSON = "af3_json"
+    COLABFOLD = "colabfold"
+    CHAI = "chai"
+    ALPHAFOLD3 = "alphafold3"
+    BOLTZ = "boltz"
 
 
 class MSAWorkflow(ProteinSequenceWorkflow):
@@ -17,15 +19,7 @@ class MSAWorkflow(ProteinSequenceWorkflow):
     :param initial_protein_sequences: protein sequences of interest
 
     New:
-    :param format: the format of the MSA return files
-
-    Results:
-    :param a3m_file: A3M file string
-    :param m8_file: M8 file string
-    :param af3_json_file: AF3 JSON file string
+    :param output_formats: the formats of the MSA return files
     """
 
-    format: MSAFormat = MSAFormat.COLABFOLD_DEFAULT
-    a3m_file: str | None = None
-    m8_file: str | None = None
-    af3_json_file: str | None = None
+    output_formats: list[MSAFormat] = [MSAFormat.COLABFOLD]
