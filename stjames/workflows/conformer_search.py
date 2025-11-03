@@ -355,7 +355,7 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
     :param monte_carlo_settings: the way the actual energy will be computed for the Monte-Carlo steps
     """
 
-    monte_carlo_settings: Settings = Settings(method=Method.AIMNET2_WB97MD3)
+    energy_settings: Settings = Settings(method=Method.AIMNET2_WB97MD3)
 
     num_monte_carlo_iterations: int = 100
     rmsd_threshold: float = 0.5
