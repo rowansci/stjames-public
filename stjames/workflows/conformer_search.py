@@ -149,7 +149,7 @@ class ETKDGSettings(ConformerGenSettings):
         return tuple(constraints)
 
     @field_validator("nci")
-    def check_nci(cls, nci: bool) -> bool:
+    def check_nci(cls, nci: bool) -> Literal[False]:
         if nci:
             raise ValueError("ETKDG does not support NCI")
 
@@ -327,7 +327,7 @@ class LyrebirdSettings(ConformerGenSettings):
         return tuple(constraints)
 
     @field_validator("nci")
-    def check_nci(cls, nci: bool) -> bool:
+    def check_nci(cls, nci: bool) -> Literal[False]:
         if nci:
             raise ValueError("Lyrebird does not support NCI")
 
@@ -367,7 +367,7 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
         return tuple(constraints)
 
     @field_validator("nci")
-    def check_nci(cls, nci: bool) -> bool:
+    def check_nci(cls, nci: bool) -> Literal[False]:
         if nci:
             raise ValueError("MCMM does not support NCI")
 
