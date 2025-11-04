@@ -7,7 +7,6 @@ class MSAFormat(LowercaseStrEnum):
 
     COLABFOLD = "colabfold"
     CHAI = "chai"
-    ALPHAFOLD3 = "alphafold3"
     BOLTZ = "boltz"
 
 
