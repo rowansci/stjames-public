@@ -26,6 +26,7 @@ class Solvent(LowercaseStrEnum):
     METHANOL = "methanol"
     ETHANOL = "ethanol"
     ISOPROPANOL = "isopropanol"
+    OCTANOL = "octanol"
     DIMETHYLACETAMIDE = "dimethylacetamide"
     DIMETHYLFORMAMIDE = "dimethylformamide"
     N_METHYLPYRROLIDONE = "n_methylpyrrolidone"
