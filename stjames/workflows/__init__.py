@@ -12,6 +12,7 @@ from .descriptors import *
 from .docking import *
 from .double_ended_ts_search import DoubleEndedTSSearchWorkflow
 from .electronic_properties import *
+from .free_energy_perturbation import *
 from .fukui import *
 from .hydrogen_bond_basicity import *
 from .ion_mobility import *
@@ -44,6 +45,7 @@ WORKFLOW_NAME = Literal[
     "docking",
     "double_ended_ts_search",
     "electronic_properties",
+    "free_energy_perturbation",
     "fukui",
     "hydrogen_bond_basicity",
     "ion_mobility",
@@ -57,6 +59,7 @@ WORKFLOW_NAME = Literal[
     "pose_analysis_md",
     "protein_cofolding",
     "protein_binder_design",
+    "rbfe_graph",
     "redox_potential",
     "scan",
     "solubility",
@@ -76,6 +79,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "docking": DockingWorkflow,  # type: ignore [dict-item]
     "double_ended_ts_search": DoubleEndedTSSearchWorkflow,  # type: ignore [dict-item]
     "electronic_properties": ElectronicPropertiesWorkflow,  # type: ignore [dict-item]
+    "free_energy_perturbation": FreeEnergyPerturbationWorkflow,  # type: ignore [dict-item]
     "fukui": FukuiIndexWorkflow,  # type: ignore [dict-item]
     "hydrogen_bond_basicity": HydrogenBondBasicityWorkflow,  # type: ignore [dict-item]
     "ion_mobility": IonMobilityWorkflow,  # type: ignore [dict-item]
@@ -89,6 +93,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "pose_analysis_md": PoseAnalysisMolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "protein_cofolding": ProteinCofoldingWorkflow,  # type: ignore [dict-item]
     "protein_binder_design": ProteinBinderDesignWorkflow,  # type: ignore [dict-item]
+    "rbfe_graph": RBFEGraphWorkflow,  # type: ignore [dict-item]
     "redox_potential": RedoxPotentialWorkflow,  # type: ignore [dict-item]
     "scan": ScanWorkflow,  # type: ignore [dict-item]
     "solubility": SolubilityWorkflow,  # type: ignore [dict-item]
