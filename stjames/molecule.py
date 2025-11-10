@@ -123,7 +123,7 @@ class Molecule(Base):
         >>> mol = Molecule.from_xyz("H 0 0 0\nH 0 0 1")
         >>> print(mol.translated((1, 0, 0)).to_xyz())
         2
-        <BLANKLINE>
+        charge: 0; multiplicity: 1;
         H     1.0000000000    0.0000000000    0.0000000000
         H     1.0000000000    0.0000000000    1.0000000000
         """
@@ -131,9 +131,9 @@ class Molecule(Base):
         def translated(position: Vector3D) -> Vector3D:
             return tuple(q + v for q, v in zip(position, vector, strict=True))  # type: ignore [return-value]
 
-        atoms = [atom.copy(update={"position": translated(atom.position)}) for atom in self.atoms]
+        atoms = [atom.model_copy(update={"position": translated(atom.position)}) for atom in self.atoms]
 
-        return self.copy(update={"atoms": atoms})
+        return self.model_copy(update={"atoms": atoms})
 
     @property
     def atomic_numbers(self) -> list[NonNegativeInt]:
@@ -184,7 +184,7 @@ class Molecule(Base):
         return self
 
     @classmethod
-    def from_file(cls: type[Self], filename: Path | str, format: str | None = None, charge: int = 0, multiplicity: PositiveInt = 1) -> Self:
+    def from_file(cls: type[Self], filename: Path | str, format: str | None = None, charge: int | None = None, multiplicity: PositiveInt | None = None) -> Self:
         r"""
         Read a molecule from a file.
 
@@ -195,7 +195,7 @@ class Molecule(Base):
         ...    mol = Molecule.from_file(f.name)
         >>> print(mol.to_xyz())
         2
-        <BLANKLINE>
+        charge: 0; multiplicity: 1;
         H     0.0000000000    0.0000000000    0.0000000000
         F     0.0000000000    0.0000000000    1.0000000000
         """
@@ -213,7 +213,7 @@ class Molecule(Base):
                     raise ValueError(f"Unsupported {format=}")
 
     @classmethod
-    def from_xyz(cls: type[Self], xyz: str, charge: int = 0, multiplicity: PositiveInt = 1) -> Self:
+    def from_xyz(cls: type[Self], xyz: str, charge: int | None = None, multiplicity: PositiveInt | None = None) -> Self:
         r"""
         Generate a Molecule from an XYZ string.
 
@@ -225,38 +225,56 @@ class Molecule(Base):
         return cls.from_xyz_lines(xyz.strip().splitlines(), charge=charge, multiplicity=multiplicity)
 
     @classmethod
-    def from_xyz_lines(cls: type[Self], lines: Iterable[str], charge: int = 0, multiplicity: PositiveInt = 1) -> Self:
+    def from_xyz_lines(cls: type[Self], lines: Iterable[str], charge: int | None = None, multiplicity: PositiveInt | None = None) -> Self:
         lines = list(lines)
+        data: dict[str, Any] = {}
         if len(lines[0].split()) == 1:
-            natoms = lines[0].strip()
-            if not natoms.isdigit() or (int(lines[0]) != len(lines) - 2):
-                raise MoleculeReadError(f"First line of XYZ file should be the number of atoms, got: {lines[0]} != {len(lines) - 2}")
-            lines = lines[2:]
+            natoms, comment, *lines = lines
+            if (not natoms.strip().isdigit()) or (int(natoms) != len(lines)):
+                raise MoleculeReadError(f"First line of XYZ file should be the number of atoms ({len(lines)}), got: {natoms}")
+
+            for kv in comment.split(";"):
+                try:
+                    key, value = kv.split(":", 1)
+                    data[key.strip()] = value.strip()
+                except ValueError:
+                    continue
+
+        data["charge"] = charge if charge is not None else int(data.get("charge", 0))
+        data["multiplicity"] = multiplicity or int(data.get("multiplicity", 1))
 
         try:
-            return cls(atoms=[Atom.from_xyz(line) for line in lines], charge=charge, multiplicity=multiplicity)
+            return cls(atoms=[Atom.from_xyz(line) for line in lines], **data)
         except (ValueError, ValidationError) as e:
             raise MoleculeReadError("Error reading molecule from xyz") from e
 
-    def to_xyz(self, comment: str = "", out_file: Path | str | None = None) -> str:
+    def to_xyz(self, comment: str | None = None, out_file: Path | str | None = None) -> str:
         r"""
         Generate an XYZ string.
 
-        >>> mol = Molecule.from_xyz("2\nComment\nH 0 1 2\nF 1 2 3")
-        >>> print(mol.to_xyz(comment="HF"))
+        :param comment: optional comment line (defaults to standard Rowan XYZ comment line format)
+        :param out_file: optional output file path to write the XYZ string to
+        :return: XYZ string
+
+        >>> mol = Molecule.from_xyz("2\nenergy: 1.0; smiles: HF;\nH 0 1 2\nF 1 2 3")
+        >>> print(mol.to_xyz())
         2
-        HF
+        charge: 0; multiplicity: 1; energy: 1.0; smiles: HF;
         H     0.0000000000    1.0000000000    2.0000000000
         F     1.0000000000    2.0000000000    3.0000000000
         >>> import tempfile
         >>> with tempfile.TemporaryDirectory() as directory:
         ...     file = Path(directory) / "mol.xyz"
-        ...     out = mol.to_xyz(comment="HF", out_file=file)
+        ...     out = mol.to_xyz(out_file=file)
         ...     with file.open() as f:
-        ...         Molecule.from_xyz(f.read()).to_xyz("HF") == out
+        ...         Molecule.from_xyz(f.read()).to_xyz() == out
         True
         """
         geom = "\n".join(map(str, self.atoms))
+        if comment is None:
+            data = self.model_dump(exclude_none=True, exclude={"atoms"})
+            comment = " ".join(f"{key}: {value};" for key, value in data.items())
+
         out = f"{len(self)}\n{comment}\n{geom}"
 
         if out_file:
