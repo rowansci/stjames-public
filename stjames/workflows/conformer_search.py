@@ -357,7 +357,7 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
 
     energy_settings: Settings = Settings(method=Method.AIMNET2_WB97MD3)
 
-    num_monte_carlo_iterations: int = 100
+    num_monte_carlo_iterations: int = 250
     rmsd_threshold: float = 0.5
     energy_window: float = 200.0
 
