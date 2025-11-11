@@ -12,7 +12,10 @@ from .descriptors import *
 from .docking import *
 from .double_ended_ts_search import DoubleEndedTSSearchWorkflow
 from .electronic_properties import *
-from .free_energy_perturbation import *
+from .free_energy_perturbation import (
+    BuildRBFEGraphWorkflow,
+    RelativeBindingFreeEnergyPerturbationWorkflow,
+)
 from .fukui import *
 from .hydrogen_bond_basicity import *
 from .ion_mobility import *
