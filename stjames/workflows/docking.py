@@ -52,15 +52,15 @@ class VinaSettings(DockingSettings):
         8 is typical, 32 is considered relatively careful.
     """
 
-    executable: Literal["qvina2", "vina"] = "vina"
+    executable: Literal["qvina2", "qvina-w", "vina"] = "vina"
     scoring_function: Literal["vinardo", "vina"] = "vinardo"
     exhaustiveness: int = 8
 
     @model_validator(mode="after")
     def check_executable_scoring_function(self) -> Self:
         """Check if the combination of exectuable and scoring function is supported."""
-        if (self.executable == "qvina2") and (self.scoring_function == "vinardo"):
-            raise ValueError("qvina2 does not implement the vinardo scoring function!")
+        if (self.executable in {"qvina2", "qvina-w"}) and (self.scoring_function == "vinardo"):
+            raise ValueError("QVina does not implement the Vinardo scoring function!")
         return self
 
 
