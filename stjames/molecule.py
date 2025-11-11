@@ -226,27 +226,59 @@ class Molecule(Base):
 
     @classmethod
     def from_xyz_lines(cls: type[Self], lines: Iterable[str], charge: int | None = None, multiplicity: PositiveInt | None = None) -> Self:
+        r"""
+        Read a molecule from a xyz lines.
+
+        >>> mol = Molecule.from_xyz_lines(["2", "charge: 0; multiplicity: 1; cell: [[1, 2e1, 3], [4, 5, 6], [7, 8, 9.1]]", "H 0 0 0", "F 0 0 1"])
+        >>> print(mol.to_xyz())
+        2
+        charge: 0; multiplicity: 1; cell: ((1.0, 20.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.1)); is_periodic: (True, True, True);
+        H     0.0000000000    0.0000000000    0.0000000000
+        F     0.0000000000    0.0000000000    1.0000000000
+        """
         lines = list(lines)
         data: dict[str, Any] = {}
         if len(lines[0].split()) == 1:
             natoms, comment, *lines = lines
             if (not natoms.strip().isdigit()) or (int(natoms) != len(lines)):
                 raise MoleculeReadError(f"First line of XYZ file should be the number of atoms ({len(lines)}), got: {natoms}")
+            data = cls._parse_comment_line(comment)
 
-            for kv in comment.split(";"):
-                try:
-                    key, value = kv.split(":", 1)
-                    data[key.strip()] = value.strip()
-                except ValueError:
-                    continue
-
-        data["charge"] = charge if charge is not None else int(data.get("charge", 0))
-        data["multiplicity"] = multiplicity or int(data.get("multiplicity", 1))
+        data["charge"] = charge if charge is not None else data.get("charge", 0)
+        data["multiplicity"] = multiplicity or data.get("multiplicity", 1)
 
         try:
             return cls(atoms=[Atom.from_xyz(line) for line in lines], **data)
         except (ValueError, ValidationError) as e:
             raise MoleculeReadError("Error reading molecule from xyz") from e
+
+    @classmethod
+    def _parse_comment_line(cls, comment: str) -> dict[str, Any]:
+        """
+        Parse the comment line of an XYZ file.
+
+        :param comment: comment line from an XYZ file
+
+        >>> Molecule._parse_comment_line("charge: -1; multiplicity: 2; cell: [[1,2,3],[4,5,6],[7,8,9]]; is_periodic: (True, False, True); energy: -75.0")
+        {'charge': '-1', 'multiplicity': '2', 'energy': '-75.0', 'cell':\
+        PeriodicCell(lattice_vectors=((1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)), is_periodic=(True, False, True))}
+        """
+        data: dict[str, Any] = {}
+        for kv in comment.split(";"):
+            try:
+                key, value = kv.split(":", 1)
+                data[key.strip()] = value.strip()
+            except ValueError:
+                continue
+
+        if cell := data.pop("cell", None):
+            data["cell"] = PeriodicCell.from_string(cell)
+            if is_periodic := data.pop("is_periodic", None):
+                x, y, z = is_periodic.strip(" ([)]").split(",")
+                true_values = {"true", "1", "yes"}
+                data["cell"].is_periodic = tuple(map(lambda v: v.strip().lower() in true_values, (x, y, z)))
+
+        return data
 
     def to_xyz(self, comment: str | None = None, out_file: Path | str | None = None) -> str:
         r"""
@@ -273,6 +305,11 @@ class Molecule(Base):
         geom = "\n".join(map(str, self.atoms))
         if comment is None:
             data = self.model_dump(exclude_none=True, exclude={"atoms"})
+
+            if cell := data.pop("cell", None):
+                data["cell"] = cell["lattice_vectors"]
+                data["is_periodic"] = cell["is_periodic"]
+
             comment = " ".join(f"{key}: {value};" for key, value in data.items())
 
         out = f"{len(self)}\n{comment}\n{geom}"
@@ -460,7 +497,7 @@ def parse_extxyz_comment_line(line: str) -> EXTXYZMetadata:
     :return: parsed properties
 
     >>> parse_extxyz_comment_line('Lattice="6.0 0.0 0.0 6.0 0.0 0.0 6.0 0.0 0.0"Properties=species:S:1:pos:R:3')
-    {'cell': PeriodicCell(lattice_vectors=((6.0, 0.0, 0.0), (6.0, 0.0, 0.0), (6.0, 0.0, 0.0)), is_periodic=(True, True, True), volume=0.0), 'properties': 'species:S:1:pos:R:3'}
+    {'cell': PeriodicCell(lattice_vectors=((6.0, 0.0, 0.0), (6.0, 0.0, 0.0), (6.0, 0.0, 0.0)), is_periodic=(True, True, True)), 'properties': 'species:S:1:pos:R:3'}
     """  # noqa: E501
 
     # Regular expression to match key="value", key='value', or key=value
