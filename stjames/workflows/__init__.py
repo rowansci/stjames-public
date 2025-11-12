@@ -48,7 +48,7 @@ WORKFLOW_NAME = Literal[
     "docking",
     "double_ended_ts_search",
     "electronic_properties",
-    "free_energy_perturbation",
+    "relative_binding_free_energy_perturbation",
     "fukui",
     "hydrogen_bond_basicity",
     "ion_mobility",
@@ -82,7 +82,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "docking": DockingWorkflow,  # type: ignore [dict-item]
     "double_ended_ts_search": DoubleEndedTSSearchWorkflow,  # type: ignore [dict-item]
     "electronic_properties": ElectronicPropertiesWorkflow,  # type: ignore [dict-item]
-    "free_energy_perturbation": FreeEnergyPerturbationWorkflow,  # type: ignore [dict-item]
+    "relative_binding_free_energy_perturbation": RelativeBindingFreeEnergyPerturbationWorkflow,  # type: ignore [dict-item]
     "fukui": FukuiIndexWorkflow,  # type: ignore [dict-item]
     "hydrogen_bond_basicity": HydrogenBondBasicityWorkflow,  # type: ignore [dict-item]
     "ion_mobility": IonMobilityWorkflow,  # type: ignore [dict-item]
