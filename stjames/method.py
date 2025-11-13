@@ -65,6 +65,7 @@ class Method(LowercaseStrEnum):
 
     # Force fields
     OFF_SAGE_2_2_1 = "off_sage_2_2_1"
+    SMIRNOFF_2_2_1_AMBER_AM1BCC = "smirnoff_2_2_1_amber_am1bcc"
 
     def default_engine(self, *, is_periodic: bool = False) -> Engine:
         """
@@ -93,7 +94,7 @@ class Method(LowercaseStrEnum):
                 return Engine.ORB
             case method if method in XTB_METHODS:
                 return Engine.TBLITE if is_periodic else Engine.XTB
-            case Method.OFF_SAGE_2_2_1:
+            case Method.OFF_SAGE_2_2_1 | Method.SMIRNOFF_2_2_1_AMBER_AM1BCC:
                 return Engine.OPENFF
             case Method.EGRET_1 | Method.EGRET_1E | Method.EGRET_1T:
                 return Engine.EGRET
@@ -140,8 +141,8 @@ XTB_METHODS = [Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB,
 CompositeMethod = Literal[Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
 COMPOSITE_METHODS = [Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
 
-FFMethod = Literal[Method.OFF_SAGE_2_2_1]
-FF_METHODS = [Method.OFF_SAGE_2_2_1]
+FFMethod = Literal[Method.OFF_SAGE_2_2_1, Method.SMIRNOFF_2_2_1_AMBER_AM1BCC]
+FF_METHODS = [Method.OFF_SAGE_2_2_1, Method.SMIRNOFF_2_2_1_AMBER_AM1BCC]
 
 PrepackagedMethod = XTBMethod | CompositeMethod | PrepackagedNNPMethod | FFMethod
 PREPACKAGED_METHODS = [*XTB_METHODS, *COMPOSITE_METHODS, *PREPACKAGED_NNP_METHODS, *FF_METHODS]

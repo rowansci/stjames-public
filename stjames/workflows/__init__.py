@@ -26,6 +26,10 @@ from .pose_analysis_md import *
 from .protein_binder_design import *
 from .protein_cofolding import *
 from .redox_potential import *
+from .relative_binding_free_energy_perturbation import (
+    BuildRBFEGraphWorkflow,
+    RelativeBindingFreeEnergyPerturbationWorkflow,
+)
 from .scan import *
 from .solubility import *
 from .spin_states import *
@@ -44,6 +48,7 @@ WORKFLOW_NAME = Literal[
     "docking",
     "double_ended_ts_search",
     "electronic_properties",
+    "relative_binding_free_energy_perturbation",
     "fukui",
     "hydrogen_bond_basicity",
     "ion_mobility",
@@ -57,6 +62,7 @@ WORKFLOW_NAME = Literal[
     "pose_analysis_md",
     "protein_cofolding",
     "protein_binder_design",
+    "build_rbfe_graph",
     "redox_potential",
     "scan",
     "solubility",
@@ -76,6 +82,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "docking": DockingWorkflow,  # type: ignore [dict-item]
     "double_ended_ts_search": DoubleEndedTSSearchWorkflow,  # type: ignore [dict-item]
     "electronic_properties": ElectronicPropertiesWorkflow,  # type: ignore [dict-item]
+    "relative_binding_free_energy_perturbation": RelativeBindingFreeEnergyPerturbationWorkflow,  # type: ignore [dict-item]
     "fukui": FukuiIndexWorkflow,  # type: ignore [dict-item]
     "hydrogen_bond_basicity": HydrogenBondBasicityWorkflow,  # type: ignore [dict-item]
     "ion_mobility": IonMobilityWorkflow,  # type: ignore [dict-item]
@@ -89,6 +96,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "pose_analysis_md": PoseAnalysisMolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "protein_cofolding": ProteinCofoldingWorkflow,  # type: ignore [dict-item]
     "protein_binder_design": ProteinBinderDesignWorkflow,  # type: ignore [dict-item]
+    "build_rbfe_graph": BuildRBFEGraphWorkflow,  # type: ignore [dict-item]
     "redox_potential": RedoxPotentialWorkflow,  # type: ignore [dict-item]
     "scan": ScanWorkflow,  # type: ignore [dict-item]
     "solubility": SolubilityWorkflow,  # type: ignore [dict-item]
