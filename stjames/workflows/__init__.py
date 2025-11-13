@@ -12,10 +12,6 @@ from .descriptors import *
 from .docking import *
 from .double_ended_ts_search import DoubleEndedTSSearchWorkflow
 from .electronic_properties import *
-from .free_energy_perturbation import (
-    BuildRBFEGraphWorkflow,
-    RelativeBindingFreeEnergyPerturbationWorkflow,
-)
 from .fukui import *
 from .hydrogen_bond_basicity import *
 from .ion_mobility import *
@@ -30,6 +26,10 @@ from .pose_analysis_md import *
 from .protein_binder_design import *
 from .protein_cofolding import *
 from .redox_potential import *
+from .relative_binding_free_energy_perturbation import (
+    BuildRBFEGraphWorkflow,
+    RelativeBindingFreeEnergyPerturbationWorkflow,
+)
 from .scan import *
 from .solubility import *
 from .spin_states import *
