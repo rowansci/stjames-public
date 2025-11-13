@@ -359,7 +359,7 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
 
     num_monte_carlo_iterations: int = 250
     rmsd_threshold: float = 0.5
-    energy_window: float = 200.0
+    energy_window: float = 20.0
 
     settings_type: Literal["monte_carlo_multiple_minimum"] = "monte_carlo_multiple_minimum"
 
