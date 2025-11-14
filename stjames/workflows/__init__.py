@@ -27,7 +27,7 @@ from .protein_binder_design import *
 from .protein_cofolding import *
 from .redox_potential import *
 from .relative_binding_free_energy_perturbation import (
-    BuildRBFEGraphWorkflow,
+    RBFEGraphWorkflow,
     RelativeBindingFreeEnergyPerturbationWorkflow,
 )
 from .scan import *
@@ -62,7 +62,7 @@ WORKFLOW_NAME = Literal[
     "pose_analysis_md",
     "protein_cofolding",
     "protein_binder_design",
-    "build_rbfe_graph",
+    "rbfe_graph",
     "redox_potential",
     "scan",
     "solubility",
@@ -96,7 +96,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "pose_analysis_md": PoseAnalysisMolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "protein_cofolding": ProteinCofoldingWorkflow,  # type: ignore [dict-item]
     "protein_binder_design": ProteinBinderDesignWorkflow,  # type: ignore [dict-item]
-    "build_rbfe_graph": BuildRBFEGraphWorkflow,  # type: ignore [dict-item]
+    "rbfe_graph": RBFEGraphWorkflow,  # type: ignore [dict-item]
     "redox_potential": RedoxPotentialWorkflow,  # type: ignore [dict-item]
     "scan": ScanWorkflow,  # type: ignore [dict-item]
     "solubility": SolubilityWorkflow,  # type: ignore [dict-item]

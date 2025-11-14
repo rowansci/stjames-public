@@ -65,7 +65,7 @@ class RBFEResult(Base):
 
 class RBFEGraphEdge(Base):
     """
-    Edge definition plus optional FEP result.
+    RBFE Edge definition with optional FEP edge results.
 
     :param mol_a: Source ligand identifier.
     :param mol_b: Target ligand identifier.
@@ -98,7 +98,7 @@ class RBFEGraphEdge(Base):
 
 class RBFEGraph(Base):
     """
-    Minimal RBFE graph container shared between build and FEP workflows.
+    Minimal RBFE graph container.
 
     :param edges: Directed edges describing the ligand pairs to simulate.
     """
@@ -106,9 +106,9 @@ class RBFEGraph(Base):
     edges: list[RBFEGraphEdge]
 
 
-class BuildRBFEGraphWorkflow(Workflow):
+class RBFEGraphWorkflow(Workflow):
     """
-    Workflow that mirrors the `examples/build_rbfe_graph.py` CLI.
+    Workflow that builds an rbfe graph for a set of ligands.
 
     :param ligands: Mapping from ligand identifiers to `Molecule` objects.
     :param graph: Optional RBFE graph output populated after the build step.
@@ -160,10 +160,10 @@ class RBFEDiagnostics(Base):
 
 class RelativeBindingFreeEnergyPerturbationWorkflow(Workflow):
     """
-    Workflow that mirrors the `examples/run_rbfe_graph.py` CLI.
+    Workflow for running relative binding free energy perturbation simulations.
 
     :param ligands: Mapping from ligand identifiers to `Molecule` objects.
-    :param graph: RBFE graph topology (typically the output of `BuildRBFEGraphWorkflow`).
+    :param graph: RBFE graph topology.
     :param pdb_structure: Prepared complex structure required for complex-leg simulations.
     :param ligand_dg_results: Optional per-ligand FEP summaries produced downstream.
     :param diagnostics: Optional aggregate QC metrics.
