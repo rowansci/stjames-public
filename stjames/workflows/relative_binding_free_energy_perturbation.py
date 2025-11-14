@@ -176,5 +176,5 @@ class RelativeBindingFreeEnergyPerturbationWorkflow(Workflow):
 
     settings: TMDRBFESettings
 
-    ligand_dg_results: dict[str, RBFEResult]
+    ligand_dg_results: dict[str, RBFEResult] | None = None
     diagnostics: RBFEDiagnostics | None = None
