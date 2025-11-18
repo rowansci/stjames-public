@@ -36,6 +36,6 @@ class BasicCalculationWorkflow(MoleculeWorkflow):
     @model_validator(mode="after")
     def set_engine(self) -> Self:
         """Set the calculation engine."""
-        self.engine = self.engine or self.settings.method.default_engine()
+        self.engine = self.engine or self.settings.engine
 
         return self
