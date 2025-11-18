@@ -56,6 +56,7 @@ class EnsembleProperties(Base):
     mean_polar_solvent_accessible_surface_area: float
     mean_radius_of_gyration: float
 
+
 class ConformerClusteringDescriptor(LowercaseStrEnum):
     """
     Potential descriptors to employ in conformer clustering.
@@ -408,7 +409,7 @@ class ConformerGenMixin(BaseModel):
     """
 
     conf_gen_mode: Mode = Mode.RAPID
-    conf_gen_settings: ConformerGenSettingsUnion | None = _sentinel  # type: ignore [assignment]
+    conf_gen_settings: None | ConformerGenSettingsUnion = None
     constraints: Sequence[Constraint] = tuple()
     nci: bool = False
     max_confs: int | None = None
@@ -417,20 +418,24 @@ class ConformerGenMixin(BaseModel):
 
     @model_validator(mode="after")
     def validate_and_build_conf_gen_settings(self) -> Self:
-        """Validate and build the ConformerGenSettings."""
-        if self.conf_gen_settings is not _sentinel:
+        """
+        Validate and build the ConformerGenSettings.
+
+        Setting `conf_gen_mode` will override the default `None` value for `conf_gen_settings` unless mode `MANUAL` is set.
+        """
+        if self.conf_gen_settings is not None:
             return self
 
         match self.conf_gen_mode:
-            case Mode.MANUAL:
-                if self.conf_gen_settings is _sentinel:
-                    raise ValueError("Must specify conf_gen_settings with MANUAL mode")
-
             case Mode.RECKLESS | Mode.RAPID:
                 # ETKDGSettings will error if constraints or nci are set
                 self.conf_gen_settings = ETKDGSettings(mode=self.conf_gen_mode, constraints=self.constraints, nci=self.nci, max_confs=self.max_confs)
+
             case Mode.CAREFUL | Mode.METICULOUS:
                 self.conf_gen_settings = iMTDSettings(mode=self.conf_gen_mode, constraints=self.constraints, nci=self.nci, max_confs=self.max_confs)
+
+            case Mode.MANUAL:
+                pass
 
             case _:
                 raise NotImplementedError(f"Unsupported mode: {self.conf_gen_mode}")
@@ -525,9 +530,8 @@ class ConformerSearchWorkflow(ConformerSearchMixin, SMILESWorkflow, MoleculeWork
 
     @model_validator(mode="after")
     def validate_mol_input(self) -> Self:
-        """Ensure that only one of initial_molecule or initial_smiles is set."""
-
-        if not (bool(self.initial_smiles) ^ bool(self.initial_molecule)):
+        """Ensure that a valid combination of input types is set."""
+        if (not self.initial_conformers) and (not (bool(self.initial_smiles) ^ bool(self.initial_molecule))):
             raise ValueError("Can only set one of initial_molecule and initial_smiles")
 
         if isinstance(self.conf_gen_settings, iMTDSettings) and (self.initial_molecule is None):
@@ -536,11 +540,10 @@ class ConformerSearchWorkflow(ConformerSearchMixin, SMILESWorkflow, MoleculeWork
         if self.conf_gen_settings is None and not self.initial_conformers:
             raise ValueError("Need `initial_conformers` to be set without a conformer-generation method!")
 
-        if self.initial_conformers:
-            for conformer in self.initial_conformers:
-                if Counter(conformer.atomic_numbers) != Counter(self.initial_conformers[0]):
+        if len(self.initial_conformers) > 1:
+            initial_count = Counter(self.initial_conformers[0].atomic_numbers)
+            for conformer in self.initial_conformers[1:]:
+                if Counter(conformer.atomic_numbers) != initial_count:
                     raise ValueError("Not all molecules in `initial_conformers` have the same atomic formula!")
 
         return self
-
-
