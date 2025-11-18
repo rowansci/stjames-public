@@ -25,7 +25,7 @@ class BDE(BaseModel):
     energy => (E_{fragment1} + E_{fragment2}) - E_{starting molecule}
 
     :param fragment_idxs: indices of the atoms in the fragment that was dissociated (1-indexed)
-    :param energy: BDE in kcal/mol
+    :param energy: BDE in Hartree
     :param fragment_energies: energy of fragments
     :param calculations_uuids: calculation UUIDs
     """
