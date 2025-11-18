@@ -1,6 +1,7 @@
 """Conformer search workflow."""
 
 from abc import ABC
+from collections import Counter
 from typing import Annotated, Literal, Self, Sequence, TypeVar
 
 from pydantic import AfterValidator, BaseModel, Field, PositiveInt, field_validator, model_validator
@@ -41,6 +42,19 @@ class ScreeningSettings(BaseModel):
     rmsd: float | None = 0.25
     max_confs: int | None = None
 
+
+class EnsembleProperties(Base):
+    """
+    Descriptors of overall ensemble properties.
+
+    :param mean_solvent_accessible_surface_area: the average SASA, in Å**2
+    :param mean_polar_solvent_accessible_surface_area: the average SASA for non-C/H elements, in Å**2
+    :param mean_radius_of_gyration: the radius of gyration, in Å
+    """
+
+    mean_solvent_accessible_surface_area: float
+    mean_polar_solvent_accessible_surface_area: float
+    mean_radius_of_gyration: float
 
 class ConformerClusteringDescriptor(LowercaseStrEnum):
     """
@@ -394,7 +408,7 @@ class ConformerGenMixin(BaseModel):
     """
 
     conf_gen_mode: Mode = Mode.RAPID
-    conf_gen_settings: ConformerGenSettingsUnion = _sentinel  # type: ignore [assignment]
+    conf_gen_settings: ConformerGenSettingsUnion | None = _sentinel  # type: ignore [assignment]
     constraints: Sequence[Constraint] = tuple()
     nci: bool = False
     max_confs: int | None = None
@@ -493,16 +507,21 @@ class ConformerSearchWorkflow(ConformerSearchMixin, SMILESWorkflow, MoleculeWork
     :param mode: Mode to use (not used)
 
     New:
+    :param initial_conformers: input conformers (if no conformer-generation is requested)
     :param conformer_uuids: list of UUIDs of the Molecules generated
     :param energies: energies of the molecules
+    :param ensemble_properties: the overall ensemble's properties
     """
 
     initial_smiles: str = ""
     initial_molecule: Molecule | None = None  # type: ignore [assignment]
+    initial_conformers: list[Molecule] = []
 
     # Results
     conformer_uuids: list[list[UUID | None]] = Field(default_factory=list)
     energies: Annotated[FloatPerAtom, AfterValidator(round_float_per_atom(6))] = Field(default_factory=list)
+
+    ensemble_properties: EnsembleProperties | None = None
 
     @model_validator(mode="after")
     def validate_mol_input(self) -> Self:
@@ -514,4 +533,14 @@ class ConformerSearchWorkflow(ConformerSearchMixin, SMILESWorkflow, MoleculeWork
         if isinstance(self.conf_gen_settings, iMTDSettings) and (self.initial_molecule is None):
             raise ValueError("iMTDSettings requires `initial_molecule` to be set")
 
+        if self.conf_gen_settings is None and not self.initial_conformers:
+            raise ValueError("Need `initial_conformers` to be set without a conformer-generation method!")
+
+        if self.initial_conformers:
+            for conformer in self.initial_conformers:
+                if Counter(conformer.atomic_numbers) != Counter(self.initial_conformers[0]):
+                    raise ValueError("Not all molecules in `initial_conformers` have the same atomic formula!")
+
         return self
+
+
