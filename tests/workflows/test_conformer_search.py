@@ -193,6 +193,7 @@ def test_ts_constraints(water: Molecule) -> None:
     cr = ConformerSearchWorkflow(initial_molecule=water, conf_gen_mode=Mode.CAREFUL, constraints=constraints, transition_state=True)
     cr_msos = cr.multistage_opt_settings
 
+    assert cr.conf_gen_settings is not None
     assert cr.conf_gen_settings.constraints == constraints
     assert len(cr_msos.optimization_settings) == 1
 
