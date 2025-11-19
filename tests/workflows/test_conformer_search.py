@@ -201,10 +201,6 @@ def test_ts_constraints(water: Molecule) -> None:
 
 
 def test_no_conformer_gen(water: Molecule, chloroethane: Molecule) -> None:
-
-    print("\nModel fields:")
-    print(ConformerSearchWorkflow.model_fields['conf_gen_settings'])
-
     ConformerSearchWorkflow(initial_molecule=chloroethane, conf_gen_mode=Mode.MANUAL, conf_gen_settings=ETKDGSettings())
 
     ConformerSearchWorkflow(initial_conformers=[chloroethane, chloroethane], conf_gen_mode=Mode.MANUAL, conf_gen_settings=None)
