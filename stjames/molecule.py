@@ -1,3 +1,4 @@
+import logging
 import re
 from pathlib import Path
 from typing import Annotated, Any, Iterable, Optional, Self, Sequence, TypeAlias, TypedDict, TypeVar
@@ -25,6 +26,8 @@ from .types import (
 )
 
 RdkitMol: TypeAlias = Chem.rdchem.Mol | Chem.rdchem.RWMol
+
+logger = logging.getLogger(__name__)
 
 
 class MoleculeReadError(RuntimeError):
@@ -242,6 +245,7 @@ class Molecule(Base):
             natoms, comment, *lines = lines
             if (not natoms.strip().isdigit()) or (int(natoms) != len(lines)):
                 raise MoleculeReadError(f"First line of XYZ file should be the number of atoms ({len(lines)}), got: {natoms}")
+
             data = cls._parse_comment_line(comment)
 
         data["charge"] = charge if charge is not None else data.get("charge", 0)
@@ -269,14 +273,19 @@ class Molecule(Base):
                 key, value = kv.split(":", 1)
                 data[key.strip()] = value.strip()
             except ValueError:
+                logger.error(f"Error parsing key/value: {kv}")
                 continue
 
         if cell := data.pop("cell", None):
-            data["cell"] = PeriodicCell.from_string(cell)
-            if is_periodic := data.pop("is_periodic", None):
-                x, y, z = is_periodic.strip(" ([)]").split(",")
-                true_values = {"true", "1", "yes"}
-                data["cell"].is_periodic = tuple(map(lambda v: v.strip().lower() in true_values, (x, y, z)))
+            try:
+                data["cell"] = PeriodicCell.from_string(cell)
+                if is_periodic := data.pop("is_periodic", None):
+                    x, y, z = is_periodic.strip(" ([)]").split(",")
+                    true_values = {"true", "1", "yes"}
+                    data["cell"].is_periodic = tuple(map(lambda v: v.strip().lower() in true_values, (x, y, z)))
+            except ValueError as e:
+                logger.error(f"Error parsing XYZ cell: {e}")
+                pass
 
         return data
 

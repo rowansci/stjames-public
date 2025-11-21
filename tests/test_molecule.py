@@ -75,3 +75,16 @@ H        0.000000     0.757000     0.587000
     assert mol.cell.lattice_vectors == ((1.0, 2.0, 3.0), (4.0, 5.0, 0.6), (7.0, 8.0, 9.0))
     assert mol.cell.is_periodic == (True, False, True)
     assert mol.smiles == "O"
+
+    mol = Molecule.from_xyz_lines(
+        """3
+cell: [(a, b, c), [4, 5, 6e-1], (7.0, 8.0, 9.0)]; smiles: O; is_periodic: [True, False, True]
+O        0.000000     0.000000     0.000000
+H        0.000000    -0.757000     0.587000
+H        0.000000     0.757000     0.587000
+""".splitlines()
+    )
+
+    assert mol.cell is None
+    assert mol.smiles == "O"
+    assert getattr(mol.cell, "is_periodic", None) is None
