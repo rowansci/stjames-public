@@ -43,18 +43,18 @@ class ScreeningSettings(BaseModel):
     max_confs: int | None = None
 
 
-class EnsembleProperties(Base):
+class ConformerProperties(Base):
     """
     Descriptors of overall ensemble properties.
 
-    :param mean_solvent_accessible_surface_area: the average SASA, in Å**2
-    :param mean_polar_solvent_accessible_surface_area: the average SASA for non-C/H elements, in Å**2
-    :param mean_radius_of_gyration: the radius of gyration, in Å
+    :param solvent_accessible_surface_area: the average SASA, in Å**2
+    :param polar_solvent_accessible_surface_area: the average SASA for non-C/H elements, in Å**2
+    :param radius_of_gyration: the radius of gyration, in Å
     """
 
-    mean_solvent_accessible_surface_area: float
-    mean_polar_solvent_accessible_surface_area: float
-    mean_radius_of_gyration: float
+    solvent_accessible_surface_area: float
+    polar_solvent_accessible_surface_area: float
+    radius_of_gyration: float
 
 
 class ConformerClusteringDescriptor(LowercaseStrEnum):
@@ -515,6 +515,7 @@ class ConformerSearchWorkflow(ConformerSearchMixin, SMILESWorkflow, MoleculeWork
     :param initial_conformers: input conformers (if no conformer-generation is requested)
     :param conformer_uuids: list of UUIDs of the Molecules generated
     :param energies: energies of the molecules
+    :param conformer_properties: each conformer's properties
     :param ensemble_properties: the overall ensemble's properties
     """
 
@@ -526,7 +527,8 @@ class ConformerSearchWorkflow(ConformerSearchMixin, SMILESWorkflow, MoleculeWork
     conformer_uuids: list[list[UUID | None]] = Field(default_factory=list)
     energies: Annotated[FloatPerAtom, AfterValidator(round_float_per_atom(6))] = Field(default_factory=list)
 
-    ensemble_properties: EnsembleProperties | None = None
+    conformer_properties: list[ConformerProperties] = []
+    ensemble_properties: ConformerProperties | None = None
 
     @model_validator(mode="after")
     def validate_mol_input(self) -> Self:
