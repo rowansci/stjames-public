@@ -238,6 +238,12 @@ class Molecule(Base):
         charge: 0; multiplicity: 1; cell: ((1.0, 20.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.1)); is_periodic: (True, True, True);
         H     0.0000000000    0.0000000000    0.0000000000
         F     0.0000000000    0.0000000000    1.0000000000
+        >>> mol = Molecule.from_xyz_lines(["2", "energy: abc", "H 0 0 0", "F 0 0 1"])
+        >>> print(mol.to_xyz())
+        2
+        charge: 0; multiplicity: 1;
+        H     0.0000000000    0.0000000000    0.0000000000
+        F     0.0000000000    0.0000000000    1.0000000000
         """
         lines = list(lines)
         data: dict[str, Any] = {}
@@ -248,11 +254,17 @@ class Molecule(Base):
 
             data = cls._parse_comment_line(comment)
 
-        data["charge"] = charge if charge is not None else data.get("charge", 0)
-        data["multiplicity"] = multiplicity or data.get("multiplicity", 1)
+        charge = charge if charge is not None else data.get("charge", 0)
+        multiplicity = multiplicity or data.get("multiplicity", 1)
+        data |= {"charge": charge, "multiplicity": multiplicity}
 
         try:
             return cls(atoms=[Atom.from_xyz(line) for line in lines], **data)
+        except (ValueError, ValidationError):
+            pass
+
+        try:
+            return cls(atoms=[Atom.from_xyz(line) for line in lines], charge=charge, multiplicity=multiplicity)
         except (ValueError, ValidationError) as e:
             raise MoleculeReadError("Error reading molecule from xyz") from e
 
@@ -266,6 +278,8 @@ class Molecule(Base):
         >>> Molecule._parse_comment_line("charge: -1; multiplicity: 2; cell: [[1,2,3],[4,5,6],[7,8,9]]; is_periodic: (True, False, True); energy: -75.0")
         {'charge': '-1', 'multiplicity': '2', 'energy': '-75.0', 'cell':\
         PeriodicCell(lattice_vectors=((1.0, 2.0, 3.0), (4.0, 5.0, 6.0), (7.0, 8.0, 9.0)), is_periodic=(True, False, True))}
+        >>> Molecule._parse_comment_line(" energy: -0.320207535977 gnorm: 0.071552110436 xtb: 6.6.1 (8d0f1dd)")  # Unfortunate
+        {'energy': '-0.320207535977 gnorm: 0.071552110436 xtb: 6.6.1 (8d0f1dd)'}
         """
         data: dict[str, Any] = {}
         for kv in comment.split(";"):
