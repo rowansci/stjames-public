@@ -1,6 +1,7 @@
 """Conformer search workflow."""
 
 from abc import ABC
+from collections import Counter
 from typing import Annotated, Literal, Self, Sequence, TypeVar
 
 from pydantic import AfterValidator, BaseModel, Field, PositiveInt, field_validator, model_validator
@@ -40,6 +41,20 @@ class ScreeningSettings(BaseModel):
     rotational_constants_threshold: float | None = 0.02
     rmsd: float | None = 0.25
     max_confs: int | None = None
+
+
+class ConformerProperties(Base):
+    """
+    Descriptors of overall ensemble properties.
+
+    :param solvent_accessible_surface_area: the average SASA, in Å**2
+    :param polar_solvent_accessible_surface_area: the average SASA for non-C/H elements, in Å**2
+    :param radius_of_gyration: the radius of gyration, in Å
+    """
+
+    solvent_accessible_surface_area: float
+    polar_solvent_accessible_surface_area: float
+    radius_of_gyration: float
 
 
 class ConformerClusteringDescriptor(LowercaseStrEnum):
@@ -394,7 +409,7 @@ class ConformerGenMixin(BaseModel):
     """
 
     conf_gen_mode: Mode = Mode.RAPID
-    conf_gen_settings: ConformerGenSettingsUnion = _sentinel  # type: ignore [assignment]
+    conf_gen_settings: None | ConformerGenSettingsUnion = None
     constraints: Sequence[Constraint] = tuple()
     nci: bool = False
     max_confs: int | None = None
@@ -403,20 +418,24 @@ class ConformerGenMixin(BaseModel):
 
     @model_validator(mode="after")
     def validate_and_build_conf_gen_settings(self) -> Self:
-        """Validate and build the ConformerGenSettings."""
-        if self.conf_gen_settings is not _sentinel:
+        """
+        Validate and build the ConformerGenSettings.
+
+        Setting `conf_gen_mode` will override the default `None` value for `conf_gen_settings` unless mode `MANUAL` is set.
+        """
+        if self.conf_gen_settings is not None:
             return self
 
         match self.conf_gen_mode:
-            case Mode.MANUAL:
-                if self.conf_gen_settings is _sentinel:
-                    raise ValueError("Must specify conf_gen_settings with MANUAL mode")
-
             case Mode.RECKLESS | Mode.RAPID:
                 # ETKDGSettings will error if constraints or nci are set
                 self.conf_gen_settings = ETKDGSettings(mode=self.conf_gen_mode, constraints=self.constraints, nci=self.nci, max_confs=self.max_confs)
+
             case Mode.CAREFUL | Mode.METICULOUS:
                 self.conf_gen_settings = iMTDSettings(mode=self.conf_gen_mode, constraints=self.constraints, nci=self.nci, max_confs=self.max_confs)
+
+            case Mode.MANUAL:
+                pass
 
             case _:
                 raise NotImplementedError(f"Unsupported mode: {self.conf_gen_mode}")
@@ -493,25 +512,40 @@ class ConformerSearchWorkflow(ConformerSearchMixin, SMILESWorkflow, MoleculeWork
     :param mode: Mode to use (not used)
 
     New:
+    :param initial_conformers: input conformers (if no conformer-generation is requested)
     :param conformer_uuids: list of UUIDs of the Molecules generated
     :param energies: energies of the molecules
+    :param conformer_properties: each conformer's properties
+    :param ensemble_properties: the overall ensemble's properties
     """
 
     initial_smiles: str = ""
     initial_molecule: Molecule | None = None  # type: ignore [assignment]
+    initial_conformers: list[Molecule] = []
 
     # Results
     conformer_uuids: list[list[UUID | None]] = Field(default_factory=list)
     energies: Annotated[FloatPerAtom, AfterValidator(round_float_per_atom(6))] = Field(default_factory=list)
 
+    conformer_properties: list[ConformerProperties] = []
+    ensemble_properties: ConformerProperties | None = None
+
     @model_validator(mode="after")
     def validate_mol_input(self) -> Self:
-        """Ensure that only one of initial_molecule or initial_smiles is set."""
-
-        if not (bool(self.initial_smiles) ^ bool(self.initial_molecule)):
+        """Ensure that a valid combination of input types is set."""
+        if (not self.initial_conformers) and (not (bool(self.initial_smiles) ^ bool(self.initial_molecule))):
             raise ValueError("Can only set one of initial_molecule and initial_smiles")
 
         if isinstance(self.conf_gen_settings, iMTDSettings) and (self.initial_molecule is None):
             raise ValueError("iMTDSettings requires `initial_molecule` to be set")
+
+        if self.conf_gen_settings is None and not self.initial_conformers:
+            raise ValueError("Need `initial_conformers` to be set without a conformer-generation method!")
+
+        if len(self.initial_conformers) > 1:
+            initial_count = Counter(self.initial_conformers[0].atomic_numbers)
+            for conformer in self.initial_conformers[1:]:
+                if Counter(conformer.atomic_numbers) != initial_count:
+                    raise ValueError("Not all molecules in `initial_conformers` have the same atomic formula!")
 
         return self

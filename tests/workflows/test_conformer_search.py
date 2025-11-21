@@ -1,4 +1,4 @@
-from pydantic.error_wrappers import ValidationError
+from pydantic import ValidationError
 from pytest import fixture, raises
 
 from stjames import Constraint, Mode, Molecule
@@ -193,8 +193,21 @@ def test_ts_constraints(water: Molecule) -> None:
     cr = ConformerSearchWorkflow(initial_molecule=water, conf_gen_mode=Mode.CAREFUL, constraints=constraints, transition_state=True)
     cr_msos = cr.multistage_opt_settings
 
+    assert cr.conf_gen_settings is not None
     assert cr.conf_gen_settings.constraints == constraints
     assert len(cr_msos.optimization_settings) == 1
 
     assert not cr_msos.constraints
     assert cr_msos.optimization_settings[0].opt_settings.constraints == []
+
+
+def test_no_conformer_gen(water: Molecule, chloroethane: Molecule) -> None:
+    ConformerSearchWorkflow(initial_molecule=chloroethane, conf_gen_mode=Mode.MANUAL, conf_gen_settings=ETKDGSettings())
+
+    ConformerSearchWorkflow(initial_conformers=[chloroethane, chloroethane], conf_gen_mode=Mode.MANUAL, conf_gen_settings=None)
+
+    with raises(ValueError):
+        ConformerSearchWorkflow(initial_molecule=water, conf_gen_mode=Mode.MANUAL, conf_gen_settings=None)
+
+    with raises(ValueError):
+        ConformerSearchWorkflow(initial_conformers=[chloroethane, water], conf_gen_mode=Mode.MANUAL, conf_gen_settings=None)
