@@ -89,7 +89,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(SMILESWorkflow):
     nonbonded_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 8.0
 
     protein_prune_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] | None = None
-    protein_restraint_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 7.0
+    protein_restraint_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] | None = 7.0
     protein_restraint_constant: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 100
 
     ionic_strength_M: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 0.10
