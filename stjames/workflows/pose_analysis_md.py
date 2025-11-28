@@ -102,7 +102,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(SMILESWorkflow):
     @model_validator(mode="after")
     def check_cutoff_sanity(self) -> Self:
         """Check if protein is provided."""
-        if self.protein_prune_cutoff is not None:
+        if (self.protein_prune_cutoff is not None) and (self.protein_restraint_cutoff is not None):
             if self.protein_prune_cutoff < self.protein_restraint_cutoff:
                 raise ValueError("Pruning cutoff must be larger than restraint cutoff")
         return self
