@@ -321,7 +321,7 @@ def assembly_lines_to_assembly_dict(lines: list[str]) -> dict[str, Any]:
         (r"(.+)AREA OF THE COMPLEX: (.+) [A-Z]", "surface_area", float),
         (r"(.+)FREE ENERGY: (.+) [A-Z]", "delta_energy", float),
     ]
-    t = None
+    t: Any = None
     for line in lines:
         for pattern, key, converter in patterns:
             matches = re.findall(pattern, line)
