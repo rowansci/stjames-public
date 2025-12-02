@@ -4,14 +4,15 @@ from abc import ABC
 from collections import Counter
 from typing import Annotated, Literal, Self, Sequence, TypeVar
 
-from pydantic import AfterValidator, BaseModel, Field, PositiveInt, field_validator, model_validator
+from pydantic import AfterValidator, BaseModel, Field, PositiveFloat, PositiveInt, field_validator, model_validator
 
-from ..base import Base, LowercaseStrEnum
+from ..base import Base, LowercaseStrEnum, round_float
 from ..constraint import Constraint
 from ..method import Method, XTBMethod
 from ..mode import Mode
 from ..molecule import Molecule
 from ..settings import Settings
+from ..solvent import SolventModel, SolventSettings
 from ..types import UUID, FloatPerAtom, round_float_per_atom
 from .multistage_opt import MultiStageOptMixin
 from .workflow import MoleculeWorkflow, SMILESWorkflow
@@ -45,16 +46,16 @@ class ScreeningSettings(BaseModel):
 
 class ConformerProperties(Base):
     """
-    Descriptors of overall ensemble properties.
+    Descriptors of a conformer's properties.
 
     :param solvent_accessible_surface_area: the average SASA, in Å**2
     :param polar_solvent_accessible_surface_area: the average SASA for non-C/H elements, in Å**2
     :param radius_of_gyration: the radius of gyration, in Å
     """
 
-    solvent_accessible_surface_area: float
-    polar_solvent_accessible_surface_area: float
-    radius_of_gyration: float
+    solvent_accessible_surface_area: Annotated[PositiveFloat, AfterValidator(round_float(3))]
+    polar_solvent_accessible_surface_area: Annotated[PositiveFloat, AfterValidator(round_float(3))]
+    radius_of_gyration: Annotated[PositiveFloat, AfterValidator(round_float(3))]
 
 
 class ConformerClusteringDescriptor(LowercaseStrEnum):
@@ -260,21 +261,29 @@ class iMTDSettings(ConformerGenSettings, ABC):
 
     New:
     :param mtd_method: method for the metadynamics
+    :param mtd_runtype: the algorithm used
     :param speed: speed of the calculations (CREST specific setting)
     :param reopt: re-optimize conformers (corrects for the lack of rotamer metadynamics and GC)
     :param free_energy_weights: calculate frequencies and re-weight based on free energies
+    :param energy_window: the energy window used, in kcal/mol (CREST specific setting). if set, overrides the default from the speed.
+    :param solvent_settings: the solvent to use, if any
     """
+
+    settings_type: Literal["imtd"] = "imtd"
 
     mtd_method: XTBMethod = Method.GFN_FF
     mtd_runtype: str = "imtd-gc"
-
     speed: iMTDSpeeds = iMTDSpeeds.QUICK
     reopt: bool = _sentinel  # type: ignore [assignment]
     free_energy_weights: bool = False
-    settings_type: Literal["imtd"] = "imtd"
+    energy_window: Annotated[PositiveFloat, AfterValidator(round_float(1))] | None = None
+    solvent_settings: SolventSettings | None = None
 
     @model_validator(mode="after")
     def validate_and_build_imtdgc_settings(self) -> Self:
+        if self.solvent_settings and self.solvent_settings.model not in {SolventModel.ALPB, SolventModel.GBSA}:
+            raise ValueError("Only ALPB or GBSA solvent models supported for iMTD conformer search!")
+
         match self.mode:
             case Mode.MANUAL:
                 if self.reopt is _sentinel:
