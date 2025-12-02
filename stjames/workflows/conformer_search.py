@@ -4,7 +4,7 @@ from abc import ABC
 from collections import Counter
 from typing import Annotated, Literal, Self, Sequence, TypeVar
 
-from pydantic import AfterValidator, BaseModel, Field, PositiveFloat, PositiveInt, field_validator, model_validator
+from pydantic import AfterValidator, BaseModel, Field, NonNegativeFloat, PositiveFloat, PositiveInt, field_validator, model_validator
 
 from ..base import Base, LowercaseStrEnum, round_float
 from ..constraint import Constraint
@@ -54,7 +54,7 @@ class ConformerProperties(Base):
     """
 
     solvent_accessible_surface_area: Annotated[PositiveFloat, AfterValidator(round_float(3))]
-    polar_solvent_accessible_surface_area: Annotated[PositiveFloat, AfterValidator(round_float(3))]
+    polar_solvent_accessible_surface_area: Annotated[NonNegativeFloat, AfterValidator(round_float(3))]
     radius_of_gyration: Annotated[PositiveFloat, AfterValidator(round_float(3))]
 
 
