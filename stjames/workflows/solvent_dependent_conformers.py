@@ -35,7 +35,7 @@ class SolventDependentConformersWorkflow(ConformerSearchMixin, SMILESWorkflow, M
 
     Final conformer scoring is done through a multi-level scheme:
         - A single-point gas-phase energy run through `multistage_opt_settings.sp_settings`.
-        - A separate thermal free-energy correcting computed via a single-point Hessian (GFN2-xTB).
+        - A separate thermal free-energy correction computed via a single-point Hessian (GFN2-xTB).
         - A per-solvent CPCM-X calculation.
 
     Inherited:
