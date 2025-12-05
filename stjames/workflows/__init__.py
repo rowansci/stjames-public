@@ -6,6 +6,7 @@ from .admet import *
 from .basic_calculation import *
 from .batch_docking import *
 from .bde import *
+from .cell_membrane_permeability import *
 from .conformer import *
 from .conformer_search import *
 from .descriptors import *
@@ -42,6 +43,7 @@ WORKFLOW_NAME = Literal[
     "basic_calculation",
     "batch_docking",
     "bde",
+    "cell_membrane_permeability",
     "conformers",
     "conformer_search",
     "descriptors",
@@ -76,6 +78,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "basic_calculation": BasicCalculationWorkflow,  # type: ignore [dict-item]
     "batch_docking": BatchDockingWorkflow,  # type: ignore [dict-item]
     "bde": BDEWorkflow,  # type: ignore [dict-item]
+    "cell_membrane_permeability": CellMembranePermeabilityWorkflow,  # type: ignore [dict-item]
     "conformers": ConformerWorkflow,  # type: ignore [dict-item]
     "conformer_search": ConformerSearchWorkflow,  # type: ignore [dict-item]
     "descriptors": DescriptorsWorkflow,  # type: ignore [dict-item]
