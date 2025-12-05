@@ -17,6 +17,7 @@ from .hydrogen_bond_basicity import *
 from .ion_mobility import *
 from .irc import *
 from .macropka import *
+from .membrane_permeability import *
 from .molecular_dynamics import *
 from .msa import *
 from .multistage_opt import *
@@ -42,6 +43,7 @@ WORKFLOW_NAME = Literal[
     "basic_calculation",
     "batch_docking",
     "bde",
+    "membrane_permeability",
     "conformers",
     "conformer_search",
     "descriptors",
@@ -76,6 +78,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "basic_calculation": BasicCalculationWorkflow,  # type: ignore [dict-item]
     "batch_docking": BatchDockingWorkflow,  # type: ignore [dict-item]
     "bde": BDEWorkflow,  # type: ignore [dict-item]
+    "membrane_permeability": MembranePermeabilityWorkflow,  # type: ignore [dict-item]
     "conformers": ConformerWorkflow,  # type: ignore [dict-item]
     "conformer_search": ConformerSearchWorkflow,  # type: ignore [dict-item]
     "descriptors": DescriptorsWorkflow,  # type: ignore [dict-item]
