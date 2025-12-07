@@ -19,10 +19,10 @@ class MembranePermeabilityWorkflow(SMILESWorkflow):
     :param membrane_permeability_method: model used to predict membrane permeability
 
     Results:
-    :param membrane_permeability: the log(P_app) in cm/s of the compound across a membrane
+    :param caco_2_P_app: Caco-2 apparent permeability P_app (x10^-6 cm/s)
     """
 
     initial_smiles: str
     membrane_permeability_method: MembranePermeabilityMethod = MembranePermeabilityMethod.CHEMPROP_OHLSSON2025
 
-    membrane_permeability: Annotated[float, AfterValidator(round_float(3))]
+    caco_2_P_app: Annotated[float, AfterValidator(round_float(3))]
