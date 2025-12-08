@@ -1,15 +1,27 @@
 """Protein cofolding workflow."""
 
-from typing import Annotated, Literal, TypeAlias
+from typing import Annotated, Any, Literal, TypeAlias
 
-from pydantic import AfterValidator, BaseModel, ConfigDict
+from pydantic import AfterValidator, BaseModel, ConfigDict, model_validator
 
-from ..base import LowercaseStrEnum, round_float, round_optional_float
+from ..base import LowercaseStrEnum, round_float
 from ..types import UUID, round_list
 from .workflow import FASTAWorkflow
 
 ProteinUUID: TypeAlias = UUID
 CalculationUUID: TypeAlias = UUID
+
+
+_LDDT_SAMPLE_ROUNDER = round_list(3)
+
+
+def _round_lddt_samples(values: list[list[float]] | None) -> list[list[float]] | None:
+    """Round each diffusion sample's lDDT values to three decimal places."""
+
+    if values is None:
+        return None
+
+    return [_LDDT_SAMPLE_ROUNDER(sample) for sample in values]
 
 
 class CofoldingModel(LowercaseStrEnum):
@@ -86,14 +98,16 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     :param pocket_constraints: Boltz pocket constraints
     :param do_pose_refinement: whether to optimize non-rotatable bonds in output poses
     :param compute_strain: whether to compute the strain of the pose (if `pose_refinement` is enabled)
+    :param diffusion_samples: number of samples generated for prediction
     :param model: which cofolding model to use
     :param affinity_score: the affinity score
-    :param lddt: the local distance different test result
-    :param predicted_structure_uuid: UUID of the predicted structure
-    :param scores: the output cofolding scores
-    :param pose: the UUID of the calculation pose
-    :param strain: the strain of the ligand, in kcal/mol
-    :param predicted_refined_structure_uuid: if the structure has been refined, the UUID of the predicted structure after refinement
+    :param lddt: per diffusion sample local distance difference test results
+    :param predicted_structure_uuid: per diffusion sample UUID of the predicted structure
+    :param scores: per diffusion sample cofolding scores
+    :param pose: per diffusion sample UUID of the calculation pose
+    :param posebusters_valid: per diffusion sample PoseBusters validity flags
+    :param strain: per diffusion sample ligand strain, in kcal/mol
+    :param predicted_refined_structure_uuid: per diffusion sample UUID of the refined predicted structure (if refinement ran)
     """
 
     model_config = ConfigDict(validate_assignment=True)
@@ -105,14 +119,55 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     pocket_constraints: list[PocketConstraint] = []
     do_pose_refinement: bool = False
     compute_strain: bool = False
+    diffusion_samples: int | None = 1
 
     model: CofoldingModel = CofoldingModel.BOLTZ_2
     affinity_score: AffinityScore | None = None
-    lddt: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
+    lddt: Annotated[list[list[float]] | None, AfterValidator(_round_lddt_samples)] = None
 
-    predicted_structure_uuid: ProteinUUID | None = None
-    scores: CofoldingScores | None = None
-    pose: CalculationUUID | None = None
-    posebusters_valid: bool | None = None
-    strain: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
-    predicted_refined_structure_uuid: ProteinUUID | None = None
+    predicted_structure_uuid: list[ProteinUUID] | None = None
+    scores: list[CofoldingScores] | None = None
+    pose: list[CalculationUUID] | None = None
+    posebusters_valid: list[bool] | None = None
+    strain: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
+    predicted_refined_structure_uuid: list[ProteinUUID] | None = None
+
+    @model_validator(mode="before")
+    @classmethod
+    def _ensure_list_outputs(cls, values: Any) -> Any:
+        """Allow single output values by wrapping them in a list."""
+
+        if not isinstance(values, dict):
+            return values
+
+        list_fields = (
+            "predicted_structure_uuid",
+            "scores",
+            "pose",
+            "posebusters_valid",
+            "strain",
+            "predicted_refined_structure_uuid",
+        )
+
+        for field in list_fields:
+            value = values.get(field)
+            if value is None or isinstance(value, list):
+                continue
+            values[field] = [value]
+
+        lddt_values = values.get("lddt")
+        if lddt_values is None:
+            return values
+
+        if not isinstance(lddt_values, list):
+            values["lddt"] = [lddt_values]
+            return values
+
+        if not lddt_values:
+            return values
+
+        if all(isinstance(sample, list) for sample in lddt_values):
+            return values
+
+        values["lddt"] = [lddt_values]
+        return values
