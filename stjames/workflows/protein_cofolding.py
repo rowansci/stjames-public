@@ -4,7 +4,7 @@ from typing import Annotated, Literal, TypeAlias
 
 from pydantic import AfterValidator, BaseModel, ConfigDict
 
-from ..base import LowercaseStrEnum, round_float, round_optional_float
+from ..base import Base, LowercaseStrEnum, round_float, round_optional_float
 from ..types import UUID, round_list
 from .workflow import FASTAWorkflow
 
@@ -66,6 +66,29 @@ class AffinityScore(BaseModel):
     probability_binary2: Annotated[float, AfterValidator(round_float(3))]
 
 
+class CofoldingResult(Base):
+    """Results for a single cofolding sample.
+
+    :param affinity_score: affinity score
+    :param lddt: local distance different test result
+    :param predicted_structure_uuid: UUID of the predicted structure
+    :param scores: output cofolding scores
+    :param pose: UUID of the calculation pose
+    :param strain: strain of the ligand, in kcal/mol
+    :param predicted_refined_structure_uuid: if the structure has been refined,
+        UUID of the predicted structure after refinement
+    """
+
+    lddt: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
+    affinity_score: AffinityScore | None = None
+    predicted_structure_uuid: ProteinUUID | None = None
+    scores: CofoldingScores | None = None
+    pose: CalculationUUID | None = None
+    posebusters_valid: bool | None = None
+    strain: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    predicted_refined_structure_uuid: ProteinUUID | None = None
+
+
 class ProteinCofoldingWorkflow(FASTAWorkflow):
     """
     Workflow for predicting structures.
@@ -86,14 +109,9 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     :param pocket_constraints: Boltz pocket constraints
     :param do_pose_refinement: whether to optimize non-rotatable bonds in output poses
     :param compute_strain: whether to compute the strain of the pose (if `pose_refinement` is enabled)
+    :param num_samples: number of samples generated for prediction
     :param model: which cofolding model to use
-    :param affinity_score: the affinity score
-    :param lddt: the local distance different test result
-    :param predicted_structure_uuid: UUID of the predicted structure
-    :param scores: the output cofolding scores
-    :param pose: the UUID of the calculation pose
-    :param strain: the strain of the ligand, in kcal/mol
-    :param predicted_refined_structure_uuid: if the structure has been refined, the UUID of the predicted structure after refinement
+    :param cofolding_results: per diffusion sample outputs, grouped together
     """
 
     model_config = ConfigDict(validate_assignment=True)
@@ -105,11 +123,13 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     pocket_constraints: list[PocketConstraint] = []
     do_pose_refinement: bool = False
     compute_strain: bool = False
+    num_samples: int | None = None
 
     model: CofoldingModel = CofoldingModel.BOLTZ_2
+    cofolding_results: list[CofoldingResult] | None = None
+
     affinity_score: AffinityScore | None = None
     lddt: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
-
     predicted_structure_uuid: ProteinUUID | None = None
     scores: CofoldingScores | None = None
     pose: CalculationUUID | None = None
