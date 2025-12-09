@@ -123,7 +123,17 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     pocket_constraints: list[PocketConstraint] = []
     do_pose_refinement: bool = False
     compute_strain: bool = False
-    num_samples: int | None = 1
+    num_samples: int | None = None
 
     model: CofoldingModel = CofoldingModel.BOLTZ_2
     cofolding_results: list[CofoldingResult] | None = None
+
+
+    affinity_score: AffinityScore | None = None
+    lddt: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
+    predicted_structure_uuid: ProteinUUID | None = None
+    scores: CofoldingScores | None = None
+    pose: CalculationUUID | None = None
+    posebusters_valid: bool | None = None
+    strain: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    predicted_refined_structure_uuid: ProteinUUID | None = None
