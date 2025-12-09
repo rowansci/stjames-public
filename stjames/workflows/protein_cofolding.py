@@ -128,7 +128,6 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     model: CofoldingModel = CofoldingModel.BOLTZ_2
     cofolding_results: list[CofoldingResult] | None = None
 
-
     affinity_score: AffinityScore | None = None
     lddt: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
     predicted_structure_uuid: ProteinUUID | None = None
