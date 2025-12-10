@@ -25,4 +25,4 @@ class MembranePermeabilityWorkflow(SMILESWorkflow):
     initial_smiles: str
     membrane_permeability_method: MembranePermeabilityMethod = MembranePermeabilityMethod.CHEMPROP_OHLSSON2025
 
-    caco_2_P_app: Annotated[float, AfterValidator(round_float(3))]
+    caco_2_P_app: Annotated[float, AfterValidator(round_float(3))] | None = None
