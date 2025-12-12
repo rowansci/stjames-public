@@ -76,6 +76,8 @@ class PoseAnalysisMolecularDynamicsWorkflow(SMILESWorkflow):
     protein_uuid: UUID | None = None
     ligand_residue_name: str = "LIG"
 
+    save_solvent: bool = False
+
     num_trajectories: PositiveInt = 1
     equilibration_time_ns: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 1
     simulation_time_ns: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 10
