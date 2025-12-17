@@ -33,6 +33,7 @@ from .relative_binding_free_energy_perturbation import (
 )
 from .scan import *
 from .solubility import *
+from .solvent_dependent_conformers import *
 from .spin_states import *
 from .strain import *
 from .tautomer import *
@@ -68,6 +69,7 @@ WORKFLOW_NAME = Literal[
     "redox_potential",
     "scan",
     "solubility",
+    "solvent_dependent_conformers",
     "spin_states",
     "strain",
     "tautomers",
@@ -103,6 +105,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "redox_potential": RedoxPotentialWorkflow,  # type: ignore [dict-item]
     "scan": ScanWorkflow,  # type: ignore [dict-item]
     "solubility": SolubilityWorkflow,  # type: ignore [dict-item]
+    "solvent_dependent_conformers": SolventDependentConformersWorkflow,  # type: ignore [dict-item]
     "spin_states": SpinStatesWorkflow,  # type: ignore [dict-item]
     "strain": StrainWorkflow,  # type: ignore [dict-item]
     "tautomers": TautomerWorkflow,  # type: ignore [dict-item]
