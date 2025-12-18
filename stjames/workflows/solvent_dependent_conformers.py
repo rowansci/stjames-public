@@ -75,19 +75,20 @@ class SolventDependentConformersWorkflow(ConformerSearchMixin, MoleculeWorkflow)
                     solvent=Solvent.WATER,
                     model=SolventModel.ALPB,
                 ),
+                tasks=["optimize"]
             )
         ],
-        sp_settings=Settings(method="g_xtb"),
+        sp_settings=Settings(method="g_xtb", tasks=["energy"]),
         mode=Mode.MANUAL,
     )
 
     conformers: list[SolventDependentConformer] = []
     per_solvent_properties: dict[Solvent, ConformerProperties] = {}
-    relative_free_energy_by_solvent: dict[Solvent, Annotated[float, AfterValidator(round_float(3))]]
+    relative_free_energy_by_solvent: dict[Solvent, Annotated[float, AfterValidator(round_float(3))]] = {}
 
     @model_validator(mode="after")
     def validate_no_solvent(self) -> Self:
-        """Ensure that a valid combination of input types is set."""
+        """Ensure that no solvent is input."""
         if self.conf_gen_settings.solvent_settings:
             raise ValueError("Solvent settings cannot be specified for this workflow!")
 
