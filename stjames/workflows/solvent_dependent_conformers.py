@@ -75,7 +75,7 @@ class SolventDependentConformersWorkflow(ConformerSearchMixin, MoleculeWorkflow)
                     solvent=Solvent.WATER,
                     model=SolventModel.ALPB,
                 ),
-                tasks=["optimize"]
+                tasks=["optimize"],
             )
         ],
         sp_settings=Settings(method="g_xtb", tasks=["energy"]),
