@@ -289,9 +289,9 @@ def test_molecule_from_extxyz_valid_with_forces() -> None:
     The forces should be converted to gradients (as the negative of forces).
     """
     molecule = Molecule.from_extxyz(valid_extxyz_with_forces_and_energy)
-    assert (
-        molecule == expected_molecule_with_forces_and_energy
-    ), f"Valid forces case failed:\nGot {molecule}\nExpected {expected_molecule_with_forces_and_energy}"
+    assert molecule == expected_molecule_with_forces_and_energy, (
+        f"Valid forces case failed:\nGot {molecule}\nExpected {expected_molecule_with_forces_and_energy}"
+    )
 
 
 @mark.parametrize(
