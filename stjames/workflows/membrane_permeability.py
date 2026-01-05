@@ -4,7 +4,7 @@ from pydantic import AfterValidator, model_validator
 
 from ..base import LowercaseStrEnum, round_float
 from ..molecule import Molecule
-from .workflow import SMILESWorkflow, MoleculeWorkflow
+from .workflow import MoleculeWorkflow, SMILESWorkflow
 
 
 class MembranePermeabilityMethod(LowercaseStrEnum):
@@ -24,7 +24,7 @@ class MembranePermeabilityWorkflow(SMILESWorkflow, MoleculeWorkflow):
     :param membrane_permeability_method: model used to predict membrane permeability
 
     Results:
-    :param caco_2_P_app: base-10 logarithm of the Caco-2 apparent permeability P_app (in 10**-6 cm/s)
+    :param caco_2_P_app: base-10 logarithm of the Caco-2 apparent permeability P_app (in cm/s)
     :param caco_2_logP: the Caco-2 intrinsic permeability coefficient logP
     :param blm_logP: the bilayer-lipid-membrane intrinsic permeability coefficient logP
     :param pampa_logP: the PAMPA intrinsic permeability coefficient logP
