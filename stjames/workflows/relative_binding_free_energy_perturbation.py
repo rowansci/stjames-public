@@ -9,6 +9,7 @@ from ..message import Message
 from ..method import Method
 from ..molecule import Molecule
 from ..pdb import PDB
+from ..types import UUID
 from .workflow import Workflow
 
 
@@ -164,7 +165,7 @@ class RelativeBindingFreeEnergyPerturbationWorkflow(Workflow):
 
     :param ligands: Mapping from ligand identifiers to `Molecule` objects.
     :param graph: RBFE graph topology.
-    :param pdb_structure: Prepared complex structure required for complex-leg simulations.
+    :param target: PDB object or the UUID of the PDB object used for simulation.
     :param ligand_dg_results: Optional per-ligand FEP summaries produced downstream.
     :param diagnostics: Optional aggregate QC metrics.
     :param settings: Simulation controls shared across all RBFE edges.
@@ -172,7 +173,7 @@ class RelativeBindingFreeEnergyPerturbationWorkflow(Workflow):
 
     ligands: dict[str, Molecule]
     graph: RBFEGraph
-    pdb_structure: PDB
+    target: PDB | UUID
 
     settings: TMDRBFESettings
 
