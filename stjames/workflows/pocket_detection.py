@@ -1,6 +1,6 @@
-from typing import Annotated, Self
+from typing import Annotated
 
-from pydantic import AfterValidator, model_validator
+from pydantic import AfterValidator, NonNegativeInt
 
 from ..base import Base, round_float
 from ..types import Vector3D
@@ -17,16 +17,19 @@ class Pocket(Base):
     :param score: the druggability / quality score, larger scores are better
     :param pocket_center: the center of the bounding box
     :param pocket_sides: the side lengths of the bounding box
+    :param residue_numbers: the indices of the residues on the pocket
     """
 
     sphere_centers: list[Vector3D]
     sphere_radii: list[float]
 
-    volume: Annotated[float, AfterValidator(round_float(3))] = 1.75
-    score: Annotated[float, AfterValidator(round_float(3))] = 1.75
+    volume: Annotated[float, AfterValidator(round_float(3))]
+    score: Annotated[float, AfterValidator(round_float(3))]
 
     pocket_center: list[Vector3D]
     pocket_sides: list[Vector3D]
+
+    residue_numbers: list[NonNegativeInt]
 
 
 class PocketDetectionWorkflow(ProteinStructureWorkflow):
@@ -45,10 +48,3 @@ class PocketDetectionWorkflow(ProteinStructureWorkflow):
 
     merge_distance: Annotated[float, AfterValidator(round_float(3))] = 1.75
     pockets: list[Pocket] = []
-
-    @model_validator(mode="after")
-    def check_protein(self) -> Self:
-        """Check if protein is provided."""
-        if not self.protein and not self.protein_uuid:
-            raise ValueError("Must provide either target or target_uuid")
-        return self
