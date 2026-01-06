@@ -9,6 +9,7 @@ from ..dna import DNASequence
 from ..message import Message
 from ..mode import Mode
 from ..molecule import Molecule
+from ..pdb import PDB
 from ..protein import ProteinSequence
 from ..rna import RNASequence
 from ..types import UUID
@@ -107,6 +108,18 @@ class ProteinSequenceWorkflow(Workflow):
     """
 
     initial_protein_sequences: list[ProteinSequence] | list[str] = []
+
+
+class ProteinStructureWorkflow(Workflow):
+    """
+    Base class for Workflows that operate on protein sequences.
+
+    :param protein: the PDB structure of the protein in question
+    :param protein_uuid: the UUID of the PDB record in Rowan
+    """
+
+    protein: PDB | None = None
+    protein_uuid: UUID | None = None
 
 
 class DBCalculation(Base):
