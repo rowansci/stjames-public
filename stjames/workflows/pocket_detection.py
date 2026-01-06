@@ -35,7 +35,6 @@ class PocketDetectionWorkflow(ProteinStructureWorkflow):
 
     Inherited:
     :param protein: the protein
-    :param protein_uuid: the protein's UUID
 
     New:
     :param merge_distance: distance for merging pocket spheres, in Å

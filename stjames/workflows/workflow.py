@@ -114,12 +114,10 @@ class ProteinStructureWorkflow(Workflow):
     """
     Base class for Workflows that operate on protein sequences.
 
-    :param protein: the PDB structure of the protein in question
-    :param protein_uuid: the UUID of the PDB record in Rowan
+    :param protein: the PDB structure of the protein in question, or the UUID of the PDB record in Rowan
     """
 
-    protein: PDB | None = None
-    protein_uuid: UUID | None = None
+    protein: PDB | UUID
 
 
 class DBCalculation(Base):
