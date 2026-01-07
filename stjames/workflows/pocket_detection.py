@@ -26,8 +26,8 @@ class Pocket(Base):
     volume: Annotated[float, AfterValidator(round_float(3))]
     score: Annotated[float, AfterValidator(round_float(3))]
 
-    pocket_center: list[Vector3D]
-    pocket_sides: list[Vector3D]
+    pocket_center: Vector3D
+    pocket_sides: Vector3D
 
     residue_numbers: list[NonNegativeInt]
 
