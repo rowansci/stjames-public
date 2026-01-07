@@ -23,6 +23,7 @@ from .msa import *
 from .multistage_opt import *
 from .nmr import *
 from .pka import *
+from .pocket_detection import Pocket, PocketDetectionWorkflow
 from .pose_analysis_md import *
 from .protein_binder_design import *
 from .protein_cofolding import *
@@ -62,6 +63,7 @@ WORKFLOW_NAME = Literal[
     "multistage_opt",
     "nmr",
     "pka",
+    "pocket_detection",
     "pose_analysis_md",
     "protein_cofolding",
     "protein_binder_design",
@@ -98,6 +100,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "msa": MSAWorkflow,  # type: ignore [dict-item]
     "nmr": NMRSpectroscopyWorkflow,  # type: ignore [dict-item]
     "pka": pKaWorkflow,  # type: ignore [dict-item]
+    "pocket_detection": PocketDetectionWorkflow,  # type: ignore [dict-item]
     "pose_analysis_md": PoseAnalysisMolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "protein_cofolding": ProteinCofoldingWorkflow,  # type: ignore [dict-item]
     "protein_binder_design": ProteinBinderDesignWorkflow,  # type: ignore [dict-item]
