@@ -427,7 +427,7 @@ def _format_atom_line(
     residue_num_str = "1"
     insertion_code = " "
     if res_num:
-        match = re.match(r"(\d+)([a-zA-Z]*)", res_num)
+        match = re.match(r"(\d)([a-zA-Z]*)", res_num)
         if match:
             residue_num_str, insertion_code = match.groups()
             insertion_code = insertion_code if insertion_code != "" else " "
