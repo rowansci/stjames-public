@@ -98,7 +98,9 @@ class Method(LowercaseStrEnum):
                 return Engine.AIMNET2
             case Method.MACE_MP_0B2_L:
                 return Engine.MACE
-            case Method.OMOL25_CONSERVING_S | Method.UMA_M_OMOL | Method.UMA_S_OMOL:
+            case (
+                Method.OMOL25_CONSERVING_S | Method.UMA_S_OMOL | Method.UMA_M_OMOL | Method.UMA_S_OMAT | Method.UMA_M_OMAT | Method.UMA_S_OMC | Method.UMA_M_OMC
+            ):
                 return Engine.OMOL25
             case Method.ORB_V3_CONSERVATIVE_INF_OMAT | Method.ORB_V3_CONSERVATIVE_OMOL:
                 return Engine.ORB
@@ -118,8 +120,12 @@ class Method(LowercaseStrEnum):
 PrepackagedNNPMethod = Literal[
     Method.AIMNET2_WB97MD3,
     Method.OMOL25_CONSERVING_S,
-    Method.UMA_M_OMOL,
     Method.UMA_S_OMOL,
+    Method.UMA_M_OMOL,
+    Method.UMA_S_OMAT,
+    Method.UMA_M_OMAT,
+    Method.UMA_S_OMC,
+    Method.UMA_M_OMC,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
     Method.ORB_V3_CONSERVATIVE_OMOL,
     Method.EGRET_1,
@@ -130,8 +136,12 @@ PrepackagedNNPMethod = Literal[
 PREPACKAGED_NNP_METHODS = [
     Method.AIMNET2_WB97MD3,
     Method.OMOL25_CONSERVING_S,
-    Method.UMA_M_OMOL,
     Method.UMA_S_OMOL,
+    Method.UMA_M_OMOL,
+    Method.UMA_S_OMAT,
+    Method.UMA_M_OMAT,
+    Method.UMA_S_OMC,
+    Method.UMA_M_OMC,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
     Method.ORB_V3_CONSERVATIVE_OMOL,
     Method.EGRET_1,
