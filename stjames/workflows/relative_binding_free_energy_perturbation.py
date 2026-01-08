@@ -34,6 +34,7 @@ class TMDRBFESettings(Base):
     :param local_md_k: Spring constant used during local MD.
     :param local_md_radius: Sphere radius in nanometers for the local MD region.
     :param local_md_free_reference: Whether to free the reference frame during local MD.
+    :param legs: Which thermodynamic cycle legs to run (default: solvent and complex).
     """
 
     forcefield: Method = Method.SMIRNOFF_2_2_1_AMBER_AM1BCC
@@ -50,6 +51,7 @@ class TMDRBFESettings(Base):
     local_md_k: float = 10_000.0
     local_md_radius: float = 1.2
     local_md_free_reference: bool = False
+    legs: list[Literal["vacuum", "solvent", "complex"]] = ["solvent", "complex"]
 
 
 class RBFEResult(Base):
