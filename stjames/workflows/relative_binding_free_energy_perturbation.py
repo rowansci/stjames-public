@@ -82,6 +82,7 @@ class RBFEGraphEdge(Base):
     :param vacuum_dg_err: Uncertainty on `vacuum_dg`.
     :param ddg: Combined cycle result derived from complex and solvent legs.
     :param ddg_err: Uncertainty on `ddg`.
+    :param failed: Whether a required leg failed, making ddG impossible to compute.
     """
 
     ligand_a: str
@@ -97,6 +98,7 @@ class RBFEGraphEdge(Base):
     vacuum_dg_err: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
     ddg: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
     ddg_err: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    failed: bool = False
 
 
 class RBFEGraph(Base):
