@@ -3,7 +3,7 @@ from datetime import date, datetime
 from pathlib import Path
 from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 import stjames.atomium_stjames as astj
 from stjames.atomium_stjames.mmcif import mmcif_dict_to_data_dict, mmcif_string_to_mmcif_dict
@@ -55,6 +55,25 @@ class PDBResidue(BaseModel):
     number: int
 
 
+def _residue_sort_key(residue_id: str) -> tuple[int, str]:
+    """
+    Extract a sort key from a residue ID for proper numeric ordering.
+
+    Residue IDs have the format "{chain_id}.{number}{insertion_code}" (e.g., "A.-3", "AA.0", "B.100A").
+    Returns a tuple (numeric_value, insertion_code) to sort by number first,
+    then by insertion code for residues with the same number.
+    """
+    # Find the first dot to separate chain ID from residue number (supports multi-char chain IDs)
+    dot_idx = residue_id.find(".")
+    if dot_idx == -1:
+        return (0, residue_id)
+    num_str = residue_id[dot_idx + 1 :]  # Everything after the dot
+    match = re.match(r"(-?\d+)(.*)", num_str)
+    if match:
+        return (int(match.group(1)), match.group(2))
+    return (0, num_str)
+
+
 class PDBPolymer(BaseModel):
     """A polymer chain."""
 
@@ -65,6 +84,12 @@ class PDBPolymer(BaseModel):
     residues: dict[str, PDBResidue] = {}
     sequence: str | None = None
     strands: list[list[str]] = []
+
+    @model_validator(mode="after")
+    def sort_residues_by_number(self) -> "PDBPolymer":
+        """Ensure residues are sorted by numeric position, not alphabetically."""
+        self.residues = dict(sorted(self.residues.items(), key=lambda x: _residue_sort_key(x[0])))
+        return self
 
 
 class PDBNonPolymer(BaseModel):
