@@ -1,7 +1,7 @@
 import re
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, Self
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
@@ -63,15 +63,14 @@ def _residue_sort_key(residue_id: str) -> tuple[int, str]:
     Returns a tuple (numeric_value, insertion_code) to sort by number first,
     then by insertion code for residues with the same number.
     """
-    # Find the first dot to separate chain ID from residue number (supports multi-char chain IDs)
-    dot_idx = residue_id.find(".")
-    if dot_idx == -1:
-        return (0, residue_id)
-    num_str = residue_id[dot_idx + 1 :]  # Everything after the dot
-    match = re.match(r"(-?\d+)(.*)", num_str)
-    if match:
+    chain_id, *number = residue_id.split(".", 1)
+    if not number:
+        return (0, chain_id)
+
+    if match := re.match(r"(-?\d+)(.*)", number[0]):
         return (int(match.group(1)), match.group(2))
-    return (0, num_str)
+
+    return (0, residue_id)
 
 
 class PDBPolymer(BaseModel):
@@ -86,7 +85,7 @@ class PDBPolymer(BaseModel):
     strands: list[list[str]] = []
 
     @model_validator(mode="after")
-    def sort_residues_by_number(self) -> "PDBPolymer":
+    def sort_residues_by_number(self) -> Self:
         """Ensure residues are sorted by numeric position, not alphabetically."""
         self.residues = dict(sorted(self.residues.items(), key=lambda x: _residue_sort_key(x[0])))
         return self
