@@ -1,3 +1,5 @@
+import json
+
 from pytest import mark
 
 from stjames.pdb import (
@@ -5,6 +7,8 @@ from stjames.pdb import (
     PDBDescription,
     PDBExperiment,
     PDBModel,
+    PDBPolymer,
+    PDBResidue,
     fetch_pdb,
     fetch_pdb_from_mmcif,
     pdb_from_mmcif_filestring,
@@ -165,3 +169,71 @@ def test_from_mmcif_to_pdb_1ema() -> None:
     assert compare_experiments_mmcif_and_pdb(mmcif_1ema.experiment, pdb_1ema.experiment)
     assert mmcif_1ema.quality == pdb_1ema.quality
     assert compare_models_mmcif_and_pdb(mmcif_1ema.models, pdb_1ema.models)
+
+
+def test_residue_order_preserved_after_json_sort() -> None:
+    """
+    Test that residue ordering is preserved after JSON round-trip with sorted keys.
+
+    PostgreSQL JSONB sorts keys alphabetically, which breaks numeric ordering for
+    residue IDs like "A.-3", "A.-2", "A.-1", "A.0", "A.1", "A.10", etc.
+    The PDBPolymer model_validator should re-sort residues by numeric position.
+    """
+    # Create residues in correct numeric order (including negative numbers)
+    residues = {
+        "A.-3": PDBResidue(name="ACE", number=-3, atoms={}, bvalue=0.0),
+        "A.-2": PDBResidue(name="ASP", number=-2, atoms={}, bvalue=0.0),
+        "A.-1": PDBResidue(name="ASP", number=-1, atoms={}, bvalue=0.0),
+        "A.0": PDBResidue(name="LYS", number=0, atoms={}, bvalue=0.0),
+        "A.1": PDBResidue(name="MET", number=1, atoms={}, bvalue=0.0),
+        "A.2": PDBResidue(name="ASP", number=2, atoms={}, bvalue=0.0),
+        "A.10": PDBResidue(name="GLY", number=10, atoms={}, bvalue=0.0),
+        "A.11": PDBResidue(name="ALA", number=11, atoms={}, bvalue=0.0),
+    }
+
+    polymer = PDBPolymer(internal_id="A", residues=residues)
+    original_order = list(polymer.residues.keys())
+
+    # Simulate JSONB round-trip (sort_keys=True mimics PostgreSQL JSONB behavior)
+    json_dict = polymer.model_dump(mode="json")
+    json_string_sorted = json.dumps(json_dict, sort_keys=True)
+    json_parsed = json.loads(json_string_sorted)
+
+    # Verify JSON sorting scrambled the keys (alphabetic order)
+    alphabetic_order = list(json_parsed["residues"].keys())
+    assert alphabetic_order == ["A.-1", "A.-2", "A.-3", "A.0", "A.1", "A.10", "A.11", "A.2"]
+
+    # Restore from sorted JSON - validator should fix the order
+    restored_polymer = PDBPolymer.model_validate(json_parsed)
+    restored_order = list(restored_polymer.residues.keys())
+
+    # Verify correct numeric order is restored
+    expected_order = ["A.-3", "A.-2", "A.-1", "A.0", "A.1", "A.2", "A.10", "A.11"]
+    assert restored_order == expected_order
+    assert restored_order == original_order
+
+
+def test_residue_order_with_multichar_chain_id() -> None:
+    """
+    Test that residue ordering works with multi-character chain IDs.
+    """
+    residues = {
+        "AA.-1": PDBResidue(name="ACE", number=-1, atoms={}, bvalue=0.0),
+        "AA.0": PDBResidue(name="MET", number=0, atoms={}, bvalue=0.0),
+        "AA.1": PDBResidue(name="ALA", number=1, atoms={}, bvalue=0.0),
+        "AA.10": PDBResidue(name="GLY", number=10, atoms={}, bvalue=0.0),
+        "AA.2": PDBResidue(name="VAL", number=2, atoms={}, bvalue=0.0),
+    }
+
+    polymer = PDBPolymer(internal_id="AA", residues=residues)
+
+    # Simulate JSONB round-trip
+    json_dict = polymer.model_dump(mode="json")
+    json_string_sorted = json.dumps(json_dict, sort_keys=True)
+    json_parsed = json.loads(json_string_sorted)
+
+    restored_polymer = PDBPolymer.model_validate(json_parsed)
+    restored_order = list(restored_polymer.residues.keys())
+
+    expected_order = ["AA.-1", "AA.0", "AA.1", "AA.2", "AA.10"]
+    assert restored_order == expected_order
