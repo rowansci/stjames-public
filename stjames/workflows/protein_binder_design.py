@@ -6,6 +6,7 @@ from typing import Annotated, TypeAlias
 from pydantic import AfterValidator
 
 from ..base import Base, LowercaseStrEnum, round_optional_float
+from ..protein import ProteinSequence
 from ..types import UUID
 from .workflow import Workflow
 
@@ -254,7 +255,8 @@ class ProteinBinderDesignResult(Base):
     :param scores: the scores for the generated structure
     """
 
-    binder_sequence: str | None = None
+    binder_sequence: str | None = None  # deprecated
+    binder_sequences: list[ProteinSequence] | None = None
     bound_structure: ProteinUUID | None = None
     scores: BoltzGenScores | None = None
 

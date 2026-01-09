@@ -13,3 +13,4 @@ class ProteinSequence(Base):
 
     sequence: str
     cyclic: bool = False
+    id: str | None = None
