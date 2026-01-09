@@ -37,7 +37,7 @@ class TMDRBFESettings(Base):
     :param legs: Which thermodynamic cycle legs to run (default: solvent and complex).
     """
 
-    forcefield: Method = Method.SMIRNOFF_2_2_1_AMBER_AM1BCC
+    forcefield: Method = Method.SMIRNOFF_2_0_0_AMBER_AM1BCC
     n_eq_steps: PositiveInt = 200_000
     n_frames: PositiveInt = 2_000
     steps_per_frame: PositiveInt = 400
