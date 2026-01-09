@@ -23,6 +23,7 @@ from .msa import *
 from .multistage_opt import *
 from .nmr import *
 from .pka import *
+from .pocket_detection import Pocket, PocketDetectionWorkflow
 from .pose_analysis_md import *
 from .protein_binder_design import *
 from .protein_cofolding import *
@@ -33,6 +34,7 @@ from .relative_binding_free_energy_perturbation import (
 )
 from .scan import *
 from .solubility import *
+from .solvent_dependent_conformers import *
 from .spin_states import *
 from .strain import *
 from .tautomer import *
@@ -61,6 +63,7 @@ WORKFLOW_NAME = Literal[
     "multistage_opt",
     "nmr",
     "pka",
+    "pocket_detection",
     "pose_analysis_md",
     "protein_cofolding",
     "protein_binder_design",
@@ -68,6 +71,7 @@ WORKFLOW_NAME = Literal[
     "redox_potential",
     "scan",
     "solubility",
+    "solvent_dependent_conformers",
     "spin_states",
     "strain",
     "tautomers",
@@ -96,6 +100,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "msa": MSAWorkflow,  # type: ignore [dict-item]
     "nmr": NMRSpectroscopyWorkflow,  # type: ignore [dict-item]
     "pka": pKaWorkflow,  # type: ignore [dict-item]
+    "pocket_detection": PocketDetectionWorkflow,  # type: ignore [dict-item]
     "pose_analysis_md": PoseAnalysisMolecularDynamicsWorkflow,  # type: ignore [dict-item]
     "protein_cofolding": ProteinCofoldingWorkflow,  # type: ignore [dict-item]
     "protein_binder_design": ProteinBinderDesignWorkflow,  # type: ignore [dict-item]
@@ -103,6 +108,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "redox_potential": RedoxPotentialWorkflow,  # type: ignore [dict-item]
     "scan": ScanWorkflow,  # type: ignore [dict-item]
     "solubility": SolubilityWorkflow,  # type: ignore [dict-item]
+    "solvent_dependent_conformers": SolventDependentConformersWorkflow,  # type: ignore [dict-item]
     "spin_states": SpinStatesWorkflow,  # type: ignore [dict-item]
     "strain": StrainWorkflow,  # type: ignore [dict-item]
     "tautomers": TautomerWorkflow,  # type: ignore [dict-item]

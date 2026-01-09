@@ -43,15 +43,25 @@ class Method(LowercaseStrEnum):
     # NNPs
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
 
+    ## MACE
     MACE_MP_0 = "mace_mp_0"
     MACE_MP_0B2_L = "mace_mp_0b2_l"
 
     OMOL25_CONSERVING_S = "omol25_conserving_s"
-    UMA_M_OMOL = "uma_m_omol"
+
+    ## UMA
     UMA_S_OMOL = "uma_s_omol"
+    UMA_M_OMOL = "uma_m_omol"
+    UMA_S_OMAT = "uma_s_omat"
+    UMA_M_OMAT = "uma_m_omat"
+    UMA_S_OMC = "uma_s_omc"
+    UMA_M_OMC = "uma_m_omc"
+
+    ## Orb
     ORB_V3_CONSERVATIVE_INF_OMAT = "orb_v3_conservative_inf_omat"
     ORB_V3_CONSERVATIVE_OMOL = "orb_v3_conservative_omol"
 
+    ## Egret
     EGRET_1 = "egret_1"
     EGRET_1E = "egret_1e"
     EGRET_1T = "egret_1t"
@@ -88,7 +98,9 @@ class Method(LowercaseStrEnum):
                 return Engine.AIMNET2
             case Method.MACE_MP_0B2_L:
                 return Engine.MACE
-            case Method.OMOL25_CONSERVING_S | Method.UMA_M_OMOL | Method.UMA_S_OMOL:
+            case (
+                Method.OMOL25_CONSERVING_S | Method.UMA_S_OMOL | Method.UMA_M_OMOL | Method.UMA_S_OMAT | Method.UMA_M_OMAT | Method.UMA_S_OMC | Method.UMA_M_OMC
+            ):
                 return Engine.OMOL25
             case Method.ORB_V3_CONSERVATIVE_INF_OMAT | Method.ORB_V3_CONSERVATIVE_OMOL:
                 return Engine.ORB
@@ -108,8 +120,12 @@ class Method(LowercaseStrEnum):
 PrepackagedNNPMethod = Literal[
     Method.AIMNET2_WB97MD3,
     Method.OMOL25_CONSERVING_S,
-    Method.UMA_M_OMOL,
     Method.UMA_S_OMOL,
+    Method.UMA_M_OMOL,
+    Method.UMA_S_OMAT,
+    Method.UMA_M_OMAT,
+    Method.UMA_S_OMC,
+    Method.UMA_M_OMC,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
     Method.ORB_V3_CONSERVATIVE_OMOL,
     Method.EGRET_1,
@@ -120,8 +136,12 @@ PrepackagedNNPMethod = Literal[
 PREPACKAGED_NNP_METHODS = [
     Method.AIMNET2_WB97MD3,
     Method.OMOL25_CONSERVING_S,
-    Method.UMA_M_OMOL,
     Method.UMA_S_OMOL,
+    Method.UMA_M_OMOL,
+    Method.UMA_S_OMAT,
+    Method.UMA_M_OMAT,
+    Method.UMA_S_OMC,
+    Method.UMA_M_OMC,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
     Method.ORB_V3_CONSERVATIVE_OMOL,
     Method.EGRET_1,

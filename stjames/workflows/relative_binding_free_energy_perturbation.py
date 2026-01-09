@@ -9,6 +9,7 @@ from ..message import Message
 from ..method import Method
 from ..molecule import Molecule
 from ..pdb import PDB
+from ..types import UUID
 from .workflow import Workflow
 
 
@@ -33,6 +34,7 @@ class TMDRBFESettings(Base):
     :param local_md_k: Spring constant used during local MD.
     :param local_md_radius: Sphere radius in nanometers for the local MD region.
     :param local_md_free_reference: Whether to free the reference frame during local MD.
+    :param legs: Which thermodynamic cycle legs to run (default: solvent and complex).
     """
 
     forcefield: Method = Method.SMIRNOFF_2_2_1_AMBER_AM1BCC
@@ -49,6 +51,7 @@ class TMDRBFESettings(Base):
     local_md_k: float = 10_000.0
     local_md_radius: float = 1.2
     local_md_free_reference: bool = False
+    legs: list[Literal["vacuum", "solvent", "complex"]] = ["solvent", "complex"]
 
 
 class RBFEResult(Base):
@@ -79,6 +82,7 @@ class RBFEGraphEdge(Base):
     :param vacuum_dg_err: Uncertainty on `vacuum_dg`.
     :param ddg: Combined cycle result derived from complex and solvent legs.
     :param ddg_err: Uncertainty on `ddg`.
+    :param failed: Whether a required leg failed, making ddG impossible to compute.
     """
 
     ligand_a: str
@@ -94,6 +98,7 @@ class RBFEGraphEdge(Base):
     vacuum_dg_err: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
     ddg: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
     ddg_err: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    failed: bool = False
 
 
 class RBFEGraph(Base):
@@ -164,7 +169,7 @@ class RelativeBindingFreeEnergyPerturbationWorkflow(Workflow):
 
     :param ligands: Mapping from ligand identifiers to `Molecule` objects.
     :param graph: RBFE graph topology.
-    :param pdb_structure: Prepared complex structure required for complex-leg simulations.
+    :param target: PDB object or the UUID of the PDB object used for simulation.
     :param ligand_dg_results: Optional per-ligand FEP summaries produced downstream.
     :param diagnostics: Optional aggregate QC metrics.
     :param settings: Simulation controls shared across all RBFE edges.
@@ -172,7 +177,7 @@ class RelativeBindingFreeEnergyPerturbationWorkflow(Workflow):
 
     ligands: dict[str, Molecule]
     graph: RBFEGraph
-    pdb_structure: PDB
+    target: PDB | UUID
 
     settings: TMDRBFESettings
 
