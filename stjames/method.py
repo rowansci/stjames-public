@@ -83,9 +83,9 @@ class Method(LowercaseStrEnum):
         Return the canonical Engine for this quantum-chemistry method.
 
         :param bool is_periodic:
-            If ``True`` **and** the method is in the XTB family, return
-            ``"tblite"`` (periodic-capable backend) instead of ``"xtb"``.
-        :returns: lower-case engine identifier (e.g. ``"psi4"``, ``"mace"``).
+            If True and the method is in the XTB family, return
+            "tblite" (periodic-capable backend) instead of "xtb".
+        :returns: lower-case engine identifier (e.g. "psi4", "mace").
 
         >>> Method.MACE_MP_0B2_L.default_engine().value
         'mace'
@@ -134,7 +134,7 @@ PrepackagedNNPMethod = Literal[
     Method.EGRET_1T,
 ]
 
-PREPACKAGED_NNP_METHODS = [
+PREPACKAGED_NNP_METHODS = {
     Method.AIMNET2_WB97MD3,
     Method.OMOL25_CONSERVING_S,
     Method.UMA_S_OMOL,
@@ -148,28 +148,78 @@ PREPACKAGED_NNP_METHODS = [
     Method.EGRET_1,
     Method.EGRET_1E,
     Method.EGRET_1T,
-]
+}
 
-CorrectableNNPMethod = Literal[Method.MACE_MP_0B2_L]
-CORRECTABLE_NNP_METHODS = [Method.MACE_MP_0B2_L]
+CorrectableNNPMethod = Literal[Method.MACE_MP_0, Method.MACE_MP_0B2_L]
+CORRECTABLE_NNP_METHODS = {Method.MACE_MP_0, Method.MACE_MP_0B2_L}
 
 NNPMethod = PrepackagedNNPMethod | CorrectableNNPMethod
-NNP_METHODS = [*PREPACKAGED_NNP_METHODS, *CORRECTABLE_NNP_METHODS]
+NNP_METHODS = PREPACKAGED_NNP_METHODS | CORRECTABLE_NNP_METHODS
 
 XTBMethod = Literal[Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB, Method.G_XTB]
-XTB_METHODS = [Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB, Method.G_XTB]
+XTB_METHODS = {Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB, Method.G_XTB}
 
 CompositeMethod = Literal[Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
-COMPOSITE_METHODS = [Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
+COMPOSITE_METHODS = {Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C}
 
 FFMethod = Literal[Method.OFF_SAGE_2_2_1, Method.SMIRNOFF_2_2_1_AMBER_AM1BCC, Method.SMIRNOFF_2_0_0_AMBER_AM1BCC]
-FF_METHODS = [Method.OFF_SAGE_2_2_1, Method.SMIRNOFF_2_2_1_AMBER_AM1BCC, Method.SMIRNOFF_2_0_0_AMBER_AM1BCC]
+FF_METHODS = {Method.OFF_SAGE_2_2_1, Method.SMIRNOFF_2_2_1_AMBER_AM1BCC, Method.SMIRNOFF_2_0_0_AMBER_AM1BCC}
 
 PrepackagedMethod = XTBMethod | CompositeMethod | PrepackagedNNPMethod | FFMethod
-PREPACKAGED_METHODS = [*XTB_METHODS, *COMPOSITE_METHODS, *PREPACKAGED_NNP_METHODS, *FF_METHODS]
+PREPACKAGED_METHODS = XTB_METHODS | COMPOSITE_METHODS | PREPACKAGED_NNP_METHODS | FF_METHODS
 
 MethodWithCorrection = Literal[Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ]
-METHODS_WITH_CORRECTION = [Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ, Method.B97D3BJ]
+METHODS_WITH_CORRECTION = {Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ, Method.B97D3BJ}
 
-MGGAFunctionals = Literal[Method.R2SCAN, Method.R2SCAN3C, Method.TPSS, Method.TPSSH, Method.M06L, Method.M06, Method.M062X, Method.WB97MD3BJ, Method.WB97MV]
-MGGA_FUNCTIONALS = [Method.R2SCAN, Method.R2SCAN3C, Method.TPSS, Method.TPSSH, Method.M06L, Method.M06, Method.M062X, Method.WB97MD3BJ, Method.WB97MV]
+MGGAFunctional = Literal[Method.R2SCAN, Method.R2SCAN3C, Method.TPSS, Method.TPSSH, Method.M06L, Method.M06, Method.M062X, Method.WB97MD3BJ, Method.WB97MV]
+MGGA_FUNCTIONALS = {Method.R2SCAN, Method.R2SCAN3C, Method.TPSS, Method.TPSSH, Method.M06L, Method.M06, Method.M062X, Method.WB97MD3BJ, Method.WB97MV}
+
+RangeSeparatedFunctional = Literal[Method.CAMB3LYP, Method.WB97XD3, Method.WB97XV, Method.WB97X3C, Method.WB97MV, Method.WB97MD3BJ]
+RANGE_SEPARATED_FUNCTIONALS = {Method.CAMB3LYP, Method.WB97XD3, Method.WB97XV, Method.WB97X3C, Method.WB97MV, Method.WB97MD3BJ}
+
+DFTFunctional = Literal[
+    Method.PBE,
+    Method.PBE0,
+    Method.BP86,
+    Method.B3LYP,
+    Method.B973C,
+    Method.B97D3BJ,
+    Method.R2SCAN,
+    Method.R2SCAN3C,
+    Method.TPSS,
+    Method.TPSSH,
+    Method.M06L,
+    Method.M06,
+    Method.M062X,
+    Method.CAMB3LYP,
+    Method.WB97XD3,
+    Method.WB97XV,
+    Method.WB97X3C,
+    Method.WB97MV,
+    Method.WB97MD3BJ,
+    Method.DSDBLYPD3BJ,
+    Method.SKALA,
+]
+DFT_FUNCTIONALS = {
+    Method.PBE,
+    Method.PBE0,
+    Method.BP86,
+    Method.B3LYP,
+    Method.B973C,
+    Method.B97D3BJ,
+    Method.R2SCAN,
+    Method.R2SCAN3C,
+    Method.TPSS,
+    Method.TPSSH,
+    Method.M06L,
+    Method.M06,
+    Method.M062X,
+    Method.CAMB3LYP,
+    Method.WB97XD3,
+    Method.WB97XV,
+    Method.WB97X3C,
+    Method.WB97MV,
+    Method.WB97MD3BJ,
+    Method.DSDBLYPD3BJ,
+    Method.SKALA,
+}
