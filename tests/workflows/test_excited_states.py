@@ -1,7 +1,8 @@
 """Tests for excited state workflows."""
 
 from stjames import Method, Settings, Task
-from stjames.workflows import OmegaTuning, TDDFTSettings
+from stjames.settings import OmegaTuning
+from stjames.workflows import TDDFTSettings
 
 
 def test_tddft_settings_basic() -> None:
@@ -16,20 +17,19 @@ def test_tddft_settings_basic() -> None:
     assert tddft_settings.tda is True
     assert tddft_settings.num_excitations == 5
     assert tddft_settings.target_root is None
-    assert tddft_settings.omega is None
+    assert tddft_settings.settings.omega is None
     assert tddft_settings.settings_type == "TDDFTSettings"
 
 
 def test_tddft_settings_custom() -> None:
     """Test TDDFTSettings with custom parameters."""
-    settings = Settings(method=Method.WB97MD3BJ, basis_set="6-31G*")
+    settings = Settings(method=Method.WB97MD3BJ, basis_set="6-31G*", omega="koopmans")
     tddft_settings = TDDFTSettings(
         settings=settings,
         tasks={Task.ENERGY, Task.GRADIENT},
         tda=False,
         num_excitations=10,
         target_root=3,
-        omega="koopmans",
     )
 
     assert tddft_settings.settings.method == Method.WB97MD3BJ
@@ -37,4 +37,4 @@ def test_tddft_settings_custom() -> None:
     assert tddft_settings.tda is False
     assert tddft_settings.num_excitations == 10
     assert tddft_settings.target_root == 3
-    assert tddft_settings.omega == OmegaTuning.KOOPMANS
+    assert tddft_settings.settings.omega == OmegaTuning.KOOPMANS

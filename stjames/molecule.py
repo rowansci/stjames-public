@@ -18,6 +18,7 @@ from .types import (
     Matrix3x3,
     Vector3D,
     Vector3DPerAtom,
+    round_list,
     round_optional_float_per_atom,
     round_optional_matrix3x3,
     round_optional_vector3d,
@@ -72,6 +73,9 @@ class Molecule(Base):
     thermal_energy_corr: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
     thermal_enthalpy_corr: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
     thermal_free_energy_corr: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
+
+    excitation_energies: Annotated[list[float] | None, AfterValidator(round_list(3))] = None  # Hartree
+    oscillator_strengths: Annotated[list[float] | None, AfterValidator(round_list(3))] = None  # dimensionless (length gauge where applicable)
 
     smiles: Optional[str] = None
     calculation_index: int | None = None
