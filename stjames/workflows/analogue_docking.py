@@ -24,6 +24,7 @@ class AnalogueDockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
 
     Results:
     :param analogue_scores: the docked poses for each analogue
+        (The SMILES string from above is the key, and the list of poses is the value.)
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)
