@@ -1,13 +1,13 @@
 from typing import Any, Optional, Self, TypeVar
 
-from pydantic import computed_field, field_validator, model_validator
+from pydantic import PositiveFloat, computed_field, field_validator, model_validator
 
-from .base import Base, UniqueList
+from .base import Base, LowercaseStrEnum, UniqueList
 from .basis_set import BasisSet
 from .compute_settings import ComputeSettings
 from .correction import Correction
 from .engine import Engine
-from .method import CORRECTABLE_NNP_METHODS, METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, Method
+from .method import CORRECTABLE_NNP_METHODS, METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, RANGE_SEPARATED_FUNCTIONALS, Method
 from .mode import Mode
 from .opt_settings import OptimizationSettings
 from .scf_settings import SCFSettings
@@ -18,7 +18,30 @@ from .thermochem_settings import ThermochemistrySettings
 _T = TypeVar("_T")
 
 
+class OmegaTuning(LowercaseStrEnum):
+    """Options for omega (range-separation parameter) tuning"""
+
+    KOOPMANS = "koopmans"  # Baer et al. doi.org/10.1146/annurev.physchem.012809.103321
+
+
 class Settings(Base):
+    """
+    Settings for (base) computational chemistry calculations.
+
+    :param mode: calculation mode (affects thresholds for optimizations, etc.)
+    :param tasks: tasks to perform (deprecated, specify in workflows or calculations instead)
+    :param method: computational method
+    :param basis_set: basis set to use (autopopulated for 3c methods)
+    :param engine: computational engine to use (auto-selected if None)
+    :param corrections: list of corrections to apply (e.g. D3BJ, D4)
+    :param solvent_settings: solvent model settings (if any)
+    :param omega: range-separation parameter (Bohr⁻¹) or method to tune it (optional)
+    :param scf_settings: SCF settings
+    :param opt_settings: geometry optimization settings
+    :param thermochem_settings: thermochemistry settings
+    :param compute_settings: hardware settings
+    """
+
     mode: Mode = Mode.AUTO
 
     # DEPRECATED - specify tasks only in BasicCalculationWorkflow or Calculation now
@@ -29,6 +52,7 @@ class Settings(Base):
     engine: Engine = None  # type: ignore [assignment]
     corrections: UniqueList[Correction] = []
     solvent_settings: Optional[SolventSettings] = None
+    omega: OmegaTuning | PositiveFloat | None = None
 
     # scf/opt settings will be set automatically based on mode, but can be overridden manually
     scf_settings: SCFSettings = SCFSettings()
@@ -78,6 +102,10 @@ class Settings(Base):
             self.mode = Mode.RAPID
 
         self.opt_settings = _assign_opt_settings_by_mode(self.mode, self.opt_settings)
+
+        if self.omega is not None and self.method not in RANGE_SEPARATED_FUNCTIONALS:
+            functionals = "\n    ".join(RANGE_SEPARATED_FUNCTIONALS)
+            raise ValueError(f"Omega tuning may only be specified for range-separated DFT functionals:\n    {functionals}.")
 
         return self
 

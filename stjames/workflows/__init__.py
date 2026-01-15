@@ -12,6 +12,7 @@ from .descriptors import *
 from .docking import *
 from .double_ended_ts_search import DoubleEndedTSSearchWorkflow
 from .electronic_properties import *
+from .excited_states_workflow import *
 from .fukui import *
 from .hydrogen_bond_basicity import *
 from .ion_mobility import *
@@ -52,6 +53,7 @@ WORKFLOW_NAME = Literal[
     "docking",
     "double_ended_ts_search",
     "electronic_properties",
+    "excited_states",
     "relative_binding_free_energy_perturbation",
     "fukui",
     "hydrogen_bond_basicity",
@@ -89,6 +91,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "docking": DockingWorkflow,  # type: ignore [dict-item]
     "double_ended_ts_search": DoubleEndedTSSearchWorkflow,  # type: ignore [dict-item]
     "electronic_properties": ElectronicPropertiesWorkflow,  # type: ignore [dict-item]
+    "excited_states": ExcitedStatesWorkflow,  # type: ignore [dict-item]
     "relative_binding_free_energy_perturbation": RelativeBindingFreeEnergyPerturbationWorkflow,  # type: ignore [dict-item]
     "fukui": FukuiIndexWorkflow,  # type: ignore [dict-item]
     "hydrogen_bond_basicity": HydrogenBondBasicityWorkflow,  # type: ignore [dict-item]
