@@ -20,9 +20,10 @@ class Score(Base):
 
     :param pose: conformation of the ligand when docked (calculation UUID)
     :param complex_pdb: the UUID of the protein–ligand complex (protein UUID)
-    :param score: score of the pose, in kcal/mol
+    :param score: score of the pose, (kcal/mol)
     :param posebusters_valid: whether or not the ligand pose passes the PoseBusters tests
-    :param strain: strain in kcal/mol
+    :param strain: strain (kcal/mol)
+    :param rmsd: RMSD from the reference, if there's a reference molecule to dock against (Å)
     """
 
     pose: CalculationUUID | None
@@ -30,6 +31,7 @@ class Score(Base):
     score: Annotated[float, AfterValidator(round_float(3))]
     posebusters_valid: bool
     strain: float | None
+    rmsd: Annotated[float, AfterValidator(round_float(3))] | None = None
 
 
 class DockingSettings(Base):
@@ -85,6 +87,7 @@ class DockingWorkflow(MoleculeWorkflow):
     :param target: PDB of the protein.
     :param target_uuid: UUID of the protein.
     :param pocket: center (x, y, z) and size (x, y, z) of the pocket
+    :param docking_settings: how docking should be run
 
     Results:
     :param conformers: UUIDs of optimized conformers
