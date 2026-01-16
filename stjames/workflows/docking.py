@@ -1,6 +1,6 @@
 """Docking workflow."""
 
-from typing import Annotated, Any, Literal, Self, TypeAlias
+from typing import Annotated, Literal, Self, TypeAlias
 
 from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
 

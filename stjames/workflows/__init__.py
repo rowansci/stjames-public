@@ -9,7 +9,7 @@ from .bde import *
 from .conformer import *
 from .conformer_search import *
 from .descriptors import *
-from .docking import AnalogueDockingWorkflow, DockingWorkflow
+from .docking import AnalogueDockingWorkflow, DockingWorkflow, Score
 from .double_ended_ts_search import DoubleEndedTSSearchWorkflow
 from .electronic_properties import *
 from .excited_states_workflow import *
