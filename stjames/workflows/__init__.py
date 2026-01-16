@@ -43,6 +43,7 @@ from .workflow import *
 
 WORKFLOW_NAME = Literal[
     "admet",
+    "analogue_docking",
     "basic_calculation",
     "batch_docking",
     "bde",
@@ -81,6 +82,7 @@ WORKFLOW_NAME = Literal[
 
 WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "admet": ADMETWorkflow,  # type: ignore [dict-item]
+    "analogue_docking": AnalogueDockingWorkflow,  # type: ignore [dict-item]
     "basic_calculation": BasicCalculationWorkflow,  # type: ignore [dict-item]
     "batch_docking": BatchDockingWorkflow,  # type: ignore [dict-item]
     "bde": BDEWorkflow,  # type: ignore [dict-item]

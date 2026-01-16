@@ -8,7 +8,7 @@ from ..base import Base, round_float
 from ..pdb import PDB
 from ..types import UUID, Vector3D
 from .conformer_search import ConformerGenSettingsUnion, ETKDGSettings
-from .workflow import MoleculeWorkflow
+from .workflow import MoleculeWorkflow, ProteinStructureWorkflow
 
 ProteinUUID: TypeAlias = UUID
 CalculationUUID: TypeAlias = UUID
@@ -20,9 +20,10 @@ class Score(Base):
 
     :param pose: conformation of the ligand when docked (calculation UUID)
     :param complex_pdb: the UUID of the protein–ligand complex (protein UUID)
-    :param score: score of the pose, in kcal/mol
+    :param score: score of the pose, (kcal/mol)
     :param posebusters_valid: whether or not the ligand pose passes the PoseBusters tests
-    :param strain: strain in kcal/mol
+    :param strain: strain (kcal/mol)
+    :param rmsd: RMSD from the reference, if there's a reference molecule to dock against (Å)
     """
 
     pose: CalculationUUID | None
@@ -30,6 +31,7 @@ class Score(Base):
     score: Annotated[float, AfterValidator(round_float(3))]
     posebusters_valid: bool
     strain: float | None
+    rmsd: Annotated[float, AfterValidator(round_float(3))] | None = None
 
 
 class DockingSettings(Base):
@@ -77,14 +79,14 @@ class DockingWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     New:
-    :param do_csearch: whether to csearch starting structures
-    :param conformer_gen_settings: settings for initial conformer search.
-    :param do_optimization: whether to optimize starting structures
-    :param optimization_settings: settings for conformer optimization.
-    :param do_pose_refinement: whether to optimize non-rotatable bonds in output poses
     :param target: PDB of the protein.
     :param target_uuid: UUID of the protein.
     :param pocket: center (x, y, z) and size (x, y, z) of the pocket
+    :param docking_settings: how docking should be run
+    :param do_csearch: whether to csearch starting structures
+    :param conformer_gen_settings: settings for initial conformer search.
+    :param do_optimization: whether to optimize starting structures
+    :param do_pose_refinement: whether to optimize non-rotatable bonds in output poses
 
     Results:
     :param conformers: UUIDs of optimized conformers
@@ -134,3 +136,29 @@ class DockingWorkflow(MoleculeWorkflow):
         if any(q <= 0 for q in size):
             raise ValueError(f"Pocket size must be positive, got: {size}")
         return pocket
+
+
+class AnalogueDockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
+    """
+    Workflow for docking analogues:
+    (1) Conformers are generated in analogous poses to the initial molecule.
+    (2) They're then optimized locally using the docking scoring function.
+    (3) PoseBusters is used to check the validity of the output poses.
+
+    Inherited:
+    :param initial_molecule: molecule of interest, to which subsequent molecules will be aligned
+    :param mode: Mode for workflow (currently unused)
+    :param protein: PDB or UUID
+
+    New:
+    :param analogues: the SMILES for the analogues of `initial_molecule`
+    :param docking_settings: how docking should be run
+
+    Results:
+    :param analogue_scores: docked poses for each analogue of form {smiles: list[poses]}
+    """
+
+    analogues: list[str]
+    docking_settings: VinaSettings = VinaSettings()
+
+    analogue_scores: dict[str, list[Score]] = {}
