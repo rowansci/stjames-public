@@ -2,7 +2,7 @@ from pytest import fixture, raises
 
 from stjames import Mode, Molecule
 from stjames.pdb import PDB, read_pdb
-from stjames.workflows import DockingWorkflow, Score
+from stjames.workflows import AnalogueDockingWorkflow, DockingWorkflow, Score
 
 
 @fixture
@@ -70,3 +70,10 @@ def test_docked(water: Molecule, gfp: str) -> None:
         Score(pose=None, score=0.0, posebusters_valid=True, complex_pdb=None, strain=0.0),
         Score(pose=None, score=1.0, posebusters_valid=False, complex_pdb=None, strain=0.0),
     ]
+
+
+def test_analogue_docking(water: Molecule, gfp: str) -> None:
+    adwf = AnalogueDockingWorkflow(initial_molecule=water, protein=gfp, analogues=["CO", "COC", "CCO"])
+
+    assert not adwf.analogue_scores
+    assert isinstance(adwf.protein, PDB)
