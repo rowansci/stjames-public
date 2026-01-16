@@ -1,6 +1,6 @@
 """Docking workflow."""
 
-from typing import Annotated, Literal, Self, TypeAlias
+from typing import Annotated, Any, Literal, Self, TypeAlias
 
 from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
 
@@ -66,7 +66,7 @@ class VinaSettings(DockingSettings):
         return self
 
 
-class DockingWorkflow(MoleculeWorkflow):
+class DockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
     """
     Docking workflow.
 
@@ -77,12 +77,12 @@ class DockingWorkflow(MoleculeWorkflow):
     Inherited:
     :param initial_molecule: Molecule of interest
     :param mode: Mode for workflow (currently unused)
+    :param protein: Protein target, as PDB or UUID
 
     New:
-    :param target: PDB of the protein.
-    :param target_uuid: UUID of the protein.
+    :param target: PDB of the protein; DEPRECATED.
+    :param target_uuid: UUID of the protein; DEPRECATED.
     :param pocket: center (x, y, z) and size (x, y, z) of the pocket
-    :param docking_settings: how docking should be run
     :param do_csearch: whether to csearch starting structures
     :param conformer_gen_settings: settings for initial conformer search.
     :param do_optimization: whether to optimize starting structures
@@ -122,6 +122,29 @@ class DockingWorkflow(MoleculeWorkflow):
 
         ligand = "".join(atom.atomic_symbol for atom in self.initial_molecule.atoms)
         return f"<{type(self).__name__} {target} {ligand}>"
+
+    @model_validator(mode="before")
+    def harmonize_target_and_protein(cls, data: Any) -> Self:
+        """
+        Syncs data between "target"/"target_uuid" and "protein" field.
+        """
+
+        protein = data.get("protein", False)
+        target = data.get("target", False)
+        target_uuid = data.get("target_uuid", False)
+
+        if not protein:
+            if target:
+                data["protein"] = target
+            elif target_uuid:
+                data["protein"] = target_uuid
+        elif not target and not target_uuid:
+            if isinstance(data.protein, PDB):
+                data["target"] = protein
+            elif isinstance(data.protein, UUID):
+                data["target_uuid"] = protein
+
+        return data
 
     @model_validator(mode="after")
     def check_protein(self) -> Self:
