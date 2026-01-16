@@ -2,7 +2,7 @@ from pytest import fixture, raises
 
 from stjames import Mode, Molecule
 from stjames.pdb import PDB, read_pdb
-from stjames.workflows import AnalogueDockingWorkflow, DockingWorkflow, Score
+from stjames.workflows.docking import AnalogueDockingWorkflow, DockingWorkflow, Score
 
 
 @fixture
