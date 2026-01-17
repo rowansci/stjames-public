@@ -44,6 +44,36 @@ class VibrationalMode(Base):
 
 
 class Molecule(Base):
+    """
+    A molecular structure with associated properties.
+
+    :param charge: total charge of the Molecule
+    :param multiplicity: spin multiplicity of the Molecule
+    :param atoms: Atom objects representing the atoms in the Molecule
+    :param cell: PeriodicCell for periodic boundary conditions
+    :param energy: electronic energy (Hartree)
+    :param scf_iterations: number of SCF iterations
+    :param scf_completed: whether the SCF converged
+    :param elapsed: time taken for the calculation (seconds)
+    :param homo_lumo_gap: energy of the HOMO-LUMO gap (eV)
+    :param gradient: energy gradient with respect to position (Hartree/Å)
+    :param stress: stress matrix
+    :param velocities: velocities of the atoms (Å/fs)
+    :param mulliken_charges: Mulliken charges
+    :param mulliken_spin_densities: Mulliken spin densities
+    :param dipole: dipole moment (debye)
+    :param vibrational_modes: vibrations
+    # https://docs.rowansci.com/science/quantum-chemistry/frequencies-and-thermochemistry
+    :param zero_point_energy: zero-point energy (Hartree)
+    :param thermal_energy_corr: ZPE + non-zero-temperature effects (Hartree)
+    :param thermal_enthalpy_corr: thermal_energy_corr + pV (Hartree)
+    :param thermal_free_energy_corr: thermal_enthalpy_corr - 298.15 x S (Hartree)
+    :param excitation_energies: electronic-excitation energies
+    :param oscillator_strengths: electronic-transition strengths
+    :param smiles: SMILES corresponding to the Molecule
+    :param calculation_index: index in a calculation output
+    """
+
     charge: int
     multiplicity: PositiveInt
     atoms: list[Atom]
@@ -286,7 +316,7 @@ class Molecule(Base):
         {'energy': '-0.320207535977 gnorm: 0.071552110436 xtb: 6.6.1 (8d0f1dd)'}
         """
         data: dict[str, Any] = {}
-        for kv in comment.split(";"):
+        for kv in comment.strip(";").split(";"):
             try:
                 key, value = kv.split(":", 1)
                 data[key.strip()] = value.strip()
