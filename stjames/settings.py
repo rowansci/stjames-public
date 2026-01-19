@@ -2,12 +2,14 @@ from typing import Any, Optional, Self, TypeVar
 
 from pydantic import PositiveFloat, computed_field, field_validator, model_validator
 
+from stjames.excited_state_settings import ExcitedStateSettingsUnion
+
 from .base import Base, LowercaseStrEnum, UniqueList
 from .basis_set import BasisSet
 from .compute_settings import ComputeSettings
 from .correction import Correction
 from .engine import Engine
-from .method import CORRECTABLE_NNP_METHODS, METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, RANGE_SEPARATED_FUNCTIONALS, Method
+from .method import CORRECTABLE_NNP_METHODS, DFT_FUNCTIONALS, METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, RANGE_SEPARATED_FUNCTIONALS, Method
 from .mode import Mode
 from .opt_settings import OptimizationSettings
 from .scf_settings import SCFSettings
@@ -53,6 +55,8 @@ class Settings(Base):
     corrections: UniqueList[Correction] = []
     solvent_settings: Optional[SolventSettings] = None
     omega: OmegaTuning | PositiveFloat | None = None
+
+    excited_state_settings: ExcitedStateSettingsUnion | None = None
 
     # scf/opt settings will be set automatically based on mode, but can be overridden manually
     scf_settings: SCFSettings = SCFSettings()
@@ -106,6 +110,14 @@ class Settings(Base):
         if self.omega is not None and self.method not in RANGE_SEPARATED_FUNCTIONALS:
             functionals = "\n    ".join(RANGE_SEPARATED_FUNCTIONALS)
             raise ValueError(f"Omega tuning may only be specified for range-separated DFT functionals:\n    {functionals}.")
+
+        if self.excited_state_settings:
+            if self.engine not in {Engine.PYSCF, Engine.GPU4PYSCF}:
+                raise ValueError("Excited-state calculations are only supported with the PySCF and GPU4PySCF engines.")
+
+            if self.method not in DFT_FUNCTIONALS:
+                functionals = "\n    ".join(DFT_FUNCTIONALS)
+                raise ValueError(f"Excited-state calculations may only be performed with DFT:\n    {functionals}.")
 
         return self
 
