@@ -138,9 +138,9 @@ class DockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
             elif target_uuid:
                 data["protein"] = target_uuid
         elif not target and not target_uuid:
-            if isinstance(data.protein, PDB):
+            if isinstance(data["protein"], PDB):
                 data["target"] = protein
-            elif isinstance(data.protein, UUID):
+            elif isinstance(data["protein"], UUID):
                 data["target_uuid"] = protein
 
         return data
