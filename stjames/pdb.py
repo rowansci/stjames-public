@@ -125,16 +125,12 @@ class PDBModel(BaseModel):
         after deserialization.
         """
         if self.chain_order is None:
-            # First time parsing: capture the current insertion order
             self.chain_order = list(self.polymer.keys())
         else:
-            # After deserialization: reorder polymer dict to match stored order
-            # Include any chains that might be in polymer but not in chain_order (defensive)
             ordered_polymer = {}
             for chain_id in self.chain_order:
                 if chain_id in self.polymer:
                     ordered_polymer[chain_id] = self.polymer[chain_id]
-            # Add any remaining chains not in chain_order
             for chain_id in self.polymer:
                 if chain_id not in ordered_polymer:
                     ordered_polymer[chain_id] = self.polymer[chain_id]
