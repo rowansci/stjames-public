@@ -25,9 +25,9 @@ from .multistage_opt import *
 from .nmr import *
 from .pka import *
 from .pocket_detection import Pocket, PocketDetectionWorkflow
-from .protein_md import *
 from .protein_binder_design import *
 from .protein_cofolding import *
+from .protein_md import *
 from .redox_potential import *
 from .relative_binding_free_energy_perturbation import (
     RBFEGraphWorkflow,
