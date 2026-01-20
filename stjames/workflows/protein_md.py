@@ -158,8 +158,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStruc
         """
         Syncs data between "protein_uuid" and "protein" field.
         """
-
-        if data.get("protein_uuid", False):
+        if "protein_uuid" in data:
             data["protein"] = data["protein_uuid"]
 
         return data
