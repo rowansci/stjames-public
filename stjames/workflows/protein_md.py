@@ -3,7 +3,6 @@ from typing import Annotated, Any
 from pydantic import AfterValidator, PositiveFloat, PositiveInt, model_validator
 
 from ..base import Base, round_float
-from ..pdb import PDB
 from ..types import UUID, round_list
 from .workflow import ProteinStructureWorkflow, SMILESWorkflow
 
