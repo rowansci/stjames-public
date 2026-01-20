@@ -124,11 +124,10 @@ class DockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
         return f"<{type(self).__name__} {target} {ligand}>"
 
     @model_validator(mode="before")
-    def harmonize_target_and_protein(cls, data: Any) -> Self:
+    def harmonize_target_and_protein(cls, data: Any) -> Any:
         """
         Syncs data between "target"/"target_uuid" and "protein" field.
         """
-
         protein = data.get("protein", False)
         target = data.get("target", False)
         target_uuid = data.get("target_uuid", False)
