@@ -22,13 +22,13 @@ def test_raises(water: Molecule, gfp: str) -> None:
         DockingWorkflow(
             initial_molecule=water,
             mode=Mode.RAPID,
-            target=gfp,
+            protein=gfp,
             pocket=((0, 0, 0), (-1, -1, -1)),
         )
 
     # no protein
     with raises(ValueError):
-        DockingWorkflow(
+        DockingWorkflow(  # type: ignore [call-arg]
             initial_molecule=water,
             mode=Mode.RAPID,
             pocket=((0, 0, 0), (-1, -1, -1)),
@@ -39,7 +39,7 @@ def test_basic(water: Molecule, gfp: str) -> None:
     dwf = DockingWorkflow(
         initial_molecule=water,
         mode=Mode.RAPID,
-        target=gfp,
+        protein=gfp,
         pocket=((0, 0, 0), (1, 1, 1)),
     )
 
@@ -56,7 +56,7 @@ def test_docked(water: Molecule, gfp: str) -> None:
     dwf = DockingWorkflow(
         initial_molecule=water,
         mode=Mode.RAPID,
-        target=gfp,
+        protein=gfp,
         pocket=((0, 0, 0), (10, 10, 10)),
     )
 
