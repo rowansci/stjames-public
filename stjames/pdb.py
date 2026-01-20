@@ -112,6 +112,34 @@ class PDBModel(BaseModel):
     non_polymer: dict[str, PDBNonPolymer] = {}
     branched: dict[str, Any] = {}
     water: dict[str, PDBWater] = {}
+    chain_order: list[str] | None = None
+
+    @model_validator(mode="after")
+    def preserve_chain_order(self) -> Self:
+        """
+        Preserve original chain order across JSON serialization.
+
+        PostgreSQL JSONB sorts dict keys alphabetically, which can break structures
+        where chain order matters (e.g., disulfide bonds between non-adjacent chains).
+        This validator captures the original order on first parse and restores it
+        after deserialization.
+        """
+        if self.chain_order is None:
+            # First time parsing: capture the current insertion order
+            self.chain_order = list(self.polymer.keys())
+        else:
+            # After deserialization: reorder polymer dict to match stored order
+            # Include any chains that might be in polymer but not in chain_order (defensive)
+            ordered_polymer = {}
+            for chain_id in self.chain_order:
+                if chain_id in self.polymer:
+                    ordered_polymer[chain_id] = self.polymer[chain_id]
+            # Add any remaining chains not in chain_order
+            for chain_id in self.polymer:
+                if chain_id not in ordered_polymer:
+                    ordered_polymer[chain_id] = self.polymer[chain_id]
+            self.polymer = ordered_polymer
+        return self
 
 
 class PDBTransformations(BaseModel):
