@@ -6,6 +6,7 @@ from .periodic_cell import *
 from .molecule import *
 from .workflows import *
 
+from .excited_state_settings import *
 from .scf_settings import *
 from .opt_settings import *
 from .compute_settings import *
