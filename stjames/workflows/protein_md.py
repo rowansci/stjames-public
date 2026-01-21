@@ -24,6 +24,8 @@ class BindingPoseContact(Base):
 class ProteinMDTrajectory(Base):
     """
     Represents a single protein MD trajectory.
+
+    :param uuid: the UUID of the trajectory
     """
 
     uuid: UUID
