@@ -159,14 +159,14 @@ class ETKDGSettings(ConformerGenSettings):
     settings_type: Literal["etkdg"] = "etkdg"
 
     @field_validator("constraints")
-    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:  # noqa: N805
+    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:
         if constraints:
             raise ValueError("ETKDG does not support constraints")
 
         return tuple(constraints)
 
     @field_validator("nci")
-    def check_nci(cls, nci: bool) -> Literal[False]:  # noqa: N805
+    def check_nci(cls, nci: bool) -> Literal[False]:
         if nci:
             raise ValueError("ETKDG does not support NCI")
 
@@ -345,14 +345,14 @@ class LyrebirdSettings(ConformerGenSettings):
     settings_type: Literal["lyrebird"] = "lyrebird"
 
     @field_validator("constraints")
-    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:  # noqa: N805
+    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:
         if constraints:
             raise ValueError("Lyrebird does not support constraints")
 
         return tuple(constraints)
 
     @field_validator("nci")
-    def check_nci(cls, nci: bool) -> Literal[False]:  # noqa: N805
+    def check_nci(cls, nci: bool) -> Literal[False]:
         if nci:
             raise ValueError("Lyrebird does not support NCI")
 
@@ -388,14 +388,14 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
     settings_type: Literal["monte_carlo_multiple_minimum"] = "monte_carlo_multiple_minimum"
 
     @field_validator("constraints")
-    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:  # noqa: N805
+    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:
         if constraints:
             raise ValueError("MCMM does not support constraints")
 
         return tuple(constraints)
 
     @field_validator("nci")
-    def check_nci(cls, nci: bool) -> Literal[False]:  # noqa: N805
+    def check_nci(cls, nci: bool) -> Literal[False]:
         if nci:
             raise ValueError("MCMM does not support NCI")
 
