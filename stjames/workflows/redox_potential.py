@@ -91,7 +91,7 @@ class RedoxPotentialWorkflow(MoleculeWorkflow, MultiStageOptMixin):
         values["mso_mode"] = values["mode"]
         return values
 
-    def model_post_init(self, __context: Any) -> None:
+    def model_post_init(self, __context: Any, /) -> None:
         """Keep back-compatible with old schema."""
         if self.redox_type == "oxidation":
             self.oxidation = True

@@ -1,13 +1,10 @@
 [project]
 name = "stjames"
 version = "0.0.148"
-description = "standardized JSON atom/molecule encoding scheme"
+description = "structured JSON atom/molecule encoding scheme"
 readme = "README.md"
+keywords = []
 requires-python = ">=3.11"
-authors = [
-    { name = "Corin Wagen", email = "corin@rowansci.com" },
-]
-
 dependencies = [
     "pydantic>=2.4",
     "numpy",
@@ -16,6 +13,15 @@ dependencies = [
     "more-itertools",
 ]
 
+[dependency-groups]
+dev = [
+    "prek>=0.2",
+    "pytest>=8.4",
+    "pytest-cov>=7.0",
+    "ruff>=0.14",
+    "mypy",
+    "rdkit-stubs",
+]
 [build-system]
 # maybe will want to move away from setuptools eventually
 requires = ["setuptools>=61.0"]
@@ -39,15 +45,59 @@ line-length = 160
 
 [tool.ruff.lint]
 select = [
-  "E",  # pycodestyle errors
-  "F",  # pyflakes
-  "I",  # isort
-  "W",  # pycodestyle warnings
+    "B",  # bugbear
+#    "D",  # pydocstyle
+    "E",  # pycodestyle errors
+    "F",  # pyflakes
+    "I",  # isort
+    "N",  # pep8-naming conventions
+    "W",  # pycodestyle warnings
+    "C4", # comprehensions
+    "PL", # pylint
+    "PT", # flake8-pytest-style
+    "PIE", # misc lints
+    "PYI", # flake8-pyi
+    "TID", # tidy imports
+    "TCH", # type-checking imports
+    "RUF", # Ruff-specific rules
+    "RSE", # flake8-raise
+    "ICN001", # unconventional-import-alias
 ]
-ignore = ["E741"]
+ignore = [
+    "N806", # Non-lowercase variable in function
+    "PLR0911", # Too many returns
+    "PLR0912", # Too many branches
+    "PLR0913", # Too many arguments to function call
+    "PLR0914", # Too many locals
+    "PLR0915", # Too many statements
+    "PLR1702", # Too many nested-blocks
+    "E741",    # Ambiguous vairable name
+    "PLR2004", # Magic value used in comparison
+    "N801",    # CapWords convention
+    "N802",    # Arguments should be lowercase
+    "N815",    # Mixed case attribute in class
+    "RUF002",  # Docstring contains ambiguous dash
+    "RUF003",  # Ambiguous dash
+    "RUF012",  # Mutable class defaults
+    "RUF028",  # invalid supression comment
+    "N803",    # Invalid argument name
+    "PT006",   # Pytest parameterize names wrong type
+    "PT011",   # Pytest raises too broad
+    "PT013",   # Incorrect import of pytest
+    "TID252",  # Prefer absolute imports from parent
+]
 
 [tool.ruff.lint.per-file-ignores]
 "__init__.py" = ["F401", "F403"]
+
+[tool.ruff.lint.pep8-naming]
+classmethod-decorators = [
+    "classmethod",
+    "field_validator",
+]
+
+[tool.ruff.lint.pydocstyle]
+convention = "numpy"
 
 [tool.pytest.ini_options]
 testpaths = ["stjames", "tests"]

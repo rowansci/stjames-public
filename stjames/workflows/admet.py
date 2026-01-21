@@ -34,6 +34,6 @@ class ADMETWorkflow(SMILESWorkflow, MoleculeWorkflow):
             raise ValueError("Can only set one of initial_molecule and initial_smiles")
 
         if self.initial_molecule is not None:
-            warnings.warn(DeprecationWarning("initial_molecule is deprecated. Use initial_smiles instead."))
+            warnings.warn(DeprecationWarning("initial_molecule is deprecated. Use initial_smiles instead."))  # noqa: B028
 
         return self

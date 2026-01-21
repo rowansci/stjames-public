@@ -19,6 +19,6 @@ class OptimizationSettings(Base):
     # for periodic systems only
     optimize_cell: bool = False
 
-    constraints: Sequence[Constraint] = tuple()
+    constraints: Sequence[Constraint] = ()
 
     save_intermediate_steps: bool = True

@@ -1,38 +1,43 @@
+exclude: '.venv'
 repos:
 - repo: https://github.com/pre-commit/pre-commit-hooks
-  rev: v5.0.0  # this is optional, use `pre-commit autoupdate` to get the latest rev!
+  rev: v6.0.0
   hooks:
+    - id: check-yaml
+    - id: check-toml
     - id: end-of-file-fixer
     - id: trailing-whitespace
 
-- repo: https://github.com/astral-sh/ruff-pre-commit
-  # Ruff version.
-  rev: v0.11.0
-  hooks:
-    - id: ruff
-      args: [ --fix ]
-    - id: ruff-format
-
-- repo: https://github.com/pre-commit/mirrors-mypy
-  rev: v1.15.0
-  hooks:
-    - id: mypy
-      stages: [pre-commit, pre-push]
-      args: ['--config-file', 'pyproject.toml']
-      additional_dependencies:
-        - atomium
-        - numpy
-        - pydantic
-        - pytest
-        - rdkit
-        - more-itertools
-
 - repo: local
   hooks:
-  - id: Pytest
-    name: pytest
-    stages: [pre-commit]
-    types: [python]
-    entry: pytest
+  - id: ruff
+    name: ruff-format
+    stages: [pre-commit, pre-push]
     language: system
+    entry: uv run ruff format .
+    types: [python]
+    pass_filenames: false
+
+  - id: ruff
+    name: ruff-check
+    stages: [pre-commit, pre-push]
+    language: system
+    entry: uv run ruff check .
+    types: [python]
+    pass_filenames: false
+
+  - id: mypy
+    name: mypy
+    stages: [pre-commit, pre-push]
+    language: system
+    entry: uv run mypy .
+    types: [python]
+    pass_filenames: false
+
+  - id: pytest
+    name: pytest
+    stages: [pre-commit, pre-push]
+    language: system
+    entry: uv run pytest
+    types: [python]
     pass_filenames: false

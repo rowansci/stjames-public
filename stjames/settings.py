@@ -121,7 +121,7 @@ class Settings(Base):
 
         return self
 
-    def model_post_init(self, __context: Any) -> None:
+    def model_post_init(self, __context: Any, /) -> None:
         # figure out `optimize_ts`
         if Task.OPTIMIZE_TS in self.tasks:
             self.tasks.pop(self.tasks.index(Task.OPTIMIZE_TS))

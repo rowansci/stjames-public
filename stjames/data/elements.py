@@ -1,8 +1,8 @@
 """Read elemental data from files."""
 
 import json
-from collections import namedtuple
 from importlib import resources
+from typing import NamedTuple
 
 data_dir = resources.files("stjames").joinpath("data")
 
@@ -11,7 +11,7 @@ with data_dir.joinpath("symbol_element.json").open() as f:
 
 ELEMENT_SYMBOL = {v: k for k, v in SYMBOL_ELEMENT.items()}
 
-Isotope = namedtuple("Isotope", ["relative_atomic_mass", "isotopic_composition", "standard_atomic_weight"])
+Isotope = NamedTuple("Isotope", [("relative_atomic_mass", float), ("isotopic_composition", float), ("standard_atomic_weight", float)])
 with data_dir.joinpath("nist_isotopes.json").open() as f:
     d = json.loads(f.read())
 
