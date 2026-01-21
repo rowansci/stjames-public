@@ -21,16 +21,26 @@ class BindingPoseContact(Base):
     occupancy: Annotated[float, AfterValidator(round_float(3))]
 
 
-class BindingPoseTrajectory(Base):
+class ProteinMDTrajectory(Base):
+    """
+    Represents a single protein MD trajectory.
+    """
+
+    uuid: UUID
+
+
+class BindingPoseTrajectory(ProteinMDTrajectory):
     """
     Represents a single trajectory looking at a binding pose.
 
+    Inherited:
     :param uuid: the UUID of the trajectory
+
+    New:
     :param ligand_rmsd: the RMSD of the ligand vs. starting pose (aligning the protein)
     :param contacts: the conserved binding-pose contacts
     """
 
-    uuid: UUID
     ligand_rmsd: Annotated[list[float], AfterValidator(round_list(3))] = []
     contacts: list[BindingPoseContact] = []
 
@@ -47,7 +57,6 @@ class ProteinMDSettingsMixin(Base):
     :param timestep_fs: the timestep, in femtoseconds
     :param constrain_hydrogens: whether or not to use SHAKE to freeze bonds to hydrogen
     :param nonbonded_cutoff: the nonbonded cutoff for particle-mesh Ewald, in Å
-    :param protein_prune_cutoff: the cutoff past which residues will be deleted, in Å
     :param protein_restraint_cutoff: the cutoff past which alpha-carbons will be constrained, in Å
     :param protein_restraint_constant: the force constant for backbone restraints, in kcal/mol/Å**2
     :param ionic_strength_M: the ionic strength of the solution, in M (molar)
@@ -86,7 +95,6 @@ class ProteinMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStructureW
     :param timestep_fs: the timestep, in femtoseconds
     :param constrain_hydrogens: whether or not to use SHAKE to freeze bonds to hydrogen
     :param nonbonded_cutoff: the nonbonded cutoff for particle-mesh Ewald, in Å
-    :param protein_prune_cutoff: the cutoff past which residues will be deleted, in Å
     :param protein_restraint_cutoff: the cutoff past which alpha-carbons will be constrained, in Å
     :param protein_restraint_constant: the force constant for backbone restraints, in kcal/mol/Å**2
     :param ionic_strength_M: the ionic strength of the solution, in M (molar)
@@ -107,7 +115,7 @@ class ProteinMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStructureW
 
     minimized_protein_uuid: UUID | None = None
     bonds: list[tuple[int, int]] = []
-    trajectories: list[UUID] = []
+    trajectories: list[ProteinMDTrajectory] = []
 
 
 class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStructureWorkflow, SMILESWorkflow):
@@ -125,7 +133,6 @@ class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStruc
     :param timestep_fs: the timestep, in femtoseconds
     :param constrain_hydrogens: whether or not to use SHAKE to freeze bonds to hydrogen
     :param nonbonded_cutoff: the nonbonded cutoff for particle-mesh Ewald, in Å
-    :param protein_prune_cutoff: the cutoff past which residues will be deleted, in Å
     :param protein_restraint_cutoff: the cutoff past which alpha-carbons will be constrained, in Å
     :param protein_restraint_constant: the force constant for backbone restraints, in kcal/mol/Å**2
     :param ionic_strength_M: the ionic strength of the solution, in M (molar)
