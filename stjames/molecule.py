@@ -32,11 +32,21 @@ logger = logging.getLogger(__name__)
 
 
 class MoleculeReadError(RuntimeError):
-    pass
+    """Error raised when molecule parsing fails."""
 
 
 class VibrationalMode(Base):
-    frequency: Annotated[float, AfterValidator(round_float(3))]  # in cm-1
+    """
+    Vibrational mode from frequency analysis.
+
+    :param frequency: vibrational frequency, in cm⁻¹
+    :param reduced_mass: reduced mass, in amu
+    :param force_constant: force constant, in mDyne/Å
+    :param displacements: atomic displacement vectors, in Å
+    :param ir_intensity: infrared intensity, in km/mol
+    """
+
+    frequency: Annotated[float, AfterValidator(round_float(3))]  # cm^-1
     reduced_mass: Annotated[float, AfterValidator(round_float(3))]  # amu
     force_constant: Annotated[float, AfterValidator(round_float(3))]  # mDyne/Å
     displacements: Annotated[Vector3DPerAtom, AfterValidator(round_vector3d_per_atom(6))]  # Å
@@ -51,25 +61,25 @@ class Molecule(Base):
     :param multiplicity: spin multiplicity of the Molecule
     :param atoms: Atom objects representing the atoms in the Molecule
     :param cell: PeriodicCell for periodic boundary conditions
-    :param energy: electronic energy (Hartree)
+    :param energy: electronic energy, in Hartree
     :param scf_iterations: number of SCF iterations
     :param scf_completed: whether the SCF converged
-    :param elapsed: time taken for the calculation (seconds)
-    :param homo_lumo_gap: energy of the HOMO-LUMO gap (eV)
-    :param gradient: energy gradient with respect to position (Hartree/Å)
+    :param elapsed: time taken for the calculation, in seconds
+    :param homo_lumo_gap: energy of the HOMO-LUMO gap, in eV
+    :param gradient: energy gradient with respect to position, in Hartree/Å
     :param stress: stress matrix
-    :param velocities: velocities of the atoms (Å/fs)
+    :param velocities: velocities of the atoms, in Å/fs
     :param mulliken_charges: Mulliken charges
     :param mulliken_spin_densities: Mulliken spin densities
-    :param dipole: dipole moment (debye)
+    :param dipole: dipole moment, in Debye
     :param vibrational_modes: vibrations
     # https://docs.rowansci.com/science/quantum-chemistry/frequencies-and-thermochemistry
-    :param zero_point_energy: zero-point energy (Hartree)
-    :param thermal_energy_corr: ZPE + non-zero-temperature effects (Hartree)
-    :param thermal_enthalpy_corr: thermal_energy_corr + pV (Hartree)
-    :param thermal_free_energy_corr: thermal_enthalpy_corr - 298.15 x S (Hartree)
-    :param excitation_energies: electronic-excitation energies
-    :param oscillator_strengths: electronic-transition strengths
+    :param zero_point_energy: zero-point energy, in Hartree
+    :param thermal_energy_corr: ZPE + non-zero-temperature effects, in Hartree
+    :param thermal_enthalpy_corr: thermal_energy_corr + pV, in Hartree
+    :param thermal_free_energy_corr: thermal_enthalpy_corr - 298.15 x S, in Hartree
+    :param excitation_energies: electronic-excitation energies, in Hartree
+    :param oscillator_strengths: electronic-transition strengths, dimensionless
     :param smiles: SMILES corresponding to the Molecule
     :param calculation_index: index in a calculation output
     """
@@ -81,12 +91,12 @@ class Molecule(Base):
     # for periodic boundary conditions
     cell: Optional[PeriodicCell] = None
 
-    energy: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None  # in Hartree
+    energy: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None  # Hartree
     scf_iterations: Optional[NonNegativeInt] = None
     scf_completed: Optional[bool] = None
-    elapsed: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None  # in seconds
+    elapsed: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None  # seconds
 
-    homo_lumo_gap: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None  # in eV
+    homo_lumo_gap: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None  # eV
 
     gradient: Annotated[Optional[Vector3DPerAtom], AfterValidator(round_optional_vector3d_per_atom(6))] = None  # Hartree/Å
     stress: Annotated[Optional[Matrix3x3], AfterValidator(round_optional_matrix3x3(6))] = None  # Hartree/Å
@@ -95,7 +105,7 @@ class Molecule(Base):
 
     mulliken_charges: Annotated[FloatPerAtom | None, AfterValidator(round_optional_float_per_atom(6))] = None
     mulliken_spin_densities: Annotated[FloatPerAtom | None, AfterValidator(round_optional_float_per_atom(6))] = None
-    dipole: Annotated[Optional[Vector3D], AfterValidator(round_optional_vector3d(6))] = None  # in Debye
+    dipole: Annotated[Optional[Vector3D], AfterValidator(round_optional_vector3d(6))] = None  # Debye
 
     vibrational_modes: Optional[list[VibrationalMode]] = None
 
@@ -115,7 +125,7 @@ class Molecule(Base):
 
     def distance(self, i: PositiveInt, j: PositiveInt) -> float:
         r"""
-        Calculate the distance between atoms.
+        Calculate the distance between atoms, in Å.
 
         >>> mol = Molecule.from_xyz("H 0 1 0\nH 0 0 1")
         >>> mol.distance(1, 2)
@@ -151,11 +161,12 @@ class Molecule(Base):
 
     @property
     def coordinates(self) -> Vector3DPerAtom:
+        """Cartesian coordinates of all atoms, in Å."""
         return [a.position for a in self.atoms]
 
     def translated(self, vector: Vector3D) -> Self:
         r"""
-        Translate the molecule by a vector.
+        Translate the molecule by a vector, in Å.
 
         >>> mol = Molecule.from_xyz("H 0 0 0\nH 0 0 1")
         >>> print(mol.translated((1, 0, 0)).to_xyz())
@@ -174,42 +185,50 @@ class Molecule(Base):
 
     @property
     def atomic_numbers(self) -> list[NonNegativeInt]:
+        """Atomic numbers of all atoms."""
         return [a.atomic_number for a in self.atoms]
 
     @property
     def sum_energy_zpe(self) -> Optional[float]:
+        """Electronic energy plus zero-point energy, in Hartree."""
         if (self.energy is None) or (self.zero_point_energy is None):
             return None
         return self.energy + self.zero_point_energy
 
     @property
     def sum_energy_thermal_corr(self) -> Optional[float]:
+        """Electronic energy plus thermal energy correction, in Hartree."""
         if (self.energy is None) or (self.thermal_energy_corr is None):
             return None
         return self.energy + self.thermal_energy_corr
 
     @property
     def sum_energy_enthalpy(self) -> Optional[float]:
+        """Electronic energy plus enthalpy correction, in Hartree."""
         if (self.energy is None) or (self.thermal_enthalpy_corr is None):
             return None
         return self.energy + self.thermal_enthalpy_corr
 
     @property
     def enthalpy(self) -> Optional[float]:
+        """Alias for sum_energy_enthalpy, in Hartree."""
         return self.sum_energy_enthalpy
 
     @property
     def sum_energy_free_energy(self) -> Optional[float]:
+        """Electronic energy plus Gibbs free energy correction, in Hartree."""
         if (self.energy is None) or (self.thermal_free_energy_corr is None):
             return None
         return self.energy + self.thermal_free_energy_corr
 
     @property
     def gibbs_free_energy(self) -> Optional[float]:
+        """Alias for sum_energy_free_energy, in Hartree."""
         return self.sum_energy_free_energy
 
     @pydantic.model_validator(mode="after")
     def check_electron_sanity(self) -> Self:
+        """Check that the charge and multiplicity combination is possible."""
         num_electrons = sum(self.atomic_numbers) - self.charge
         num_unpaired_electrons = self.multiplicity - 1
         if (num_electrons - num_unpaired_electrons) % 2 != 0:
@@ -533,6 +552,8 @@ def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
 
 
 class EXTXYZMetadata(TypedDict, total=False):
+    """Metadata from EXTXYZ file comment line."""
+
     properties: Any
     total_charge: int
     multiplicity: int
@@ -597,7 +618,9 @@ def angle(p0: Sequence[float], p1: Sequence[float], p2: Sequence[float], degrees
     """
     Angle between three points.
 
-    :param i, j, k: positions of points
+    :param p0: position of first point
+    :param p1: position of vertex point
+    :param p2: position of third point
     :param degrees: whether to return in degrees
     :return: angle in radians or degrees
     """

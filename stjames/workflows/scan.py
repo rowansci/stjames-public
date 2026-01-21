@@ -65,7 +65,7 @@ class ScanWorkflow(MoleculeWorkflow):
     New:
     :param scan_settings: what coordinate(s) to scan; if more than one, all will be performed simultaneously and should have the same number of steps
     :param scan_settings_2d: what additional coordinate(s) to scan; makes a grid with `scan_settings`
-    :param wavefront propagation: whether to use wavefront propagation (10.1063/5.0009232) for more expensive but smoother scans
+    :param wavefront_propagation: whether to use wavefront propagation (10.1063/5.0009232) for more expensive but smoother scans
     :param calc_settings: settings for the calculation
     :param calc_engine: engine to use for the calculation
     :param scan_points: points along the scan

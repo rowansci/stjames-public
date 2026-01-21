@@ -28,6 +28,8 @@ def round_optional_float(round_to: int) -> Callable[[Optional[float]], Optional[
 
 
 class Base(pydantic.BaseModel):
+    """Base model with automatic numpy array coercion."""
+
     @pydantic.field_validator("*", mode="before")
     @classmethod
     def coerce_numpy(cls, val: _T) -> _T | list[Any]:

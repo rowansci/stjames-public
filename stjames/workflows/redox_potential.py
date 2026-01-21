@@ -39,12 +39,12 @@ class RedoxPotentialWorkflow(MoleculeWorkflow, MultiStageOptMixin):
     :param neutral_molecule: UUID of the calculation for the neutral molecule
     :param anion_molecule: UUID of the calculation for the anion molecule
     :param cation_molecule: UUID of the calculation for the cation molecule
-    :param reduction_potential: the final potential, in V
-    :param oxidation_potential: the final potential, in V
+    :param reduction_potential: final potential in V
+    :param oxidation_potential: final potential in V
 
     Legacy:
     :param redox_type: one of "reduction" or "oxidation"
-    :param redox_potential: the corresponding potential, in V
+    :param redox_potential: corresponding potential in V
     """
 
     solvent: Solvent = Solvent.ACETONITRILE

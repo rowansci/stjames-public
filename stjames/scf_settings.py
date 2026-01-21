@@ -11,7 +11,7 @@ class SCFSettings(Base):
     """
     Settings for SCF convergence.
 
-    :param max_iters: the maximum number of SCF iterations to permit
+    :param max_iters: maximum number of SCF iterations to permit
     :param soscf: whether or not to use SOSCF (second-order SCF).
     """
 

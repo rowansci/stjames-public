@@ -19,7 +19,7 @@ class Score(Base):
     Pose with its score.
 
     :param pose: conformation of the ligand when docked (calculation UUID)
-    :param complex_pdb: the UUID of the protein–ligand complex (protein UUID)
+    :param complex_pdb: UUID of protein–ligand complex (protein UUID)
     :param score: score of the pose, (kcal/mol)
     :param posebusters_valid: whether or not the ligand pose passes the PoseBusters tests
     :param strain: strain (kcal/mol)
@@ -38,7 +38,7 @@ class DockingSettings(Base):
     """
     Base class for controlling how docked poses are generated.
 
-    :param max_poses: the maximum number of poses generated per input molecule
+    :param max_poses: maximum number of poses generated per input molecule
     """
 
     max_poses: int = 4
@@ -178,7 +178,7 @@ class AnalogueDockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
     :param protein: PDB or UUID
 
     New:
-    :param analogues: the SMILES for the analogues of `initial_molecule`
+    :param analogues: SMILES for analogues of `initial_molecule`
     :param docking_settings: how docking should be run
 
     Results:

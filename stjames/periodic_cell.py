@@ -11,6 +11,13 @@ Bool3: TypeAlias = tuple[bool, bool, bool]
 
 
 class PeriodicCell(Base):
+    """
+    Unit cell for periodic systems.
+
+    :param lattice_vectors: 3x3 matrix of lattice vectors, in Å
+    :param is_periodic: periodicity in each dimension
+    """
+
     lattice_vectors: Annotated[Matrix3x3, pydantic.AfterValidator(round_matrix3x3(6))]
     is_periodic: Bool3 = (True, True, True)
 

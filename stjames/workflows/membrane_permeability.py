@@ -24,14 +24,14 @@ class MembranePermeabilityWorkflow(SMILESWorkflow, MoleculeWorkflow):
     :param membrane_permeability_method: model used to predict membrane permeability
 
     Results:
-    :param caco_2_P_app: base-10 logarithm of the Caco-2 apparent permeability P_app (in cm/s)
-    :param caco_2_logP: the Caco-2 intrinsic permeability coefficient logP
-    :param blm_logP: the bilayer-lipid-membrane intrinsic permeability coefficient logP
-    :param pampa_logP: the PAMPA intrinsic permeability coefficient logP
-    :param plasma_logP: the plasma-membrane intrinsic permeability coefficient logP
-    :param bbb_logP: the blood–brain-barrier intrinsic permeability coefficient logP
+    :param caco_2_P_app: base-10 logarithm of the Caco-2 apparent permeability P_app, in cm/s
+    :param caco_2_logP: Caco-2 intrinsic permeability coefficient logP
+    :param blm_logP: bilayer-lipid-membrane intrinsic permeability coefficient logP
+    :param pampa_logP: PAMPA intrinsic permeability coefficient logP
+    :param plasma_logP: plasma-membrane intrinsic permeability coefficient logP
+    :param bbb_logP: blood–brain-barrier intrinsic permeability coefficient logP
     :param energy_profile: how the energy of the compound is predicted to change as it passes through a membrane.
-        the first value is the membrane profile (Å), the second is the energy (kcal/mol).
+        the first value is the membrane profile, in Å, the second is the energy, in kcal/mol
     """
 
     initial_smiles: str = ""

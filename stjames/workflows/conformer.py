@@ -95,7 +95,7 @@ def csearch_settings_by_mode(mode: Mode, old_settings: Optional[ConformerSetting
         )
 
     else:
-        raise ValueError(f"invalid mode ``{mode.value}`` for conformer settings")
+        raise ValueError(f"invalid mode {mode.value} for conformer settings")
 
     if old_settings is not None:
         settings.final_method = old_settings.final_method

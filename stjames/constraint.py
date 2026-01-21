@@ -19,8 +19,8 @@ class Constraint(Base):
     Represents a single (absolute) constraint.
 
     :param constraint_type: which type
-    :param atoms: the atoms in question. n.b. - these are 1-indexed!
-    :param value: the value to constrain this to, leaving this blank sets the current value
+    :param atoms: atoms in question (1-indexed)
+    :param value: value to constrain to; leaving blank sets current value
     """
 
     constraint_type: ConstraintType
@@ -53,8 +53,8 @@ class PairwiseHarmonicConstraint(Base):
     Represents a harmonic constraint, with a characteristic spring constant.
 
     :param atoms: which atoms to apply to
-    :param force_constant: the strength of the attraction, in kcal/mol/Å
-    :param equilibrium: the distance at which force is zero
+    :param force_constant: strength of attraction, in kcal/mol/Å
+    :param equilibrium: distance at which force is zero
     """
 
     atoms: tuple[PositiveInt, PositiveInt]  # 1-indexed
@@ -66,8 +66,8 @@ class SphericalHarmonicConstraint(Base):
     """
     Represents a spherical harmonic constraint to keep a system near the origin.
 
-    :param confining radius: the confining radius, in Å
-    :param force_constant: the strength of the confinement, in kcal/mol/Å
+    :param confining_radius: confining radius, in Å
+    :param force_constant: strength of confinement, in kcal/mol/Å
     """
 
     confining_radius: PositiveFloat

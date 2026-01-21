@@ -11,9 +11,9 @@ class Atom(Base):
     """
     A single atom.
 
-    :param atomic_number: the atomic number
-    :param position: the Cartesian coordinates in Å
-    :param mass: the mass, in Daltons. If `None` the most common isotopologue will be employed.
+    :param atomic_number: atomic number
+    :param position: Cartesian coordinates, in Å
+    :param mass: mass, in Daltons; if None, most common isotopologue will be used
     """
 
     atomic_number: NonNegativeInt

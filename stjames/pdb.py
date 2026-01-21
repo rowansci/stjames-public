@@ -46,7 +46,7 @@ class PDBWater(BaseModel):
 
 
 class PDBResidue(BaseModel):
-    """A structure."""
+    """Residue within a polymer chain."""
 
     model_config = ConfigDict(extra=EXTRA)
 
@@ -162,6 +162,8 @@ class PDBQuality(BaseModel):
 
 
 class PDBMissingResidue(BaseModel):
+    """Residue missing from PDB structure."""
+
     model_config = ConfigDict(extra=EXTRA)
 
     name: str
@@ -389,13 +391,10 @@ def _create_filestring(lines: list[str]) -> str:
 
 def _format_date(date_str: str | None) -> str | None:
     """
-    Formats a date string from "YYYY-MM-DD" to "DD-MMM-YY".
+    Format date string from "YYYY-MM-DD" to "DD-MMM-YY".
 
-    Args:
-        date_str (str): Date string in "YYYY-MM-DD" format.
-
-    Returns:
-        str: Formatted date string in "DD-MMM-YY" format.
+    :param date_str: date string in "YYYY-MM-DD" format
+    :return: formatted date string in "DD-MMM-YY" format
     """
     if date_str is None:
         return None

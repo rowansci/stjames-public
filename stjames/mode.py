@@ -2,6 +2,8 @@ from .base import LowercaseStrEnum
 
 
 class Mode(LowercaseStrEnum):
+    """Calculation accuracy mode."""
+
     # choose based on job type
     AUTO = "auto"
 

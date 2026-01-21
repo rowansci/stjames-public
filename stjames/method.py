@@ -5,6 +5,8 @@ from .engine import Engine
 
 
 class Method(LowercaseStrEnum):
+    """Computational chemistry method."""
+
     HARTREE_FOCK = "hf"
     HF3C = "hf_3c"
 
@@ -82,10 +84,9 @@ class Method(LowercaseStrEnum):
         """
         Return the canonical Engine for this quantum-chemistry method.
 
-        :param bool is_periodic:
-            If True and the method is in the XTB family, return
-            "tblite" (periodic-capable backend) instead of "xtb".
-        :returns: lower-case engine identifier (e.g. "psi4", "mace").
+        :param is_periodic: if True and method is in XTB family, return
+            "tblite" (periodic-capable backend) instead of "xtb"
+        :return: lower-case engine identifier (e.g. "psi4", "mace")
 
         >>> Method.MACE_MP_0B2_L.default_engine().value
         'mace'

@@ -14,11 +14,11 @@ class IonMobilityForcefieldElement(Base):
     """
     A single atom specification for the ion-mobility forcefield.
 
-    :param name: the name of the element (e.g. "Hydrogen")
-    :param atomic_number: the element's atomic number
-    :param mass: the mass of the element in Daltons (e.g. 1.00794)
-    :param sigma: the sigma Lennard-Jones parameter, in Å
-    :param epsilon: the epsilon Lennard-Jones parameter, in kcal/mol
+    :param name: name of element (e.g. "Hydrogen")
+    :param atomic_number: element's atomic number
+    :param mass: mass of element, in Daltons (e.g. 1.00794)
+    :param sigma: sigma Lennard-Jones parameter, in Å
+    :param epsilon: epsilon Lennard-Jones parameter, in kcal/mol
     """
 
     name: str
@@ -42,20 +42,19 @@ class IonMobilityWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     New:
-    :param protonate: automatically protonate the molecule
-    :param temperature: the temperature, in Kelvin
-    :param do_csearch: whether to perform a conformational search
-    :param do_optimization: whether to perform an optimization
-    :param forcefield: the forcefield used to describe atom–gas interactions.
-        if None, the default forcefield will be used.
+    :param protonate: automatically protonate molecule
+    :param temperature: temperature, in Kelvin
+    :param do_csearch: whether to perform conformational search
+    :param do_optimization: whether to perform optimization
+    :param forcefield: forcefield for atom–gas interactions; if None, default forcefield used
 
     Results:
-    :param conformers: the UUIDs of the conformers
-    :param conformer_ccs: the collision cross section (Å**2) per conformer
-    :param conformer_ccs_stdev: the uncertainty in the same
-    :param conformer_weights: the Boltzmann weights at RT
-    :param average_ccs: the Boltzmann-weighted CCS for the ensemble
-    :param average_ccs_stdev: the uncertainty in the same
+    :param conformers: UUIDs of conformers
+    :param conformer_ccs: collision cross section per conformer, in Å**2
+    :param conformer_ccs_stdev: uncertainty in same
+    :param conformer_weights: Boltzmann weights at RT
+    :param average_ccs: Boltzmann-weighted CCS for ensemble
+    :param average_ccs_stdev: uncertainty in same
     """
 
     protonate: bool = False

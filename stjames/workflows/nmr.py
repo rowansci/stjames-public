@@ -22,9 +22,9 @@ class NMRPeak(Base):
     """
     Represents a single NMR peak.
 
-    :param nucleus: the atomic number of the nucleus in question
-    :param shift: the chemical shift of the peak
-    :param atom_indices: the zero-indices of the atoms giving rise to the peak
+    :param nucleus: atomic number of nucleus in question
+    :param shift: chemical shift of peak
+    :param atom_indices: zero-indices of atoms giving rise to peak
     """
 
     nucleus: int
@@ -41,18 +41,18 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     New:
-    :param nmr_method: how to run the NMR calculations
-    :param solvent: the solvent in which to run the calculations
-    :param conf_gen_settings : the conformer-search settings. if `None`, no conformer search will be performed
-    :param multistage_opt_settings: the optimization settings. if `None`, no optimization will be performed
+    :param nmr_method: how to run NMR calculations
+    :param solvent: solvent in which to run calculations
+    :param conf_gen_settings: conformer-search settings; if `None`, no conformer search performed
+    :param multistage_opt_settings: optimization settings; if `None`, no optimization performed
 
     Results:
     :param conformers: list of conformer UUIDs
-    :param boltzmann_weights: the boltzmann weights for each conformer
-    :param per_conformer_chemical_shifts: the per-atom shifts for each conformer
-    :param chemical_shifts: the per-atom shifts
+    :param boltzmann_weights: Boltzmann weights for each conformer
+    :param per_conformer_chemical_shifts: per-atom shifts for each conformer
+    :param chemical_shifts: per-atom shifts
     :param symmetry_equivalent_nuclei: 0-indexed atoms which are equivalent to one another
-    :param predicted_peaks: the predicted NMR peaks
+    :param predicted_peaks: predicted NMR peaks
     """
 
     nmr_method: NMRMethod = NMRMethod.MAGNETZERO

@@ -2,6 +2,8 @@ from enum import Enum
 
 
 class Status(int, Enum):
+    """Job execution status."""
+
     # what a job gets when it's created if user is below max_concurrency
     QUEUED = 0
 
