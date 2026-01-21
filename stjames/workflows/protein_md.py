@@ -59,8 +59,6 @@ class ProteinMDSettingsMixin(Base):
     :param timestep_fs: the timestep, in femtoseconds
     :param constrain_hydrogens: whether or not to use SHAKE to freeze bonds to hydrogen
     :param nonbonded_cutoff: the nonbonded cutoff for particle-mesh Ewald, in Å
-    :param protein_restraint_cutoff: the cutoff past which alpha-carbons will be constrained, in Å
-    :param protein_restraint_constant: the force constant for backbone restraints, in kcal/mol/Å**2
     :param ionic_strength_M: the ionic strength of the solution, in M (molar)
     :param water_buffer: the amount of water to add around the protein, in Å
     """
@@ -75,9 +73,6 @@ class ProteinMDSettingsMixin(Base):
     timestep_fs: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 2
     constrain_hydrogens: bool = True
     nonbonded_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 8.0
-
-    protein_restraint_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] | None = None
-    protein_restraint_constant: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 100
 
     ionic_strength_M: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 0.10
     water_buffer: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 6.0
@@ -135,8 +130,6 @@ class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStruc
     :param timestep_fs: the timestep, in femtoseconds
     :param constrain_hydrogens: whether or not to use SHAKE to freeze bonds to hydrogen
     :param nonbonded_cutoff: the nonbonded cutoff for particle-mesh Ewald, in Å
-    :param protein_restraint_cutoff: the cutoff past which alpha-carbons will be constrained, in Å
-    :param protein_restraint_constant: the force constant for backbone restraints, in kcal/mol/Å**2
     :param ionic_strength_M: the ionic strength of the solution, in M (molar)
     :param water_buffer: the amount of water to add around the protein, in Å
 
@@ -145,6 +138,8 @@ class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStruc
     :param ligand_residue_name: ligand's residue name
     :param num_trajectories: the number of trajectories to run
     :param save_solvent: whether solvent should be saved
+    :param protein_restraint_cutoff: the cutoff past which alpha-carbons will be constrained, in Å
+    :param protein_restraint_constant: the force constant for backbone restraints, in kcal/mol/Å**2
 
     Results:
     :param minimized_protein_uuid: UUID of final system PDB
@@ -157,6 +152,9 @@ class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStruc
 
     num_trajectories: PositiveInt = 1
     save_solvent: bool = False
+
+    protein_restraint_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] | None = None
+    protein_restraint_constant: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 100
 
     minimized_protein_uuid: UUID | None = None
     bonds: list[tuple[int, int]] = []
