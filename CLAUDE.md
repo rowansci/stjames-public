@@ -15,7 +15,7 @@ This document provides essential guidance for AI agents working on this reposito
 
 ## Before every commit
 - Ensure all code has type annotations
-- Add Google-style docstrings (NO types, NO leading articles)
+- Add sphinx-style docstrings (NO types, NO leading articles)
 - Run checks: `prek -a`
 - Pre-commit hooks will run automatically and must pass
 
@@ -30,7 +30,7 @@ This document provides essential guidance for AI agents working on this reposito
 
 Required for: all public modules, classes, functions, and methods
 
-#### Format: Google-style
+#### Format: Sphinx-style
 1. Do not place type information in docstrings - use type annotations only
 2. Do not use leading articles in parameter, return, and error descriptions "a", "an", or "the"
 
@@ -46,32 +46,27 @@ Required for: all public modules, classes, functions, and methods
 #### Example
 ```python
 def process_data(input_data: list[str], threshold: int = 10) -> dict[str, int]:
-    """Process input data and return summary statistics.
+    """
+    Process input data and return summary statistics.
 
-    Args:
-        input_data: strings to process
-        threshold: minimum count threshold for inclusion
+    :param input_data: strings to process
+    :param threshold: minimum count threshold for inclusion
+    :return: Mapping of categories to counts
 
-    Returns:
-        Mapping of categories to counts
-
-    Examples:
-        >>> process_data(["a", "b"], 5)
-        {"valid": 2}
+    >>> process_data(["a", "b"], 5)
+    {"valid": 2}
     """
 ```
 
 #### Incorrect example (do not do this!)
 ```python
 def process_data(input_data: list[str], threshold: int = 10) -> dict[str, int]:
-    """Process input data and return summary statistics.
+    """
+    Process input data and return summary statistics.
 
-    Args:
-        input_data (list[str]): A list of strings to process.  # ❌ Has type and article
-        threshold (int): A minimum count threshold.            # ❌ Has type and article
-
-    Returns:
-        dict[str, int]: A dictionary mapping categories.       # ❌ Has type and article
+    :param input_data: (list[str]): A list of strings to process.  # ❌ Has type and article
+    :param threshold: (int): A minimum count threshold.            # ❌ Has type and article
+    :return: dict[str, int]: A dictionary mapping categories.      # ❌ Has type and article
     """
 ```
 
@@ -383,20 +378,17 @@ Both test files in `tests/` and docstring examples in source code are automatica
 Include examples in docstrings:
 ```python
 def add(a: int, b: int) -> int:
-    """Add two integers.
+    """
+    Add two integers.
 
-    Args:
-        a: first integer
-        b: second integer
+    :param a: first integer
+    :param b: second integer
+    :return: sum of a and b
 
-    Returns:
-        Sum of a and b
-
-    Examples:
-        >>> add(2, 3)
-        5
-        >>> add(-1, 1)
-        0
+    >>> add(2, 3)
+    5
+    >>> add(-1, 1)
+    0
     """
     return a + b
 ```
@@ -506,4 +498,3 @@ git commit -m "feat: add user authentication
 - pydantic documentation: https://docs.pydantic.dev
 - pytest documentation: https://docs.pytest.org
 - prek documentation: https://prek.j178.dev
-- Google docstring style: https://google.github.io/styleguide/pyguide.html#38-comments-and-docstrings
