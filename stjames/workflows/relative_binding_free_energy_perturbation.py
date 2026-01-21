@@ -170,7 +170,6 @@ class RelativeBindingFreeEnergyPerturbationWorkflow(ProteinStructureWorkflow):
     Inherited:
     :param protein: PDB of the protein, or the UUID of the protein.
 
-
     New:
     :param ligands: Mapping from ligand identifiers to `Molecule` objects.
     :param graph: RBFE graph topology.
@@ -196,8 +195,8 @@ class RelativeBindingFreeEnergyPerturbationWorkflow(ProteinStructureWorkflow):
         """
         Syncs data between "target" and "protein" field.
         """
-        protein = data.get("protein", False)
-        target = data.get("target", False)
+        protein = data.get("protein")
+        target = data.get("target")
 
         if target and not protein:
             data["protein"] = target

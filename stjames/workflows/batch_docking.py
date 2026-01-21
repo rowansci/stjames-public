@@ -40,8 +40,8 @@ class BatchDockingWorkflow(BatchSMILESWorkflow, ProteinStructureWorkflow):
         """
         Syncs data between "target" and "protein" field.
         """
-        protein = data.get("protein", False)
-        target = data.get("target", False)
+        protein = data.get("protein")
+        target = data.get("target")
 
         if target and not protein:
             data["protein"] = target
