@@ -119,7 +119,7 @@ class ConformerGenSettings(BaseModel):
     mode: Mode = Mode.RAPID
     conf_opt_method: XTBMethod = Method.GFN_FF
     screening: ScreeningSettings | None = None
-    constraints: Sequence[Constraint] = tuple()  # noqa: C408
+    constraints: Sequence[Constraint] = ()
     nci: bool = False
     max_confs: int | None = None
 
@@ -419,7 +419,7 @@ class ConformerGenMixin(BaseModel):
 
     conf_gen_mode: Mode = Mode.RAPID
     conf_gen_settings: None | ConformerGenSettingsUnion = None
-    constraints: Sequence[Constraint] = tuple()  # noqa: C408
+    constraints: Sequence[Constraint] = ()
     nci: bool = False
     max_confs: int | None = None
 

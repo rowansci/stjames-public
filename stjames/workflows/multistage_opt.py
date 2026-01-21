@@ -57,11 +57,11 @@ class MultiStageOptSettings(BaseModel):
     """
 
     mode: Mode
-    optimization_settings: Sequence[Settings] = tuple()  # noqa: C408
+    optimization_settings: Sequence[Settings] = ()
     singlepoint_settings: Settings | None = None
     solvent: Solvent | None = None
     xtb_preopt: bool = False
-    constraints: Sequence[Constraint] = tuple()  # noqa: C408
+    constraints: Sequence[Constraint] = ()
     transition_state: bool = False
     frequencies: bool = False
 
@@ -237,7 +237,7 @@ class MultiStageOptMixin(BaseModel):
     multistage_opt_settings: MultiStageOptSettings = _sentinel_msos  # type: ignore [assignment]
     solvent: Solvent | None = None
     xtb_preopt: bool = False
-    constraints: Sequence[Constraint] = tuple()  # noqa: C408
+    constraints: Sequence[Constraint] = ()
     transition_state: bool = False
     frequencies: bool = False
 
