@@ -1,6 +1,6 @@
 """Workflows covering RBFE graph construction and endpoint FEP execution."""
 
-from typing import Annotated, Literal, Self
+from typing import Annotated, Any, Literal, Self
 
 from pydantic import AfterValidator, PositiveInt, model_validator
 
@@ -10,7 +10,7 @@ from ..method import Method
 from ..molecule import Molecule
 from ..pdb import PDB
 from ..types import UUID
-from .workflow import Workflow
+from .workflow import ProteinStructureWorkflow, Workflow
 
 
 class TMDRBFESettings(Base):
@@ -163,13 +163,19 @@ class RBFEDiagnostics(Base):
     notes: list[Message] = []
 
 
-class RelativeBindingFreeEnergyPerturbationWorkflow(Workflow):
+class RelativeBindingFreeEnergyPerturbationWorkflow(ProteinStructureWorkflow):
     """
     Workflow for running relative binding free energy perturbation simulations.
 
+    Inherited:
+    :param protein: PDB of the protein, or the UUID of the protein.
+
+    New:
     :param ligands: Mapping from ligand identifiers to `Molecule` objects.
     :param graph: RBFE graph topology.
-    :param target: PDB object or the UUID of the PDB object used for simulation.
+    :param target: PDB object or the UUID of the PDB object used for simulation. DEPRECATED.
+
+    Results:
     :param ligand_dg_results: Optional per-ligand FEP summaries produced downstream.
     :param diagnostics: Optional aggregate QC metrics.
     :param settings: Simulation controls shared across all RBFE edges.
@@ -183,3 +189,18 @@ class RelativeBindingFreeEnergyPerturbationWorkflow(Workflow):
 
     ligand_dg_results: dict[str, RBFEResult] | None = None
     diagnostics: RBFEDiagnostics | None = None
+
+    @model_validator(mode="before")
+    def harmonize_target_and_protein(cls, data: Any) -> Any:  # noqa: N805
+        """
+        Syncs data between "target" and "protein" field.
+        """
+        protein = data.get("protein")
+        target = data.get("target")
+
+        if target and not protein:
+            data["protein"] = target
+        elif not target and protein:
+            data["target"] = protein
+
+        return data
