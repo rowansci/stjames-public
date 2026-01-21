@@ -1,10 +1,9 @@
 name: Test
 
 on:
-  pull_request:
-    types: [opened, synchronize]
+  pull_request: {}
   push:
-    branches: [master, develop]
+    branches: master
 
 jobs:
   test:
@@ -13,20 +12,21 @@ jobs:
         python-version: ['3.11', '3.12', '3.13']
         os: [ubuntu-latest]
 
-    name: "Python ${{ matrix.os }} ${{ matrix.python-version }}"
+    name: Python ${{ matrix.os }} ${{ matrix.python-version }}
     runs-on: ${{ matrix.os }}
+
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - name: Install the latest version of uv
+        uses: astral-sh/setup-uv@v7.2.0
         with:
-          python-version: ${{ matrix.python-version }}
+          enable-cache: true
 
-      - run: pip install .
-      - run: pip install -r dev-requirements.txt
+      - name: Install Python
+        run: uv python install ${{ matrix.python-version }}
 
-      - run: ruff format . --check
-      - run: ruff check .
-      - run: mypy stjames tests
-
-      - run: pytest --cov
+      - run: uv run ruff format .
+      - run: uv run ruff check .
+      - run: uv run mypy .
+      - run: uv run pytest --cov --cov-report=xml

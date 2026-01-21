@@ -57,11 +57,11 @@ class MultiStageOptSettings(BaseModel):
     """
 
     mode: Mode
-    optimization_settings: Sequence[Settings] = tuple()
+    optimization_settings: Sequence[Settings] = tuple()  # noqa: C408
     singlepoint_settings: Settings | None = None
     solvent: Solvent | None = None
     xtb_preopt: bool = False
-    constraints: Sequence[Constraint] = tuple()
+    constraints: Sequence[Constraint] = tuple()  # noqa: C408
     transition_state: bool = False
     frequencies: bool = False
 
@@ -113,7 +113,6 @@ class MultiStageOptSettings(BaseModel):
 
             case (mode, True):
                 logger.debug(f"Mode {mode=} specified with optimization_settings or singlepoint_settings, ignoring")
-                pass
 
             case (mode, False):
                 self._assign_settings_by_mode(mode)
@@ -238,7 +237,7 @@ class MultiStageOptMixin(BaseModel):
     multistage_opt_settings: MultiStageOptSettings = _sentinel_msos  # type: ignore [assignment]
     solvent: Solvent | None = None
     xtb_preopt: bool = False
-    constraints: Sequence[Constraint] = tuple()
+    constraints: Sequence[Constraint] = tuple()  # noqa: C408
     transition_state: bool = False
     frequencies: bool = False
 
@@ -258,7 +257,6 @@ class MultiStageOptMixin(BaseModel):
 
             case (mso_mode, msos) if msos is not _sentinel_msos:
                 logger.debug(f"Mode {mso_mode=} specified with multistage_opt_settings, ignoring")
-                pass
 
             case (mso_mode, _):
                 self.multistage_opt_settings = MultiStageOptSettings(

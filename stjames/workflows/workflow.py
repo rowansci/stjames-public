@@ -46,7 +46,7 @@ class FASTAWorkflow(Workflow):
     initial_smiles_list: list[str] = []
     ligand_binding_affinity_index: int | None = None
 
-    def model_post_init(self, __context: Any) -> None:
+    def model_post_init(self, __context: Any, /) -> None:
         if not (self.initial_protein_sequences or self.initial_dna_sequences or self.initial_rna_sequences):
             raise ValueError(
                 "Provide at least one of `initial_protein_sequences`, `initial_dna_sequences`, or `initial_rna_sequences`.",

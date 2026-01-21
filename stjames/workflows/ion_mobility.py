@@ -78,7 +78,7 @@ class IonMobilityWorkflow(MoleculeWorkflow):
     def check_supported_atoms(self) -> Self:
         """Validate that user-supplied forcefields have correct atoms."""
         if self.forcefield is not None:
-            supported_atoms = set(e.atomic_number for e in self.forcefield)
+            supported_atoms = {e.atomic_number for e in self.forcefield}
             if not all(z in supported_atoms for z in self.initial_molecule.atomic_numbers):
                 raise ValueError("Provided forcefield does not support all elements in input structure!")
 

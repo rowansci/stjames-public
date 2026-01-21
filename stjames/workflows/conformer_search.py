@@ -119,7 +119,7 @@ class ConformerGenSettings(BaseModel):
     mode: Mode = Mode.RAPID
     conf_opt_method: XTBMethod = Method.GFN_FF
     screening: ScreeningSettings | None = None
-    constraints: Sequence[Constraint] = tuple()
+    constraints: Sequence[Constraint] = tuple()  # noqa: C408
     nci: bool = False
     max_confs: int | None = None
 
@@ -159,14 +159,14 @@ class ETKDGSettings(ConformerGenSettings):
     settings_type: Literal["etkdg"] = "etkdg"
 
     @field_validator("constraints")
-    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:
+    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:  # noqa: N805
         if constraints:
             raise ValueError("ETKDG does not support constraints")
 
         return tuple(constraints)
 
     @field_validator("nci")
-    def check_nci(cls, nci: bool) -> Literal[False]:
+    def check_nci(cls, nci: bool) -> Literal[False]:  # noqa: N805
         if nci:
             raise ValueError("ETKDG does not support NCI")
 
@@ -345,14 +345,14 @@ class LyrebirdSettings(ConformerGenSettings):
     settings_type: Literal["lyrebird"] = "lyrebird"
 
     @field_validator("constraints")
-    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:
+    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:  # noqa: N805
         if constraints:
             raise ValueError("Lyrebird does not support constraints")
 
         return tuple(constraints)
 
     @field_validator("nci")
-    def check_nci(cls, nci: bool) -> Literal[False]:
+    def check_nci(cls, nci: bool) -> Literal[False]:  # noqa: N805
         if nci:
             raise ValueError("Lyrebird does not support NCI")
 
@@ -388,14 +388,14 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
     settings_type: Literal["monte_carlo_multiple_minimum"] = "monte_carlo_multiple_minimum"
 
     @field_validator("constraints")
-    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:
+    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:  # noqa: N805
         if constraints:
             raise ValueError("MCMM does not support constraints")
 
         return tuple(constraints)
 
     @field_validator("nci")
-    def check_nci(cls, nci: bool) -> Literal[False]:
+    def check_nci(cls, nci: bool) -> Literal[False]:  # noqa: N805
         if nci:
             raise ValueError("MCMM does not support NCI")
 
@@ -419,7 +419,7 @@ class ConformerGenMixin(BaseModel):
 
     conf_gen_mode: Mode = Mode.RAPID
     conf_gen_settings: None | ConformerGenSettingsUnion = None
-    constraints: Sequence[Constraint] = tuple()
+    constraints: Sequence[Constraint] = tuple()  # noqa: C408
     nci: bool = False
     max_confs: int | None = None
 

@@ -57,5 +57,5 @@ class HydrogenBondBasicityWorkflow(MoleculeWorkflow):
     do_optimization: bool = True
 
     optimization: UUID | None = None
-    hba_sites: list[HydrogenBondAcceptorSite] = []  # noqa: RUF012
-    hbd_sites: list[HydrogenBondDonorSite] = []  # noqa: RUF012
+    hba_sites: list[HydrogenBondAcceptorSite] = []
+    hbd_sites: list[HydrogenBondDonorSite] = []

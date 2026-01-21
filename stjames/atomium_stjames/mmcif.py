@@ -140,7 +140,7 @@ def loop_block_to_list(block: dict[str, Any]) -> list[dict[str, Any]]:
             lines[n] += lines[n + 1]
             lines.pop(n + 1)
     for line in lines:
-        l.append({name: value for name, value in zip(names, line)})
+        l.append(dict(zip(names, line, strict=True)))
 
     return l
 
@@ -406,7 +406,7 @@ def operation_id_groups_to_operations(operations: Any, operation_id_groups: Any)
     """
     operation_groups = [[operations[i] for i in ids] for ids in operation_id_groups]
 
-    while len(operation_groups) and len(operation_groups) != 1:
+    while operation_groups and len(operation_groups) != 1:
         operations = [np.matmul(op1, op2) for op1 in operation_groups[0] for op2 in operation_groups[1]]
         operation_groups[0] = operations
         operation_groups.pop(1)
@@ -440,7 +440,7 @@ def update_models_list(mmcif_dict: dict[str, Any], data_dict: dict[str, Any]) ->
             model = {"polymer": {}, "non_polymer": {}, "water": {}, "branched": {}}
             model_num = atom["pdbx_PDB_model_num"]
         mol_type = types[entities[atom["label_asym_id"]]]
-        if mol_type == "polymer" or mol_type == "branched":
+        if mol_type in {"polymer", "branched"}:
             add_atom_to_polymer(atom, aniso, model, names)
         else:
             add_atom_to_non_polymer(atom, aniso, model, mol_type, names)

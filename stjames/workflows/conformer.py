@@ -49,7 +49,7 @@ class ConformerWorkflow(MoleculeWorkflow):
     settings: ConformerSettings = ConformerSettings()
     conformers: list[Conformer] = []
 
-    def model_post_init(self, __context: Any) -> None:
+    def model_post_init(self, __context: Any, /) -> None:
         self.settings = csearch_settings_by_mode(self.mode, self.settings)
 
 

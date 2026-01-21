@@ -124,7 +124,7 @@ class DockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
         return f"<{type(self).__name__} {target} {ligand}>"
 
     @model_validator(mode="before")
-    def harmonize_target_and_protein(cls, data: Any) -> Any:
+    def harmonize_target_and_protein(cls, data: Any) -> Any:  # noqa: N805
         """
         Syncs data between "target"/"target_uuid" and "protein" field.
         """
@@ -153,7 +153,7 @@ class DockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
         return self
 
     @field_validator("pocket", mode="after")
-    def validate_pocket(cls, pocket: tuple[Vector3D, Vector3D]) -> tuple[Vector3D, Vector3D]:
+    def validate_pocket(cls, pocket: tuple[Vector3D, Vector3D]) -> tuple[Vector3D, Vector3D]:  # noqa: N805
         _center, size = pocket
         if any(q <= 0 for q in size):
             raise ValueError(f"Pocket size must be positive, got: {size}")

@@ -121,7 +121,7 @@ class Molecule(Base):
         >>> mol.distance(1, 2)
         1.4142135623730951
         """
-        return sum((q2 - q1) ** 2 for q1, q2 in zip(self.atoms[i - 1].position, self.atoms[j - 1].position)) ** 0.5  # type: ignore [no-any-return,unused-ignore]
+        return sum((q2 - q1) ** 2 for q1, q2 in zip(self.atoms[i - 1].position, self.atoms[j - 1].position, strict=True)) ** 0.5  # type: ignore [no-any-return,unused-ignore]
 
     def angle(self, i: PositiveInt, j: PositiveInt, k: PositiveInt, degrees: bool = True) -> float:
         r"""
@@ -330,10 +330,9 @@ class Molecule(Base):
                 if is_periodic := data.pop("is_periodic", None):
                     x, y, z = is_periodic.strip(" ([)]").split(",")
                     true_values = {"true", "1", "yes"}
-                    data["cell"].is_periodic = tuple(map(lambda v: v.strip().lower() in true_values, (x, y, z)))
+                    data["cell"].is_periodic = tuple((v.strip().lower() in true_values) for v in (x, y, z))
             except ValueError as e:
                 logger.error(f"Error parsing XYZ cell: {e}")
-                pass
 
         return data
 
@@ -526,7 +525,7 @@ def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
     except Exception as e:
         status1 = AllChem.EmbedMolecule(rdkm, maxAttempts=200, useRandomCoords=True)  # type: ignore [attr-defined, unused-ignore]
         if status1 < 0:
-            raise ValueError(f"Cannot embed molecule! Error: {e}")
+            raise ValueError(f"Cannot embed molecule! Error: {e}") from e
 
     AllChem.MMFFOptimizeMolecule(rdkm, maxIters=200)  # type: ignore [attr-defined, call-arg, unused-ignore]
 
@@ -574,8 +573,8 @@ def parse_extxyz_comment_line(line: str) -> EXTXYZMetadata:
 
             try:
                 cell = tuple(tuple(map(float, lattice_values[i : i + 3])) for i in range(0, 9, 3))
-            except ValueError:
-                raise MoleculeReadError(f"Lattice should be floats, got {lattice_values}")
+            except ValueError as e:
+                raise MoleculeReadError(f"Lattice should be floats, got {lattice_values}") from e
 
             prop_dict["cell"] = PeriodicCell(lattice_vectors=cell)
 

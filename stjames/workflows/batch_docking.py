@@ -39,7 +39,7 @@ class BatchDockingWorkflow(BatchSMILESWorkflow):
     best_scores: Annotated[list[float | None], AfterValidator(round_list(3))] = []
 
     @field_validator("pocket", mode="after")
-    def validate_pocket(cls, pocket: tuple[Vector3D, Vector3D]) -> tuple[Vector3D, Vector3D]:
+    def validate_pocket(cls, pocket: tuple[Vector3D, Vector3D]) -> tuple[Vector3D, Vector3D]:  # noqa: N805
         _center, size = pocket
         if any(q <= 0 for q in size):
             raise ValueError(f"Pocket size must be positive, got: {size}")

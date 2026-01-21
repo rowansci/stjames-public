@@ -154,7 +154,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStruc
     trajectories: list[BindingPoseTrajectory] = []
 
     @model_validator(mode="before")
-    def harmonize_protein_uuid(cls, data: Any) -> Any:
+    def harmonize_protein_uuid(cls, data: Any) -> Any:  # noqa: N805
         """
         Syncs data between "protein_uuid" and "protein" field.
         """
