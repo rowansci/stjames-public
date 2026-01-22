@@ -5,11 +5,12 @@ from typing import Annotated
 from pydantic import AfterValidator
 
 from ..base import Base, LowercaseStrEnum, round_float
+from ..conformers import ConformerGenSettingsUnion, iMTDSettings, iMTDSpeeds
+from ..method import Method
 from ..mode import Mode
 from ..settings import Settings
 from ..solvent import Solvent
 from ..types import UUID, round_list
-from .conformer_search import ConformerGenSettingsUnion, iMTDSettings
 from .multistage_opt import MultiStageOptSettings
 from .workflow import MoleculeWorkflow
 
@@ -58,7 +59,11 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
     nmr_method: NMRMethod = NMRMethod.MAGNETZERO
     solvent: Solvent = Solvent.CHLOROFORM
 
-    conf_gen_settings: ConformerGenSettingsUnion | None = iMTDSettings(mode="careful")
+    conf_gen_settings: ConformerGenSettingsUnion | None = iMTDSettings(
+        speed=iMTDSpeeds.QUICK,
+        conf_opt_method=Method.GFN2_XTB,
+        reopt=False,
+    )
     multistage_opt_settings: MultiStageOptSettings | None = MultiStageOptSettings(
         mode=Mode.MANUAL,
         optimization_settings=[Settings(method="aimnet2_wb97md3", tasks=["optimize"])],

@@ -2,13 +2,12 @@ from typing import Any, Optional, Self, TypeVar
 
 from pydantic import PositiveFloat, computed_field, field_validator, model_validator
 
-from stjames.excited_state_settings import ExcitedStateSettingsUnion
-
 from .base import Base, LowercaseStrEnum, UniqueList
 from .basis_set import BasisSet
 from .compute_settings import ComputeSettings
 from .correction import Correction
 from .engine import Engine
+from .excited_state_settings import ExcitedStateSettingsUnion
 from .method import CORRECTABLE_NNP_METHODS, DFT_FUNCTIONALS, METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, RANGE_SEPARATED_FUNCTIONALS, Method
 from .mode import Mode
 from .opt_settings import OptimizationSettings

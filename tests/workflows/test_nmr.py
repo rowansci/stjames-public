@@ -1,6 +1,6 @@
 from pytest import fixture
 
-from stjames import Mode, Molecule
+from stjames import Molecule
 from stjames.solvent import Solvent
 from stjames.workflows import NMRSpectroscopyWorkflow
 
@@ -11,12 +11,8 @@ def water() -> Molecule:
 
 
 def test_basic(water: Molecule) -> None:
-    nmr = NMRSpectroscopyWorkflow(
-        initial_molecule=water,
-        mode=Mode.RAPID,
-    )
+    nmr = NMRSpectroscopyWorkflow(initial_molecule=water)
 
-    assert nmr.mode == Mode.RAPID
     assert nmr.solvent == Solvent.CHLOROFORM
 
     nmr.per_conformer_chemical_shifts = [
