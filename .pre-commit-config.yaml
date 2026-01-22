@@ -22,7 +22,7 @@ repos:
     name: ruff-check
     stages: [pre-commit, pre-push]
     language: system
-    entry: uv run ruff check .
+    entry: uv run ruff check . --fix
     types: [python]
     pass_filenames: false
 

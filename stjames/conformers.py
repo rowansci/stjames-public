@@ -6,6 +6,7 @@ from pydantic import AfterValidator, BaseModel, Field, NonNegativeFloat, Positiv
 from .base import LowercaseStrEnum, round_float
 from .constraint import Constraint
 from .method import Method, XTBMethod
+from .mode import Mode
 from .settings import Settings
 from .solvent import SolventModel, SolventSettings
 from .workflows.multistage_opt import MultiStageOptMixin
@@ -158,6 +159,37 @@ class ETKDGSettings(ConformerGenSettings):
 
         return nci
 
+    @classmethod
+    def from_mode(cls, mode: Mode) -> Self:
+        match mode:
+            case Mode.RECKLESS:
+                num_initial_confs = 200
+                num_confs_considered = 50
+                max_mmff_iterations = 500
+                max_mmff_energy = 30
+                max_confs = 20
+                max_mmff_energy = 20
+                conf_opt_method = Method.GFN0_XTB
+            case Mode.RAPID:
+                num_initial_confs = 300
+                num_confs_considered = 100
+                max_mmff_iterations = 500
+                max_mmff_energy = 30
+                max_confs = 50
+                max_mmff_energy = 30
+                conf_opt_method = Method.GFN0_XTB
+            case _:
+                raise NotImplementedError(f"Unsupported mode: {mode}")
+
+        return cls(
+            num_initial_confs=num_initial_confs,
+            num_confs_considered=num_confs_considered,
+            max_mmff_iterations=max_mmff_iterations,
+            max_mmff_energy=max_mmff_energy,
+            max_confs=max_confs,
+            conf_opt_method=conf_opt_method,
+        )
+
 
 class iMTDSpeeds(LowercaseStrEnum):
     MEGAQUICK = "megaquick"
@@ -174,6 +206,8 @@ class iMTDSettings(ConformerGenSettings, ABC):
     See https://github.com/crest-lab/crest/blob/5ca82feb2ec4df30a0129db957163c934f085952/src/choose_settings.f90#L202
     and https://github.com/crest-lab/crest/blob/5ca82feb2ec4df30a0129db957163c934f085952/src/confparse.f90#L825
     for how quick, superquick, and megaquick are defined.
+
+    See build_imtd_setings(mode) for sensible defaults.
 
     Inherited:
     :param conf_opt_method: method for the optimization
@@ -208,6 +242,80 @@ class iMTDSettings(ConformerGenSettings, ABC):
             raise ValueError("Only ALPB or GBSA solvent models supported for iMTD conformer search!")
 
         return self
+
+    @classmethod
+    def from_mode(cls, mode: Mode) -> Self:
+        """
+        Settings for iMTD style conformer generation.
+
+        RECKLESS:
+            - GFN-FF//MTD(GFN-FF)
+            - Megaquick
+                - No GC
+                - No rotamer metadynamics
+                - Energy window = 5.0
+                - Run scaling factor = 0.5
+                - 6 MTD runs
+        RAPID:
+            - GFN0//MTD(GFN-FF)
+            - Superquick
+                - No GC
+                - No rotamer metadynamics
+                - Energy window = 5.0
+                - Run scaling factor = 0.5
+                - 6 MTD runs
+        CAREFUL:
+            - GFN2//MTD(GFN-FF)
+            - Quick
+                - GC (for iMTD-GC)
+                - Rotamer metadynamics (for iMTD-GC)
+                - Energy window = 5.0
+                - Run scaling factor = 0.5
+                - 6 MTD runs
+        METICULOUS:
+            - GFN2//MTD(GFN2)
+            - "Normal"
+                - GC (for iMTD-GC)
+                - Rotamer metadynamics (for iMTD-GC)
+                - Energy window = 6.0
+                - Run scaling factor = 1
+                - 14 MTD runs (2 with extreme values)
+        """
+        match mode:
+            case Mode.RECKLESS:  # GFN-FF//MTD(GFN-FF)
+                mtd_method = Method.GFN_FF
+                conf_opt_method = Method.GFN0_XTB
+                speed = iMTDSpeeds.MEGAQUICK
+                reopt = True
+                max_confs: int | None = 20
+            case Mode.RAPID:  # GFN0//MTD(GFN-FF)
+                mtd_method = Method.GFN_FF
+                conf_opt_method = Method.GFN0_XTB
+                speed = iMTDSpeeds.SUPERQUICK
+                reopt = True
+                max_confs = 50
+            case Mode.CAREFUL:  # GFN2//MTD(GFN-FF)
+                mtd_method = Method.GFN_FF
+                conf_opt_method = Method.GFN2_XTB
+                speed = iMTDSpeeds.QUICK
+                reopt = False
+                max_confs = None
+            case Mode.METICULOUS:  # GFN2//MTD(GFN2)
+                mtd_method = Method.GFN2_XTB
+                conf_opt_method = Method.GFN2_XTB
+                speed = iMTDSpeeds.NORMAL
+                reopt = False
+                max_confs = None
+            case _:
+                raise NotImplementedError(f"Unsupported mode: {mode}")
+
+        return cls(
+            mtd_method=mtd_method,
+            conf_opt_method=conf_opt_method,
+            speed=speed,
+            reopt=reopt,
+            max_confs=max_confs,
+        )
 
 
 class iMTDGCSettings(iMTDSettings):
