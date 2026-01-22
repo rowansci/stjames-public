@@ -1,6 +1,6 @@
 from pytest import fixture, raises
 
-from stjames import Mode, Molecule
+from stjames import Molecule
 from stjames.pdb import PDB, read_pdb
 from stjames.workflows.docking import AnalogueDockingWorkflow, DockingWorkflow, Score
 
@@ -21,7 +21,6 @@ def test_raises(water: Molecule, gfp: str) -> None:
     with raises(ValueError):
         DockingWorkflow(
             initial_molecule=water,
-            mode=Mode.RAPID,
             protein=gfp,
             pocket=((0, 0, 0), (-1, -1, -1)),
         )
@@ -30,7 +29,6 @@ def test_raises(water: Molecule, gfp: str) -> None:
     with raises(ValueError):
         DockingWorkflow(  # type: ignore [call-arg]
             initial_molecule=water,
-            mode=Mode.RAPID,
             pocket=((0, 0, 0), (-1, -1, -1)),
         )
 
@@ -38,12 +36,10 @@ def test_raises(water: Molecule, gfp: str) -> None:
 def test_basic(water: Molecule, gfp: str) -> None:
     dwf = DockingWorkflow(
         initial_molecule=water,
-        mode=Mode.RAPID,
         protein=gfp,
         pocket=((0, 0, 0), (1, 1, 1)),
     )
 
-    assert dwf.mode == Mode.RAPID
     assert not dwf.scores
 
     assert dwf.pocket == ((0.0, 0.0, 0.0), (1.0, 1.0, 1.0))
@@ -55,7 +51,6 @@ def test_basic(water: Molecule, gfp: str) -> None:
 def test_docked(water: Molecule, gfp: str) -> None:
     dwf = DockingWorkflow(
         initial_molecule=water,
-        mode=Mode.RAPID,
         protein=gfp,
         pocket=((0, 0, 0), (10, 10, 10)),
     )

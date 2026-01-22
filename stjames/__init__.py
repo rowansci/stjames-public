@@ -13,6 +13,7 @@ from .compute_settings import *
 from .thermochem_settings import *
 from .settings import *
 
+from .conformers import *
 from .method import *
 from .basis_set import *
 from .task import *
