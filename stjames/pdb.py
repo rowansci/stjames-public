@@ -6,9 +6,10 @@ from typing import Any, Literal, Self
 from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
 
 import stjames.atomium_stjames as astj
-from stjames.atomium_stjames.mmcif import mmcif_dict_to_data_dict, mmcif_string_to_mmcif_dict
-from stjames.atomium_stjames.pdb import inverse_make_sequences, pdb_dict_to_data_dict, pdb_string_to_pdb_dict
-from stjames.types import Matrix3x3, Vector3D
+
+from .atomium_stjames.mmcif import mmcif_dict_to_data_dict, mmcif_string_to_mmcif_dict
+from .atomium_stjames.pdb import inverse_make_sequences, pdb_dict_to_data_dict, pdb_string_to_pdb_dict
+from .types import Matrix3x3, Vector3D
 
 # Mostly for testing purposes
 EXTRA: Literal["allow", "ignore", "forbid"] = "allow"

@@ -3,11 +3,11 @@ from typing import Annotated
 from pydantic import AfterValidator
 
 from ..base import Base, round_float
+from ..conformers import ConformerClusteringSettings, ConformerProperties, ConformerSearchMixin, iMTDSettings
 from ..mode import Mode
 from ..settings import Settings
 from ..solvent import Solvent, SolventModel, SolventSettings
 from ..types import UUID
-from .conformer_search import ConformerClusteringSettings, ConformerProperties, ConformerSearchMixin, iMTDSettings
 from .multistage_opt import MultiStageOptSettings
 from .workflow import MoleculeWorkflow
 
@@ -42,9 +42,7 @@ class SolventDependentConformersWorkflow(ConformerSearchMixin, MoleculeWorkflow)
 
     Inherited:
     :param initial_molecule: Molecule of interest
-    :param conf_gen_mode: Mode for calculations
     :param conf_gen_settings: settings for conformer generation
-    :param mso_mode: Mode for MultiStageOptSettings
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
 
     New:
@@ -62,7 +60,6 @@ class SolventDependentConformersWorkflow(ConformerSearchMixin, MoleculeWorkflow)
         Solvent.WATER,
     ]
 
-    conf_gen_mode: Mode = Mode.MANUAL
     conf_gen_settings: iMTDSettings = iMTDSettings(
         max_confs=None,
         mode=Mode.MANUAL,

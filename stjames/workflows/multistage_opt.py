@@ -7,9 +7,8 @@ from typing import Self, Sequence
 import more_itertools as mit
 from pydantic import BaseModel, Field, model_validator
 
-from stjames.correction import Correction
-
 from ..constraint import Constraint
+from ..correction import Correction
 from ..method import XTB_METHODS, Method
 from ..mode import Mode
 from ..opt_settings import OptimizationSettings

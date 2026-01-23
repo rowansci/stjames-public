@@ -3,10 +3,11 @@ from typing import Annotated
 from pydantic import AfterValidator
 
 from ..base import round_float, round_optional_float
+from ..conformers import ConformerGenSettingsUnion, ETKDGSettings
+from ..method import Method
 from ..mode import Mode
 from ..settings import Settings
 from ..types import UUID
-from .conformer_search import ConformerGenSettingsUnion, ETKDGSettings
 from .multistage_opt import MultiStageOptSettings
 from .workflow import MoleculeWorkflow
 
@@ -31,7 +32,7 @@ class StrainWorkflow(MoleculeWorkflow):
     :param strain: the actual strain in kcal/mol
     """
 
-    conf_gen_settings: ConformerGenSettingsUnion = ETKDGSettings(mode="rapid")
+    conf_gen_settings: ConformerGenSettingsUnion = ETKDGSettings(max_confs=50, conf_opt_method=Method.GFN0_XTB)
     multistage_opt_settings: MultiStageOptSettings = MultiStageOptSettings(
         mode=Mode.MANUAL,
         optimization_settings=[Settings(method="aimnet2_wb97md3", tasks=["optimize"])],

@@ -4,10 +4,9 @@ from typing import Annotated, Self
 
 from pydantic import AfterValidator, model_validator
 
-from stjames.method import Method
-
 from ..base import round_optional_float
 from ..engine import Engine
+from ..method import Method
 from ..settings import Settings
 from ..types import UUID, FloatPerAtom, round_optional_float_per_atom
 from .workflow import MoleculeWorkflow
