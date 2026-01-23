@@ -1,0 +1,8 @@
+HEADER    TEST INSERTION CODES                    23-JAN-26   TEST
+ATOM      1  N   MET A  16       0.000   0.000   0.000  1.00  0.00           N
+ATOM      2  N   GLY A  16A      1.000   0.000   0.000  1.00  0.00           N
+ATOM      3  N   VAL A  17       2.000   0.000   0.000  1.00  0.00           N
+ATOM      4  N   ALA A 169       3.000   0.000   0.000  1.00  0.00           N
+ATOM      5  N   LEU A 170       4.000   0.000   0.000  1.00  0.00           N
+TER       6      LEU A 170
+END

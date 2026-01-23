@@ -7,8 +7,6 @@ from stjames.pdb import (
     PDBDescription,
     PDBExperiment,
     PDBModel,
-    PDBPolymer,
-    PDBResidue,
     fetch_pdb,
     fetch_pdb_from_mmcif,
     pdb_from_mmcif_filestring,
@@ -171,69 +169,72 @@ def test_from_mmcif_to_pdb_1ema() -> None:
     assert compare_models_mmcif_and_pdb(mmcif_1ema.models, pdb_1ema.models)
 
 
-def test_residue_order_preserved_after_json_sort() -> None:
-    """
-    Test that residue ordering is preserved after JSON round-trip with sorted keys.
-
-    PostgreSQL JSONB sorts keys alphabetically, which breaks numeric ordering for
-    residue IDs like "A.-3", "A.-2", "A.-1", "A.0", "A.1", "A.10", etc.
-    The PDBPolymer model_validator should re-sort residues by numeric position.
-    """
-    # Create residues in correct numeric order (including negative numbers)
-    residues = {
-        "A.-3": PDBResidue(name="ACE", number=-3, atoms={}, bvalue=0.0),
-        "A.-2": PDBResidue(name="ASP", number=-2, atoms={}, bvalue=0.0),
-        "A.-1": PDBResidue(name="ASP", number=-1, atoms={}, bvalue=0.0),
-        "A.0": PDBResidue(name="LYS", number=0, atoms={}, bvalue=0.0),
-        "A.1": PDBResidue(name="MET", number=1, atoms={}, bvalue=0.0),
-        "A.2": PDBResidue(name="ASP", number=2, atoms={}, bvalue=0.0),
-        "A.10": PDBResidue(name="GLY", number=10, atoms={}, bvalue=0.0),
-        "A.11": PDBResidue(name="ALA", number=11, atoms={}, bvalue=0.0),
-    }
-
-    polymer = PDBPolymer(internal_id="A", residues=residues)
-    original_order = list(polymer.residues.keys())
-
-    # Simulate JSONB round-trip (sort_keys=True mimics PostgreSQL JSONB behavior)
-    json_dict = polymer.model_dump(mode="json")
-    json_string_sorted = json.dumps(json_dict, sort_keys=True)
-    json_parsed = json.loads(json_string_sorted)
-
-    # Verify JSON sorting scrambled the keys (alphabetic order)
-    alphabetic_order = list(json_parsed["residues"].keys())
-    assert alphabetic_order == ["A.-1", "A.-2", "A.-3", "A.0", "A.1", "A.10", "A.11", "A.2"]
-
-    # Restore from sorted JSON - validator should fix the order
-    restored_polymer = PDBPolymer.model_validate(json_parsed)
-    restored_order = list(restored_polymer.residues.keys())
-
-    # Verify correct numeric order is restored
-    expected_order = ["A.-3", "A.-2", "A.-1", "A.0", "A.1", "A.2", "A.10", "A.11"]
-    assert restored_order == expected_order
-    assert restored_order == original_order
+def _jsonb_roundtrip(pdb: PDB) -> PDB:
+    """Simulate PostgreSQL JSONB round-trip (alphabetically sorts dict keys)."""
+    json_dict = pdb.model_dump(mode="json")
+    json_sorted = json.dumps(json_dict, sort_keys=True)
+    return PDB.model_validate(json.loads(json_sorted))
 
 
-def test_residue_order_with_multichar_chain_id() -> None:
-    """
-    Test that residue ordering works with multi-character chain IDs.
-    """
-    residues = {
-        "AA.-1": PDBResidue(name="ACE", number=-1, atoms={}, bvalue=0.0),
-        "AA.0": PDBResidue(name="MET", number=0, atoms={}, bvalue=0.0),
-        "AA.1": PDBResidue(name="ALA", number=1, atoms={}, bvalue=0.0),
-        "AA.10": PDBResidue(name="GLY", number=10, atoms={}, bvalue=0.0),
-        "AA.2": PDBResidue(name="VAL", number=2, atoms={}, bvalue=0.0),
-    }
+def _extract_atom_records(pdb_string: str) -> list[tuple[str, int, str, int, str]]:
+    """Extract (record_type, serial, chain, res_num, insertion_code) from PDB string."""
+    records = []
+    for line in pdb_string.split("\n"):
+        if line.startswith(("ATOM", "HETATM")):
+            record_type = line[:6].strip()
+            serial = int(line[6:11])
+            chain = line[21]
+            res_num = int(line[22:26])
+            ins_code = line[26].strip()
+            records.append((record_type, serial, chain, res_num, ins_code))
+        elif line.startswith("TER"):
+            records.append(("TER", 0, "", 0, ""))
+    return records
 
-    polymer = PDBPolymer(internal_id="AA", residues=residues)
 
-    # Simulate JSONB round-trip
-    json_dict = polymer.model_dump(mode="json")
-    json_string_sorted = json.dumps(json_dict, sort_keys=True)
-    json_parsed = json.loads(json_string_sorted)
+def test_jsonb_roundtrip_insertion_codes() -> None:
+    """Test that insertion codes (16, 16A, 17, 169, 170) survive JSONB round-trip."""
+    with open("tests/data/insertion_codes.pdb") as f:
+        pdb = pdb_from_pdb_filestring(f.read())
 
-    restored_polymer = PDBPolymer.model_validate(json_parsed)
-    restored_order = list(restored_polymer.residues.keys())
+    restored = _jsonb_roundtrip(pdb)
+    out1 = pdb_object_to_pdb_filestring(pdb, seqres=False, hetnam=False)
+    out2 = pdb_object_to_pdb_filestring(restored, seqres=False, hetnam=False)
+    assert out1 == out2
 
-    expected_order = ["AA.-1", "AA.0", "AA.1", "AA.2", "AA.10"]
-    assert restored_order == expected_order
+    # Verify specific ordering
+    records = _extract_atom_records(out2)
+    res_nums = [(r[3], r[4]) for r in records if r[0] == "ATOM"]
+    assert res_nums == [(16, ""), (16, "A"), (17, ""), (169, ""), (170, "")]
+
+
+def test_jsonb_roundtrip_negative_residue_numbers() -> None:
+    """Test that negative residue numbers (-3 to 11) survive JSONB round-trip."""
+    with open("tests/data/negative_residue_numbers.pdb") as f:
+        pdb = pdb_from_pdb_filestring(f.read())
+
+    restored = _jsonb_roundtrip(pdb)
+    out1 = pdb_object_to_pdb_filestring(pdb, seqres=False, hetnam=False)
+    out2 = pdb_object_to_pdb_filestring(restored, seqres=False, hetnam=False)
+    assert out1 == out2
+
+    # Verify specific ordering
+    records = _extract_atom_records(out2)
+    res_nums = [r[3] for r in records if r[0] == "ATOM"]
+    assert res_nums == [-3, -2, -1, 0, 1, 2, 10, 11]
+
+
+def test_jsonb_roundtrip_multichain_with_ligand() -> None:
+    """Test multi-chain structure with ligand survives JSONB round-trip with correct TER placement."""
+    with open("tests/data/multichain_with_ligand.pdb") as f:
+        pdb = pdb_from_pdb_filestring(f.read())
+
+    restored = _jsonb_roundtrip(pdb)
+    out1 = pdb_object_to_pdb_filestring(pdb, seqres=False, hetnam=False)
+    out2 = pdb_object_to_pdb_filestring(restored, seqres=False, hetnam=False)
+    assert out1 == out2
+
+    # Verify structure: chain A atoms, TER, chain B atoms, TER, ligand
+    records = _extract_atom_records(out2)
+    record_types = [r[0] for r in records]
+    assert record_types == ["ATOM", "ATOM", "ATOM", "ATOM", "ATOM", "TER", "ATOM", "ATOM", "ATOM", "ATOM", "TER", "HETATM", "HETATM"]

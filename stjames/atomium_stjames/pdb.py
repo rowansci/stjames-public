@@ -142,10 +142,11 @@ def update_models_list(pdb_dict: dict[str, Any], data_dict: dict[str, Any]) -> N
     sequences = make_sequences(pdb_dict)
     secondary_structure = make_secondary_structure(pdb_dict)
     full_names = get_full_names(pdb_dict)
+    connections = parse_conect_records(pdb_dict)
     for model_lines in pdb_dict["MODEL"]:
         aniso = make_aniso(model_lines)
         last_ter = get_last_ter_line(model_lines)
-        model: dict[str, Any] = {"polymer": {}, "non_polymer": {}, "water": {}}
+        model: dict[str, Any] = {"polymer": {}, "non_polymer": {}, "water": {}, "connections": connections}
         for index, line in enumerate(model_lines):
             if line[:6] in ["ATOM  ", "HETATM"]:
                 chain_id = line[21] if index < last_ter else id_from_line(line)
@@ -159,6 +160,28 @@ def update_models_list(pdb_dict: dict[str, Any], data_dict: dict[str, Any]) -> N
                 _chain["sequence"] = sequences.get(chain_id, "")
         add_secondary_structure_to_polymers(model, secondary_structure)
         data_dict["models"].append(model)
+
+
+def parse_conect_records(pdb_dict: dict[str, Any]) -> list[list[int]]:
+    """Parse CONECT records from PDB dictionary.
+
+    :param dict pdb_dict: The .pdb dictionary to read.
+    :return: List of connections, where each inner list is [atom1, atom2, ...]
+    """
+    connections = []
+    for line in pdb_dict.get("CONECT", []):
+        # CONECT records: columns 7-11, 12-16, 17-21, 22-26, 27-31 (5 chars each)
+        atoms = []
+        for i in range(6, min(len(line), 31), 5):
+            atom_str = line[i : i + 5].strip()
+            if atom_str:
+                try:
+                    atoms.append(int(atom_str))
+                except ValueError:
+                    pass
+        if len(atoms) >= 2:
+            connections.append(atoms)
+    return connections
 
 
 def extract_header(pdb_dict: dict[str, Any], description_dict: dict[str, Any]) -> None:
@@ -433,13 +456,27 @@ def get_full_names(pdb_dict: dict[str, Any]) -> dict[str, Any]:
     return full_names
 
 
-def make_aniso(model_lines: list[str]) -> dict[int, list[float]]:
-    """Creates a mapping of chain IDs to anisotropy, by parsing ANISOU records.
+def make_aniso(model_lines: list[str]) -> dict[int, list[float | None]]:
+    """Creates a mapping of atom serial numbers to anisotropy, by parsing ANISOU records.
 
-    :param dict pdb_dict: the .pdb dictionary to read.
+    Preserves missing values as None for faithful round-trip.
+
+    :param model_lines: the lines to parse.
     :rtype: ``dict``"""
 
-    return {int(line[6:11].strip()): [int(line[n * 7 + 28 : n * 7 + 35]) / 10000 for n in range(6)] for line in model_lines if line[:6] == "ANISOU"}
+    result = {}
+    for line in model_lines:
+        if line[:6] == "ANISOU":
+            atom_serial = int(line[6:11].strip())
+            values: list[float | None] = []
+            for n in range(6):
+                val_str = line[n * 7 + 28 : n * 7 + 35].strip()
+                if val_str:
+                    values.append(int(val_str) / 10000)
+                else:
+                    values.append(None)
+            result[atom_serial] = values
+    return result
 
 
 def get_last_ter_line(model_lines: list[str]) -> int:
