@@ -1,9 +1,9 @@
 import re
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Literal, Self
+from typing import Any, Literal
 
-from pydantic import BaseModel, ConfigDict, Field, field_validator, model_validator
+from pydantic import BaseModel, ConfigDict, Field, field_validator
 
 import stjames.atomium_stjames as astj
 from stjames.atomium_stjames.mmcif import mmcif_dict_to_data_dict, mmcif_string_to_mmcif_dict
@@ -27,7 +27,7 @@ class PDBAtom(BaseModel):
     charge: float | None = None
     occupancy: float | None = None
     alt_loc: str | None = None
-    anisotropy: list[float] | None = None
+    anisotropy: list[float | None] | None = None
     bvalue: float
     is_hetatm: bool | None = None
 
@@ -84,12 +84,6 @@ class PDBPolymer(BaseModel):
     sequence: str | None = None
     strands: list[list[str]] = []
 
-    @model_validator(mode="after")
-    def sort_residues_by_number(self) -> Self:
-        """Ensure residues are sorted by numeric position, not alphabetically."""
-        self.residues = dict(sorted(self.residues.items(), key=lambda x: _residue_sort_key(x[0])))
-        return self
-
 
 class PDBNonPolymer(BaseModel):
     """Non-polymeric molecules/atoms (e.g. ions and ligands)."""
@@ -113,29 +107,7 @@ class PDBModel(BaseModel):
     branched: dict[str, Any] = {}
     water: dict[str, PDBWater] = {}
     chain_order: list[str] | None = None
-
-    @model_validator(mode="after")
-    def preserve_chain_order(self) -> Self:
-        """
-        Preserve original chain order across JSON serialization.
-
-        PostgreSQL JSONB sorts dict keys alphabetically, which can break structures
-        where chain order matters (e.g., disulfide bonds between non-adjacent chains).
-        This validator captures the original order on first parse and restores it
-        after deserialization.
-        """
-        if self.chain_order is None:
-            self.chain_order = list(self.polymer.keys())
-        else:
-            ordered_polymer = {}
-            for chain_id in self.chain_order:
-                if chain_id in self.polymer:
-                    ordered_polymer[chain_id] = self.polymer[chain_id]
-            for chain_id in self.polymer:
-                if chain_id not in ordered_polymer:
-                    ordered_polymer[chain_id] = self.polymer[chain_id]
-            self.polymer = ordered_polymer
-        return self
+    connections: list[list[int]] = []
 
 
 class PDBTransformations(BaseModel):
@@ -311,116 +283,139 @@ def pdb_object_to_pdb_filestring(
         if len(pdb.models) > 1:
             pdb_lines.append(f"MODEL     {model_index:>4}")
 
+        # Collect all atoms with metadata, then sort by serial number
+        # This preserves original file order through JSONB round-trips
+        all_atoms: list[tuple[int, PDBAtom, str, str, str, str, bool]] = []
+        # tuple: (serial, atom, chain_id, res_name, res_num, alt_loc, is_polymer)
+
         # === 1) Polymers (protein, DNA, etc.) ===
         for chain_id, polymer in model.polymer.items():
-            # Use polymer's internal_id if you want that as the chain ID
-            # otherwise just use the dictionary key
             this_chain_id = polymer.internal_id or chain_id
-
-            for _residue_id, residue in polymer.residues.items():
+            for residue_id, residue in polymer.residues.items():
                 assert residue.name is not None
-                for _atom_id, atom in residue.atoms.items():
-                    line = _format_atom_line(
-                        serial=_atom_id,
-                        atom=atom,
-                        chain_id=this_chain_id,
-                        res_name=residue.name,
-                        res_num=_residue_id[2:],
-                        alt_loc=atom.alt_loc or "",
-                    )
-                    pdb_lines.append(line)
-                    if atom.anisotropy and atom.anisotropy != [0, 0, 0, 0, 0, 0]:
-                        line = _format_anisou_line(
-                            serial=_atom_id,
-                            atom=atom,
-                            chain_id=this_chain_id,
-                            res_name=residue.name,
-                            res_num=_residue_id[2:],
-                            alt_loc=atom.alt_loc or "",
-                        )
-                        pdb_lines.append(line)
-
-            pdb_lines.append(f"TER   {_atom_id + 1:>5}      {residue.name:>3} {this_chain_id}{_residue_id[2:]:>4}")
+                res_num_part = residue_id.split(".", 1)[1] if "." in residue_id else residue_id
+                for atom_id, atom in residue.atoms.items():
+                    all_atoms.append((
+                        int(atom_id),
+                        atom,
+                        this_chain_id,
+                        residue.name,
+                        res_num_part,
+                        atom.alt_loc or "",
+                        True,  # is_polymer
+                    ))
 
         # === 2) Non-polymers (e.g. ligands, ions) ===
-        for _np_id, nonpoly in model.non_polymer.items():
-            # We'll treat each non-polymer as if it had a chain ID = nonpoly.polymer (or "Z")
+        for np_id, nonpoly in model.non_polymer.items():
             chain_id_for_np = nonpoly.polymer or "Z"
-
-            # For residue name, we can just use nonpoly.name or a 3-letter variant
-            # There's no standard "residue number" for these, so pick something
-            # or let the user define it in the original model. We'll just use 1 for demonstration.
-            # If you prefer incremental numbering, keep a separate counter.
-            for _atom_id, atom in nonpoly.atoms.items():
-                line = _format_atom_line(
-                    serial=_atom_id,
-                    atom=atom,
-                    chain_id=chain_id_for_np,
-                    res_name=nonpoly.name,
-                    res_num=_np_id[2:],
-                )
-                pdb_lines.append(line)
-                if atom.anisotropy and atom.anisotropy != [0, 0, 0, 0, 0, 0]:
-                    line = _format_anisou_line(
-                        serial=_atom_id,
-                        atom=atom,
-                        chain_id=chain_id_for_np,
-                        res_name=nonpoly.name,
-                        res_num=_np_id[2:],
-                    )
-                    pdb_lines.append(line)
+            np_res_num = np_id.split(".", 1)[1] if "." in np_id else np_id
+            for atom_id, atom in nonpoly.atoms.items():
+                all_atoms.append((
+                    int(atom_id),
+                    atom,
+                    chain_id_for_np,
+                    nonpoly.name,
+                    np_res_num,
+                    "",
+                    False,  # is_polymer
+                ))
 
         # === 3) Water ===
-        for _w_id, water in model.water.items():
-            # Water is typically "HOH" in PDB
-            for _atom_id, atom in water.atoms.items():
-                line = _format_atom_line(
-                    serial=_atom_id,
-                    atom=atom,
-                    chain_id=_w_id[0],  # Or you can use water.polymer if set
-                    res_name="HOH",
-                    res_num=_w_id[2:],  # or an incrementing value
-                )
-                pdb_lines.append(line)
-                if atom.anisotropy and atom.anisotropy != [0, 0, 0, 0, 0, 0]:
-                    line = _format_anisou_line(
-                        serial=_atom_id,
-                        atom=atom,
-                        chain_id=_w_id[0],
-                        res_name="HOH",
-                        res_num=_w_id[2:],
-                    )
-                    pdb_lines.append(line)
+        for w_id, water in model.water.items():
+            w_chain_id = w_id.split(".")[0] if "." in w_id else w_id[0]
+            w_res_num = w_id.split(".", 1)[1] if "." in w_id else w_id
+            for atom_id, atom in water.atoms.items():
+                all_atoms.append((
+                    int(atom_id),
+                    atom,
+                    w_chain_id,
+                    "HOH",
+                    w_res_num,
+                    "",
+                    False,  # is_polymer
+                ))
 
         # === 4) Branched ===
-        # If your structure has branched molecules (glycans, etc.),
-        # adapt similarly. For now, let's demonstrate if there's anything in branched
-        for _b_id, branched_obj in model.branched.items():
-            # "branched_obj" could be a custom structure. We'll assume it
-            # mirrors the format of non_polymer or something similar.
-            # If it has `.atoms`, we do the same:
+        for b_id, branched_obj in model.branched.items():
             if isinstance(branched_obj, dict) and "atoms" in branched_obj:
-                for _atom_id, atom in branched_obj["atoms"].items():
-                    line = _format_atom_line(
-                        serial=_atom_id,
-                        atom=atom,
-                        chain_id="B",
-                        res_name="BRN",  # or branched_obj.get("name", "BRN")
-                        res_num="1",
-                    )
-                    pdb_lines.append(line)
-                    if atom.anisotropy and atom.anisotropy != [0, 0, 0, 0, 0, 0]:
-                        line = _format_anisou_line(
-                            serial=_atom_id,
-                            atom=atom,
-                            chain_id="B",
-                            res_name="BRN",
-                            res_num="1",
-                        )
-                        pdb_lines.append(line)
+                for atom_id, atom in branched_obj["atoms"].items():
+                    all_atoms.append((
+                        int(atom_id),
+                        atom,
+                        "B",
+                        "BRN",
+                        "1",
+                        "",
+                        False,  # is_polymer
+                    ))
+
+        # Sort all atoms by serial number
+        all_atoms.sort(key=lambda x: x[0])
+
+        # Write atoms in order, inserting TER when polymer chain ends
+        prev_chain: str | None = None
+        prev_was_polymer = False
+        last_polymer_atom: tuple[int, str, str, str] | None = None  # (serial, res_name, chain_id, res_num)
+
+        for serial, atom, chain_id, res_name, res_num, alt_loc, is_polymer in all_atoms:
+            # Insert TER when transitioning from one polymer chain to another, or from polymer to non-polymer
+            if prev_was_polymer and (not is_polymer or (is_polymer and chain_id != prev_chain)):
+                if last_polymer_atom:
+                    ter_serial, ter_res_name, ter_chain_id, ter_res_num = last_polymer_atom
+                    ter_match = re.match(r"(-?\d+)([a-zA-Z]*)", ter_res_num)
+                    if ter_match:
+                        ter_num, ter_ins = ter_match.groups()
+                        ter_ins = ter_ins if ter_ins else " "
+                    else:
+                        ter_num, ter_ins = ter_res_num, " "
+                    pdb_lines.append(f"TER   {ter_serial + 1:>5}      {ter_res_name:>3} {ter_chain_id}{int(ter_num):>4}{ter_ins}")
+
+            # Write ATOM/HETATM line
+            line = _format_atom_line(
+                serial=serial,
+                atom=atom,
+                chain_id=chain_id,
+                res_name=res_name,
+                res_num=res_num,
+                alt_loc=alt_loc,
+            )
+            pdb_lines.append(line)
+
+            # Write ANISOU if present
+            if atom.anisotropy and atom.anisotropy != [0, 0, 0, 0, 0, 0]:
+                line = _format_anisou_line(
+                    serial=serial,
+                    atom=atom,
+                    chain_id=chain_id,
+                    res_name=res_name,
+                    res_num=res_num,
+                    alt_loc=alt_loc,
+                )
+                pdb_lines.append(line)
+
+            # Track state for TER insertion
+            if is_polymer:
+                last_polymer_atom = (serial, res_name, chain_id, res_num)
+            prev_chain = chain_id
+            prev_was_polymer = is_polymer
+
+        # Final TER after last polymer chain (if file ends with polymer)
+        if prev_was_polymer and last_polymer_atom:
+            ter_serial, ter_res_name, ter_chain_id, ter_res_num = last_polymer_atom
+            ter_match = re.match(r"(-?\d+)([a-zA-Z]*)", ter_res_num)
+            if ter_match:
+                ter_num, ter_ins = ter_match.groups()
+                ter_ins = ter_ins if ter_ins else " "
+            else:
+                ter_num, ter_ins = ter_res_num, " "
+            pdb_lines.append(f"TER   {ter_serial + 1:>5}      {ter_res_name:>3} {ter_chain_id}{int(ter_num):>4}{ter_ins}")
 
         if len(pdb.models) > 1:
             pdb_lines.append("ENDMDL")
+
+        # === 5) CONECT records ===
+        for connection in model.connections:
+            pdb_lines.append(_format_conect_line(connection))
 
     # Finally, the PDB standard ends with an END record
     pdb_lines.append("END")
@@ -482,20 +477,25 @@ def _format_atom_line(
 
     residue_num = int(residue_num_str)
 
-    # Format charge: PDB uses e.g. " 2-", " 1+" in columns 79-80
-    # If your model stores charges differently, adapt as needed.
-    # For simplicity, let's store integer/float charges as strings, e.g. " 0", " 2", etc.
-    # Or we can leave it blank if zero.
-    chg = ""
+    # Format charge: PDB uses e.g. "1-", "2+" in columns 79-80 (number then sign)
+    chg = "  "
     if atom.charge and abs(atom.charge) > 0:
-        # E.g., +1.0 -> " +1", -2.0 -> " -2"
-        # Convert to integer if it's always integral
-        chg_val = int(atom.charge) if float(atom.charge).is_integer() else atom.charge
-        chg = f"{chg_val:2}"
-    else:
-        chg = "  "
+        chg_val = abs(int(atom.charge)) if float(atom.charge).is_integer() else abs(atom.charge)
+        sign = "+" if atom.charge > 0 else "-"
+        chg = f"{chg_val}{sign}"
 
     atom_name = atom.name if atom.name else atom.element
+
+    # PDB atom name formatting (columns 13-16):
+    # - 4-char names: use as-is
+    # - Names starting with digit (e.g. 1H, 2H): left-justify
+    # - Other short names: add leading space (element in cols 13-14)
+    if len(atom_name) >= 4:
+        formatted_atom_name = atom_name[:4]
+    elif atom_name[0].isdigit():
+        formatted_atom_name = f"{atom_name:<4}"
+    else:
+        formatted_atom_name = f" {atom_name:<3}"
 
     occupancy = atom.occupancy if atom.occupancy else 1.0
 
@@ -504,7 +504,7 @@ def _format_atom_line(
     line = (
         f"{record_type}"
         f"{serial:5d} "  # atom serial number (columns 7-11)
-        f"{(' ' + atom_name if len(atom_name) < 4 else atom_name):<4}"  # atom name (columns 13-16, left-justified in this snippet)
+        f"{formatted_atom_name}"  # atom name (columns 13-16)
         f"{alt_loc_char}"  # altLoc (column 17)
         f"{residue_name:>3}"  # residue name (columns 18-20)
         f" {chain_char}"  # chain ID (column 22)
@@ -554,43 +554,44 @@ def _format_anisou_line(
 
     residue_num = int(residue_num_str)
 
-    chg = ""
+    # Format charge: PDB uses e.g. "1-", "2+" in columns 79-80 (number then sign)
+    chg = "  "
     if atom.charge and abs(atom.charge) > 0:
-        # E.g., +1.0 -> " +1", -2.0 -> " -2"
-        # Convert to integer if it's always integral
-        chg_val = int(atom.charge) if float(atom.charge).is_integer() else atom.charge
-        chg = f"{chg_val:2}"
-    else:
-        chg = "  "
+        chg_val = abs(int(atom.charge)) if float(atom.charge).is_integer() else abs(atom.charge)
+        sign = "+" if atom.charge > 0 else "-"
+        chg = f"{chg_val}{sign}"
 
     atom_name = atom.name if atom.name else atom.element
 
-    if atom.anisotropy:
-        aniso_lines = (
-            f"{_float_to_pdb_string(atom.anisotropy[0]):>7}"  # x (columns 29-35)
-            f"{_float_to_pdb_string(atom.anisotropy[1]):>7}"  # x (columns 36-42)
-            f"{_float_to_pdb_string(atom.anisotropy[2]):>7}"  # x (columns 43-49)
-            f"{_float_to_pdb_string(atom.anisotropy[3]):>7}"  # x (columns 50-56)
-            f"{_float_to_pdb_string(atom.anisotropy[4]):>7}"  # x (columns 57-63)
-            f"{_float_to_pdb_string(atom.anisotropy[5]):>7}"
-        )
+    # PDB atom name formatting (columns 13-16):
+    # - 4-char names: use as-is
+    # - Names starting with digit (e.g. 1H, 2H): left-justify
+    # - Other short names: add leading space (element in cols 13-14)
+    if len(atom_name) >= 4:
+        formatted_atom_name = atom_name[:4]
+    elif atom_name[0].isdigit():
+        formatted_atom_name = f"{atom_name:<4}"
     else:
-        space = " "
-        aniso_lines = (
-            f"{space:>7}"  # x (columns 29-35)
-            f"{space:>7}"  # x (columns 36-42)
-            f"{space:>7}"  # x (columns 43-49)
-            f"{space:>7}"  # x (columns 50-56)
-            f"{space:>7}"  # x (columns 57-63)
-            f"{space:>7}"
-        )
+        formatted_atom_name = f" {atom_name:<3}"
+
+    if atom.anisotropy:
+        # Handle None values (missing data) - write as empty space
+        aniso_parts = []
+        for val in atom.anisotropy:
+            if val is None:
+                aniso_parts.append(f"{'':>7}")
+            else:
+                aniso_parts.append(f"{_float_to_pdb_string(val):>7}")
+        aniso_lines = "".join(aniso_parts)
+    else:
+        aniso_lines = f"{'':>7}" * 6
 
     # Construct the line.
     # Use exact spacing & field widths to match PDB guidelines.
     line = (
         f"{record_type}"
         f"{serial:5d} "  # atom serial number (columns 7-11)
-        f"{atom_name:<4}"  # atom name (columns 13-16, left-justified in this snippet)
+        f"{formatted_atom_name}"  # atom name (columns 13-16)
         f"{alt_loc_char}"  # altLoc (column 17)
         f"{residue_name:>3}"  # residue name (columns 18-20)
         f" {chain_char}"  # chain ID (column 22)
@@ -602,6 +603,20 @@ def _format_anisou_line(
         f"{atom.element:>2}"  # element (columns 77-78)
         f"{chg:>2}"  # charge (columns 79-80)
     )
+    return line
+
+
+def _format_conect_line(atoms: list[int]) -> str:
+    """
+    Format a CONECT record line.
+
+    CONECT records specify connectivity between atoms.
+    Format: CONECT atom1 atom2 [atom3] [atom4] [atom5]
+    Each atom serial number is 5 characters wide.
+    """
+    line = "CONECT"
+    for atom in atoms:
+        line += f"{atom:5d}"
     return line
 
 

@@ -4,10 +4,13 @@ from pytest import mark
 
 from stjames.pdb import (
     PDB,
+    PDBAtom,
     PDBDescription,
     PDBExperiment,
+    PDBGeometry,
     PDBModel,
     PDBPolymer,
+    PDBQuality,
     PDBResidue,
     fetch_pdb,
     fetch_pdb_from_mmcif,
@@ -171,69 +174,159 @@ def test_from_mmcif_to_pdb_1ema() -> None:
     assert compare_models_mmcif_and_pdb(mmcif_1ema.models, pdb_1ema.models)
 
 
-def test_residue_order_preserved_after_json_sort() -> None:
+def test_residue_order_preserved_in_pdb_output_after_json_sort() -> None:
     """
-    Test that residue ordering is preserved after JSON round-trip with sorted keys.
+    Test that residue ordering is correct in PDB output after JSON round-trip.
 
     PostgreSQL JSONB sorts keys alphabetically, which breaks numeric ordering for
     residue IDs like "A.-3", "A.-2", "A.-1", "A.0", "A.1", "A.10", etc.
-    The PDBPolymer model_validator should re-sort residues by numeric position.
+    The pdb_object_to_pdb_filestring function should output residues in correct order.
     """
     # Create residues in correct numeric order (including negative numbers)
+    # Each residue needs at least one atom for serialization
     residues = {
-        "A.-3": PDBResidue(name="ACE", number=-3, atoms={}, bvalue=0.0),
-        "A.-2": PDBResidue(name="ASP", number=-2, atoms={}, bvalue=0.0),
-        "A.-1": PDBResidue(name="ASP", number=-1, atoms={}, bvalue=0.0),
-        "A.0": PDBResidue(name="LYS", number=0, atoms={}, bvalue=0.0),
-        "A.1": PDBResidue(name="MET", number=1, atoms={}, bvalue=0.0),
-        "A.2": PDBResidue(name="ASP", number=2, atoms={}, bvalue=0.0),
-        "A.10": PDBResidue(name="GLY", number=10, atoms={}, bvalue=0.0),
-        "A.11": PDBResidue(name="ALA", number=11, atoms={}, bvalue=0.0),
+        "A.-3": PDBResidue(name="ACE", number=-3, atoms={1: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "A.-2": PDBResidue(name="ASP", number=-2, atoms={2: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "A.-1": PDBResidue(name="ASP", number=-1, atoms={3: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "A.0": PDBResidue(name="LYS", number=0, atoms={4: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "A.1": PDBResidue(name="MET", number=1, atoms={5: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "A.2": PDBResidue(name="ASP", number=2, atoms={6: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "A.10": PDBResidue(name="GLY", number=10, atoms={7: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "A.11": PDBResidue(name="ALA", number=11, atoms={8: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
     }
 
     polymer = PDBPolymer(internal_id="A", residues=residues)
-    original_order = list(polymer.residues.keys())
+    model = PDBModel(polymer={"A": polymer})
+    pdb = PDB(
+        description=PDBDescription(),
+        experiment=PDBExperiment(),
+        geometry=PDBGeometry(),
+        quality=PDBQuality(),
+        models=[model],
+    )
 
     # Simulate JSONB round-trip (sort_keys=True mimics PostgreSQL JSONB behavior)
-    json_dict = polymer.model_dump(mode="json")
+    json_dict = pdb.model_dump(mode="json")
     json_string_sorted = json.dumps(json_dict, sort_keys=True)
     json_parsed = json.loads(json_string_sorted)
 
-    # Verify JSON sorting scrambled the keys (alphabetic order)
-    alphabetic_order = list(json_parsed["residues"].keys())
+    # Verify JSON sorting scrambled the residue keys (alphabetic order)
+    alphabetic_order = list(json_parsed["models"][0]["polymer"]["A"]["residues"].keys())
     assert alphabetic_order == ["A.-1", "A.-2", "A.-3", "A.0", "A.1", "A.10", "A.11", "A.2"]
 
-    # Restore from sorted JSON - validator should fix the order
-    restored_polymer = PDBPolymer.model_validate(json_parsed)
-    restored_order = list(restored_polymer.residues.keys())
+    # Restore from sorted JSON
+    restored_pdb = PDB.model_validate(json_parsed)
 
-    # Verify correct numeric order is restored
-    expected_order = ["A.-3", "A.-2", "A.-1", "A.0", "A.1", "A.2", "A.10", "A.11"]
-    assert restored_order == expected_order
-    assert restored_order == original_order
+    # Serialize to PDB format - should be in correct numeric order
+    pdb_string = pdb_object_to_pdb_filestring(restored_pdb, seqres=False, hetnam=False)
+
+    # Extract residue numbers from ATOM lines
+    residue_nums = []
+    for line in pdb_string.split("\n"):
+        if line.startswith("ATOM"):
+            # Residue number is in columns 23-26 (0-indexed: 22:26)
+            res_num = int(line[22:26])
+            residue_nums.append(res_num)
+
+    # Verify correct numeric order in output
+    expected_order = [-3, -2, -1, 0, 1, 2, 10, 11]
+    assert residue_nums == expected_order
 
 
 def test_residue_order_with_multichar_chain_id() -> None:
     """
-    Test that residue ordering works with multi-character chain IDs.
+    Test that atom ordering by serial number preserves file order with multi-char chain IDs.
+
+    Atom serials encode original file order, allowing correct reconstruction after JSONB.
     """
+    # Atom serials reflect correct file order: -1, 0, 1, 2, 10
     residues = {
-        "AA.-1": PDBResidue(name="ACE", number=-1, atoms={}, bvalue=0.0),
-        "AA.0": PDBResidue(name="MET", number=0, atoms={}, bvalue=0.0),
-        "AA.1": PDBResidue(name="ALA", number=1, atoms={}, bvalue=0.0),
-        "AA.10": PDBResidue(name="GLY", number=10, atoms={}, bvalue=0.0),
-        "AA.2": PDBResidue(name="VAL", number=2, atoms={}, bvalue=0.0),
+        "AA.-1": PDBResidue(name="ACE", number=-1, atoms={1: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "AA.0": PDBResidue(name="MET", number=0, atoms={2: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "AA.1": PDBResidue(name="ALA", number=1, atoms={3: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "AA.2": PDBResidue(name="VAL", number=2, atoms={4: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "AA.10": PDBResidue(name="GLY", number=10, atoms={5: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
     }
 
-    polymer = PDBPolymer(internal_id="AA", residues=residues)
+    polymer = PDBPolymer(internal_id="A", residues=residues)
+    model = PDBModel(polymer={"A": polymer})
+    pdb = PDB(
+        description=PDBDescription(),
+        experiment=PDBExperiment(),
+        geometry=PDBGeometry(),
+        quality=PDBQuality(),
+        models=[model],
+    )
 
     # Simulate JSONB round-trip
-    json_dict = polymer.model_dump(mode="json")
+    json_dict = pdb.model_dump(mode="json")
     json_string_sorted = json.dumps(json_dict, sort_keys=True)
     json_parsed = json.loads(json_string_sorted)
 
-    restored_polymer = PDBPolymer.model_validate(json_parsed)
-    restored_order = list(restored_polymer.residues.keys())
+    restored_pdb = PDB.model_validate(json_parsed)
 
-    expected_order = ["AA.-1", "AA.0", "AA.1", "AA.2", "AA.10"]
-    assert restored_order == expected_order
+    # Serialize to PDB format - should be in correct numeric order
+    pdb_string = pdb_object_to_pdb_filestring(restored_pdb, seqres=False, hetnam=False)
+
+    # Extract residue numbers from ATOM lines
+    residue_nums = []
+    for line in pdb_string.split("\n"):
+        if line.startswith("ATOM"):
+            res_num = int(line[22:26])
+            residue_nums.append(res_num)
+
+    expected_order = [-1, 0, 1, 2, 10]
+    assert residue_nums == expected_order
+
+
+def test_residue_order_with_insertion_codes() -> None:
+    """
+    Test that atom ordering by serial number preserves original file order through JSONB.
+
+    Atoms are sorted by serial number, which encodes the original file order.
+    This test verifies that order is preserved even when dict keys get scrambled.
+    """
+    # Atom serials reflect correct file order: 16, 16A, 17, 169, 170
+    residues = {
+        "A.16": PDBResidue(name="MET", number=16, atoms={1: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "A.16A": PDBResidue(name="GLY", number=16, atoms={2: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "A.17": PDBResidue(name="VAL", number=17, atoms={3: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "A.169": PDBResidue(name="ALA", number=169, atoms={4: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+        "A.170": PDBResidue(name="LEU", number=170, atoms={5: PDBAtom(x=0, y=0, z=0, element="N", bvalue=0)}, bvalue=0.0),
+    }
+
+    polymer = PDBPolymer(internal_id="A", residues=residues)
+    model = PDBModel(polymer={"A": polymer})
+    pdb = PDB(
+        description=PDBDescription(),
+        experiment=PDBExperiment(),
+        geometry=PDBGeometry(),
+        quality=PDBQuality(),
+        models=[model],
+    )
+
+    # Simulate JSONB round-trip (sorts keys alphabetically)
+    json_dict = pdb.model_dump(mode="json")
+    json_string_sorted = json.dumps(json_dict, sort_keys=True)
+    json_parsed = json.loads(json_string_sorted)
+
+    # Verify JSONB scrambles residue keys (alphabetically: 16, 169, 16A, 17, 170)
+    alphabetic_order = list(json_parsed["models"][0]["polymer"]["A"]["residues"].keys())
+    assert alphabetic_order == ["A.16", "A.169", "A.16A", "A.17", "A.170"]
+
+    restored_pdb = PDB.model_validate(json_parsed)
+
+    # Serialize to PDB format - should preserve original order via atom serials
+    pdb_string = pdb_object_to_pdb_filestring(restored_pdb, seqres=False, hetnam=False)
+
+    # Extract residue numbers and insertion codes from ATOM lines
+    residue_ids = []
+    for line in pdb_string.split("\n"):
+        if line.startswith("ATOM"):
+            res_num = int(line[22:26])
+            ins_code = line[26].strip()
+            residue_ids.append((res_num, ins_code))
+
+    # Order preserved: 16, 16A, 17, 169, 170 (based on atom serial order)
+    expected_order = [(16, ""), (16, "A"), (17, ""), (169, ""), (170, "")]
+    assert residue_ids == expected_order
