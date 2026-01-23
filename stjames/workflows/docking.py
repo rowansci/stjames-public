@@ -5,9 +5,9 @@ from typing import Annotated, Any, Literal, Self, TypeAlias
 from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
 
 from ..base import Base, round_float
+from ..conformers import ConformerGenSettingsUnion, ETKDGSettings
 from ..pdb import PDB
 from ..types import UUID, Vector3D
-from .conformer_search import ConformerGenSettingsUnion, ETKDGSettings
 from .workflow import MoleculeWorkflow, ProteinStructureWorkflow
 
 ProteinUUID: TypeAlias = UUID
@@ -102,7 +102,12 @@ class DockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
     docking_settings: VinaSettings = VinaSettings()
 
     do_csearch: bool = True
-    conformer_gen_settings: ConformerGenSettingsUnion = ETKDGSettings(mode="reckless")
+    conformer_gen_settings: ConformerGenSettingsUnion = ETKDGSettings(
+        num_initial_confs=200,
+        num_confs_considered=50,
+        max_confs=20,
+        max_mmff_energy=20,
+    )
     do_optimization: bool = True
     do_pose_refinement: bool = True
 
