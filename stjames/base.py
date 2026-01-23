@@ -36,6 +36,9 @@ class Base(pydantic.BaseModel):
 
         return val
 
+    def model_dump(self, *, exclude_none: bool = True, **kwargs: dict[str, Any]) -> dict[str, Any]:  # type: ignore [override]
+        return super().model_dump(exclude_none=exclude_none, **kwargs)  # type: ignore [arg-type]
+
 
 class LowercaseStrEnum(str, Enum):
     """Enum where hyphens, underscores, and case are ignored."""
