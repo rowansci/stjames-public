@@ -146,15 +146,12 @@ def update_models_list(pdb_dict: dict[str, Any], data_dict: dict[str, Any]) -> N
     for model_lines in pdb_dict["MODEL"]:
         aniso = make_aniso(model_lines)
         last_ter = get_last_ter_line(model_lines)
-        model: dict[str, Any] = {"polymer": {}, "non_polymer": {}, "water": {}, "connections": connections, "chain_order": []}
+        model: dict[str, Any] = {"polymer": {}, "non_polymer": {}, "water": {}, "connections": connections}
         for index, line in enumerate(model_lines):
             if line[:6] in ["ATOM  ", "HETATM"]:
                 chain_id = line[21] if index < last_ter else id_from_line(line)
                 res_id = id_from_line(line)
                 if index < last_ter:
-                    # Track chain order by first appearance
-                    if chain_id not in model["chain_order"]:
-                        model["chain_order"].append(chain_id)
                     add_atom_to_polymer(line, model, chain_id, res_id, aniso, full_names)
                 else:
                     add_atom_to_non_polymer(line, model, res_id, aniso, full_names)

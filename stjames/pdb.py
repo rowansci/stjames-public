@@ -1,7 +1,7 @@
 import re
 from datetime import date, datetime
 from pathlib import Path
-from typing import Any, Literal
+from typing import Any, Literal, NamedTuple
 
 from pydantic import BaseModel, ConfigDict, Field, field_validator
 
@@ -241,6 +241,89 @@ def pdb_from_mmcif_filestring(pdb: str) -> PDB:
     return PDB.model_validate(mmcif_dict_to_data_dict(mmcif_string_to_mmcif_dict(pdb)))
 
 
+class _AtomRecord(NamedTuple):
+    """Atom with context needed for PDB output."""
+
+    serial: int
+    atom: PDBAtom
+    chain_id: str
+    res_name: str
+    res_num: str
+    alt_loc: str
+    is_polymer: bool
+
+
+def _build_atom_lines(model: PDBModel) -> list[str]:
+    """Build ATOM/HETATM/ANISOU/TER lines for a model, sorted by atom serial."""
+    lines: list[str] = []
+
+    # Collect all atoms from all sources
+    atoms: list[_AtomRecord] = []
+
+    for chain_id, polymer in model.polymer.items():
+        cid = polymer.internal_id or chain_id
+        for res_id, res in polymer.residues.items():
+            res_num = res_id.split(".", 1)[1] if "." in res_id else res_id
+            for atom_id, atom in res.atoms.items():
+                atoms.append(_AtomRecord(int(atom_id), atom, cid, res.name or "UNK", res_num, atom.alt_loc or "", True))
+
+    for np_id, nonpoly in model.non_polymer.items():
+        cid = nonpoly.polymer or "Z"
+        res_num = np_id.split(".", 1)[1] if "." in np_id else np_id
+        for atom_id, atom in nonpoly.atoms.items():
+            atoms.append(_AtomRecord(int(atom_id), atom, cid, nonpoly.name, res_num, "", False))
+
+    for w_id, water in model.water.items():
+        cid = w_id.split(".")[0] if "." in w_id else w_id[0]
+        res_num = w_id.split(".", 1)[1] if "." in w_id else w_id
+        for atom_id, atom in water.atoms.items():
+            atoms.append(_AtomRecord(int(atom_id), atom, cid, "HOH", res_num, "", False))
+
+    for _b_id, branched in model.branched.items():
+        if isinstance(branched, dict) and "atoms" in branched:
+            for atom_id, atom in branched["atoms"].items():
+                atoms.append(_AtomRecord(int(atom_id), atom, "B", "BRN", "1", "", False))
+
+    atoms.sort(key=lambda a: a.serial)
+
+    # Write lines, inserting TER at polymer chain boundaries
+    prev_chain: str | None = None
+    prev_polymer = False
+    last_poly: _AtomRecord | None = None
+
+    for a in atoms:
+        # TER when leaving a polymer chain
+        if prev_polymer and (not a.is_polymer or a.chain_id != prev_chain) and last_poly:
+            lines.append(_format_ter_line(last_poly))
+
+        lines.append(_format_atom_line(a.serial, a.atom, a.chain_id, a.res_name, a.res_num, a.alt_loc))
+
+        if a.atom.anisotropy and a.atom.anisotropy != [0, 0, 0, 0, 0, 0]:
+            lines.append(_format_anisou_line(a.serial, a.atom, a.chain_id, a.res_name, a.res_num, a.alt_loc))
+
+        if a.is_polymer:
+            last_poly = a
+        prev_chain = a.chain_id
+        prev_polymer = a.is_polymer
+
+    # Final TER if ended on polymer
+    if prev_polymer and last_poly:
+        lines.append(_format_ter_line(last_poly))
+
+    return lines
+
+
+def _format_ter_line(a: _AtomRecord) -> str:
+    """Format a TER record after the given atom."""
+    match = re.match(r"(-?\d+)([a-zA-Z]*)", a.res_num)
+    if match:
+        num, ins = match.groups()
+        ins = ins or " "
+    else:
+        num, ins = a.res_num, " "
+    return f"TER   {a.serial + 1:>5}      {a.res_name:>3} {a.chain_id}{int(num):>4}{ins}"
+
+
 def pdb_object_to_pdb_filestring(
     pdb: PDB,
     header: bool = False,
@@ -279,136 +362,10 @@ def pdb_object_to_pdb_filestring(
         pdb_lines.extend(_build_crystallography_section(pdb))
 
     for model_index, model in enumerate(pdb.models, start=1):
-        # If more than one model, add MODEL line
         if len(pdb.models) > 1:
             pdb_lines.append(f"MODEL     {model_index:>4}")
 
-        # Collect all atoms with metadata, then sort by serial number
-        # This preserves original file order through JSONB round-trips
-        all_atoms: list[tuple[int, PDBAtom, str, str, str, str, bool]] = []
-        # tuple: (serial, atom, chain_id, res_name, res_num, alt_loc, is_polymer)
-
-        # === 1) Polymers (protein, DNA, etc.) ===
-        for chain_id, polymer in model.polymer.items():
-            this_chain_id = polymer.internal_id or chain_id
-            for residue_id, residue in polymer.residues.items():
-                assert residue.name is not None
-                res_num_part = residue_id.split(".", 1)[1] if "." in residue_id else residue_id
-                for atom_id, atom in residue.atoms.items():
-                    all_atoms.append((
-                        int(atom_id),
-                        atom,
-                        this_chain_id,
-                        residue.name,
-                        res_num_part,
-                        atom.alt_loc or "",
-                        True,  # is_polymer
-                    ))
-
-        # === 2) Non-polymers (e.g. ligands, ions) ===
-        for np_id, nonpoly in model.non_polymer.items():
-            chain_id_for_np = nonpoly.polymer or "Z"
-            np_res_num = np_id.split(".", 1)[1] if "." in np_id else np_id
-            for atom_id, atom in nonpoly.atoms.items():
-                all_atoms.append((
-                    int(atom_id),
-                    atom,
-                    chain_id_for_np,
-                    nonpoly.name,
-                    np_res_num,
-                    "",
-                    False,  # is_polymer
-                ))
-
-        # === 3) Water ===
-        for w_id, water in model.water.items():
-            w_chain_id = w_id.split(".")[0] if "." in w_id else w_id[0]
-            w_res_num = w_id.split(".", 1)[1] if "." in w_id else w_id
-            for atom_id, atom in water.atoms.items():
-                all_atoms.append((
-                    int(atom_id),
-                    atom,
-                    w_chain_id,
-                    "HOH",
-                    w_res_num,
-                    "",
-                    False,  # is_polymer
-                ))
-
-        # === 4) Branched ===
-        for b_id, branched_obj in model.branched.items():
-            if isinstance(branched_obj, dict) and "atoms" in branched_obj:
-                for atom_id, atom in branched_obj["atoms"].items():
-                    all_atoms.append((
-                        int(atom_id),
-                        atom,
-                        "B",
-                        "BRN",
-                        "1",
-                        "",
-                        False,  # is_polymer
-                    ))
-
-        # Sort all atoms by serial number
-        all_atoms.sort(key=lambda x: x[0])
-
-        # Write atoms in order, inserting TER when polymer chain ends
-        prev_chain: str | None = None
-        prev_was_polymer = False
-        last_polymer_atom: tuple[int, str, str, str] | None = None  # (serial, res_name, chain_id, res_num)
-
-        for serial, atom, chain_id, res_name, res_num, alt_loc, is_polymer in all_atoms:
-            # Insert TER when transitioning from one polymer chain to another, or from polymer to non-polymer
-            if prev_was_polymer and (not is_polymer or (is_polymer and chain_id != prev_chain)):
-                if last_polymer_atom:
-                    ter_serial, ter_res_name, ter_chain_id, ter_res_num = last_polymer_atom
-                    ter_match = re.match(r"(-?\d+)([a-zA-Z]*)", ter_res_num)
-                    if ter_match:
-                        ter_num, ter_ins = ter_match.groups()
-                        ter_ins = ter_ins if ter_ins else " "
-                    else:
-                        ter_num, ter_ins = ter_res_num, " "
-                    pdb_lines.append(f"TER   {ter_serial + 1:>5}      {ter_res_name:>3} {ter_chain_id}{int(ter_num):>4}{ter_ins}")
-
-            # Write ATOM/HETATM line
-            line = _format_atom_line(
-                serial=serial,
-                atom=atom,
-                chain_id=chain_id,
-                res_name=res_name,
-                res_num=res_num,
-                alt_loc=alt_loc,
-            )
-            pdb_lines.append(line)
-
-            # Write ANISOU if present
-            if atom.anisotropy and atom.anisotropy != [0, 0, 0, 0, 0, 0]:
-                line = _format_anisou_line(
-                    serial=serial,
-                    atom=atom,
-                    chain_id=chain_id,
-                    res_name=res_name,
-                    res_num=res_num,
-                    alt_loc=alt_loc,
-                )
-                pdb_lines.append(line)
-
-            # Track state for TER insertion
-            if is_polymer:
-                last_polymer_atom = (serial, res_name, chain_id, res_num)
-            prev_chain = chain_id
-            prev_was_polymer = is_polymer
-
-        # Final TER after last polymer chain (if file ends with polymer)
-        if prev_was_polymer and last_polymer_atom:
-            ter_serial, ter_res_name, ter_chain_id, ter_res_num = last_polymer_atom
-            ter_match = re.match(r"(-?\d+)([a-zA-Z]*)", ter_res_num)
-            if ter_match:
-                ter_num, ter_ins = ter_match.groups()
-                ter_ins = ter_ins if ter_ins else " "
-            else:
-                ter_num, ter_ins = ter_res_num, " "
-            pdb_lines.append(f"TER   {ter_serial + 1:>5}      {ter_res_name:>3} {ter_chain_id}{int(ter_num):>4}{ter_ins}")
+        pdb_lines.extend(_build_atom_lines(model))
 
         if len(pdb.models) > 1:
             pdb_lines.append("ENDMDL")

@@ -1,0 +1,11 @@
+HEADER    TEST NEGATIVE RESIDUE NUMBERS           23-JAN-26   TEST
+ATOM      1  N   ACE A  -3       0.000   0.000   0.000  1.00  0.00           N
+ATOM      2  N   ASP A  -2       1.000   0.000   0.000  1.00  0.00           N
+ATOM      3  N   ASP A  -1       2.000   0.000   0.000  1.00  0.00           N
+ATOM      4  N   LYS A   0       3.000   0.000   0.000  1.00  0.00           N
+ATOM      5  N   MET A   1       4.000   0.000   0.000  1.00  0.00           N
+ATOM      6  N   ASP A   2       5.000   0.000   0.000  1.00  0.00           N
+ATOM      7  N   GLY A  10       6.000   0.000   0.000  1.00  0.00           N
+ATOM      8  N   ALA A  11       7.000   0.000   0.000  1.00  0.00           N
+TER       9      ALA A  11
+END

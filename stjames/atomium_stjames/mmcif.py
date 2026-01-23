@@ -432,19 +432,15 @@ def update_models_list(mmcif_dict: dict[str, Any], data_dict: dict[str, Any]) ->
     secondary_structure = make_secondary_structure(mmcif_dict)
     aniso = make_aniso(mmcif_dict)
 
-    model: dict[str, Any] = {"polymer": {}, "non_polymer": {}, "water": {}, "branched": {}, "chain_order": []}
+    model: dict[str, Any] = {"polymer": {}, "non_polymer": {}, "water": {}, "branched": {}}
     model_num = mmcif_dict["atom_site"][0]["pdbx_PDB_model_num"]
     for atom in mmcif_dict["atom_site"]:
         if atom["pdbx_PDB_model_num"] != model_num:
             data_dict["models"].append(model)
-            model = {"polymer": {}, "non_polymer": {}, "water": {}, "branched": {}, "chain_order": []}
+            model = {"polymer": {}, "non_polymer": {}, "water": {}, "branched": {}}
             model_num = atom["pdbx_PDB_model_num"]
         mol_type = types[entities[atom["label_asym_id"]]]
         if mol_type in {"polymer", "branched"}:
-            # Track chain order by first appearance
-            chain_id = atom["auth_asym_id"]
-            if chain_id not in model["chain_order"]:
-                model["chain_order"].append(chain_id)
             add_atom_to_polymer(atom, aniso, model, names)
         else:
             add_atom_to_non_polymer(atom, aniso, model, mol_type, names)
