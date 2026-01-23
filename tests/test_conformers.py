@@ -2,7 +2,7 @@ from pydantic import ValidationError
 from pytest import raises
 
 from stjames import Constraint
-from stjames.conformers import ConformerGenMixin, ConformerSearchMixin, ETKDGSettings, ScreeningSettings, iMTDSettings, iMTDSpeeds
+from stjames.conformers import ConformerGenMixin, ConformerSearchMixin, ETKDGSettings, iMTDSettings, iMTDSpeeds
 from stjames.method import Method
 
 
@@ -24,20 +24,11 @@ def test_imtdgc() -> None:
     assert settings.speed == iMTDSpeeds.QUICK
     assert not settings.reopt
     assert settings.mtd_method == Method.GFN_FF
-    assert settings.conf_opt_method == Method.GFN_FF
 
 
 def test_conformer_gen_mixin() -> None:
     settings = ConformerGenMixin(conf_gen_settings=ETKDGSettings(num_initial_confs=150))
     assert settings.conf_gen_settings == ETKDGSettings(num_initial_confs=150)
-
-
-def test_screening_settings() -> None:
-    settings = ScreeningSettings(energy_threshold=10)
-
-    assert settings.energy_threshold == 10
-    assert settings.rotational_constants_threshold == 0.02
-    assert settings.max_confs is None
 
 
 def test_conformer_search_mixin() -> None:

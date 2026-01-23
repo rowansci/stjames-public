@@ -12,22 +12,6 @@ from .solvent import SolventModel, SolventSettings
 from .workflows.multistage_opt import MultiStageOptMixin
 
 
-class ScreeningSettings(BaseModel):
-    """
-    Settings for determining unique and useful conformers.
-
-    :param energy_threshold: maximum relative energy for screening (kcal/mol)
-    :param rotational_constants_threshold: maximum difference in rotational constants for screening
-    :param rmsd: Cartesian RMSD for screening
-    :param max_confs: maximum number of conformers to keep
-    """
-
-    energy_threshold: float | None = None
-    rotational_constants_threshold: float | None = 0.02
-    rmsd: float | None = 0.25
-    max_confs: int | None = None
-
-
 class ConformerProperties(BaseModel):
     """
     Descriptors of a conformer's properties.
@@ -90,15 +74,12 @@ class ConformerGenSettings(BaseModel):
 
     Conformers are generated and an initial screening is performed to remove duplicates and high-energy conformers.
 
-    :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings
     :param constraints: constraints for conformer generation
     :param nci: add a constraining potential for non-covalent interactions
     :param max_confs: maximum number of conformers to keep
     """
 
-    conf_opt_method: XTBMethod = Method.GFN_FF
-    screening: ScreeningSettings | None = None
     constraints: Sequence[Constraint] = ()
     nci: bool = False
     max_confs: PositiveInt | None = None
@@ -117,7 +98,7 @@ class ConformerGenSettings(BaseModel):
         if self.max_confs:
             extra += f" max_confs={self.max_confs}"
 
-        return f"<{type(self).__name__} {self.conf_opt_method}{extra}>"
+        return f"<{type(self).__name__} {extra}>"
 
 
 class ETKDGSettings(ConformerGenSettings):
@@ -125,7 +106,6 @@ class ETKDGSettings(ConformerGenSettings):
     Settings for ETKDG conformer generation.
 
     Inherited:
-    :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings
     :param constraints: constraints for conformer generation
     :param nci: add a constraining potential for non-covalent interactions (not supported in ETKDG)
@@ -169,7 +149,6 @@ class ETKDGSettings(ConformerGenSettings):
                 max_mmff_energy = 30
                 max_confs = 20
                 max_mmff_energy = 20
-                conf_opt_method = Method.GFN0_XTB
             case Mode.RAPID:
                 num_initial_confs = 300
                 num_confs_considered = 100
@@ -177,7 +156,6 @@ class ETKDGSettings(ConformerGenSettings):
                 max_mmff_energy = 30
                 max_confs = 50
                 max_mmff_energy = 30
-                conf_opt_method = Method.GFN0_XTB
             case _:
                 raise NotImplementedError(f"Unsupported mode: {mode}")
 
@@ -187,7 +165,6 @@ class ETKDGSettings(ConformerGenSettings):
             max_mmff_iterations=max_mmff_iterations,
             max_mmff_energy=max_mmff_energy,
             max_confs=max_confs,
-            conf_opt_method=conf_opt_method,
         )
 
 
@@ -210,7 +187,6 @@ class iMTDSettings(ConformerGenSettings, ABC):
     See build_imtd_setings(mode) for sensible defaults.
 
     Inherited:
-    :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings (not used)
     :param constraints: constraints to add
     :param nci: add an ellipsoide potential around the input structure
@@ -284,25 +260,21 @@ class iMTDSettings(ConformerGenSettings, ABC):
         match mode:
             case Mode.RECKLESS:  # GFN-FF//MTD(GFN-FF)
                 mtd_method = Method.GFN_FF
-                conf_opt_method = Method.GFN0_XTB
                 speed = iMTDSpeeds.MEGAQUICK
                 reopt = True
                 max_confs: int | None = 20
             case Mode.RAPID:  # GFN0//MTD(GFN-FF)
                 mtd_method = Method.GFN_FF
-                conf_opt_method = Method.GFN0_XTB
                 speed = iMTDSpeeds.SUPERQUICK
                 reopt = True
                 max_confs = 50
             case Mode.CAREFUL:  # GFN2//MTD(GFN-FF)
                 mtd_method = Method.GFN_FF
-                conf_opt_method = Method.GFN2_XTB
                 speed = iMTDSpeeds.QUICK
                 reopt = False
                 max_confs = None
             case Mode.METICULOUS:  # GFN2//MTD(GFN2)
                 mtd_method = Method.GFN2_XTB
-                conf_opt_method = Method.GFN2_XTB
                 speed = iMTDSpeeds.NORMAL
                 reopt = False
                 max_confs = None
@@ -311,7 +283,6 @@ class iMTDSettings(ConformerGenSettings, ABC):
 
         return cls(
             mtd_method=mtd_method,
-            conf_opt_method=conf_opt_method,
             speed=speed,
             reopt=reopt,
             max_confs=max_confs,
@@ -331,7 +302,6 @@ class LyrebirdSettings(ConformerGenSettings):
     Settings for Lyrebird-based conformer generation.
 
     Inherited:
-    :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings
     :param constraints: constraints for conformer generation (not supported)
     :param nci: add a constraining potential for non-covalent interactions (not supported)
@@ -365,7 +335,6 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
     Default values recommended by Nick Casetti.
 
     Inherited:
-    :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings
     :param constraints: constraints for conformer generation (not supported)
     :param nci: add a constraining potential for non-covalent interactions (not supported)
