@@ -6,7 +6,6 @@ from pydantic import AfterValidator
 
 from ..base import Base, LowercaseStrEnum, round_float
 from ..conformers import ConformerGenSettingsUnion, iMTDSettings, iMTDSpeeds
-from ..method import Method
 from ..mode import Mode
 from ..settings import Settings
 from ..solvent import Solvent
@@ -61,7 +60,6 @@ class NMRSpectroscopyWorkflow(MoleculeWorkflow):
 
     conf_gen_settings: ConformerGenSettingsUnion | None = iMTDSettings(
         speed=iMTDSpeeds.QUICK,
-        conf_opt_method=Method.GFN2_XTB,
         reopt=False,
     )
     multistage_opt_settings: MultiStageOptSettings | None = MultiStageOptSettings(
