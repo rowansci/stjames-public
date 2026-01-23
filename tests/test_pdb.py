@@ -4,14 +4,9 @@ from pytest import mark
 
 from stjames.pdb import (
     PDB,
-    PDBAtom,
     PDBDescription,
     PDBExperiment,
-    PDBGeometry,
     PDBModel,
-    PDBPolymer,
-    PDBQuality,
-    PDBResidue,
     fetch_pdb,
     fetch_pdb_from_mmcif,
     pdb_from_mmcif_filestring,
