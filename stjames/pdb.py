@@ -107,7 +107,6 @@ class PDBModel(BaseModel):
     non_polymer: dict[str, PDBNonPolymer] = {}
     branched: dict[str, Any] = {}
     water: dict[str, PDBWater] = {}
-    chain_order: list[str] | None = None
     connections: list[list[int]] = []
 
 
@@ -372,7 +371,7 @@ def pdb_object_to_pdb_filestring(
             pdb_lines.append("ENDMDL")
 
         # === 5) CONECT records ===
-        for connection in model.connections:
+        for connection in getattr(model, "connections", []):
             pdb_lines.append(_format_conect_line(connection))
 
     # Finally, the PDB standard ends with an END record
