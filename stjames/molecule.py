@@ -1,7 +1,7 @@
 import logging
 import re
 from pathlib import Path
-from typing import Annotated, Any, Iterable, Optional, Self, Sequence, TypeAlias, TypedDict, TypeVar
+from typing import Annotated, Any, Iterable, Self, Sequence, TypeAlias, TypedDict, TypeVar
 
 import numpy as np
 import pydantic
@@ -46,11 +46,11 @@ class VibrationalMode(Base):
     :param ir_intensity: infrared intensity, in km/mol
     """
 
-    frequency: Annotated[float, AfterValidator(round_float(3))]  # cm^-1
-    reduced_mass: Annotated[float, AfterValidator(round_float(3))]  # amu
-    force_constant: Annotated[float, AfterValidator(round_float(3))]  # mDyne/Å
-    displacements: Annotated[Vector3DPerAtom, AfterValidator(round_vector3d_per_atom(6))]  # Å
-    ir_intensity: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None  # km/mol
+    frequency: Annotated[float, AfterValidator(round_float(3))]
+    reduced_mass: Annotated[float, AfterValidator(round_float(3))]
+    force_constant: Annotated[float, AfterValidator(round_float(3))]
+    displacements: Annotated[Vector3DPerAtom, AfterValidator(round_vector3d_per_atom(6))]
+    ir_intensity: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
 
 
 class Molecule(Base):
@@ -88,36 +88,35 @@ class Molecule(Base):
     multiplicity: PositiveInt
     atoms: list[Atom]
 
-    # for periodic boundary conditions
-    cell: Optional[PeriodicCell] = None
+    cell: PeriodicCell | None = None
 
-    energy: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None  # Hartree
-    scf_iterations: Optional[NonNegativeInt] = None
-    scf_completed: Optional[bool] = None
-    elapsed: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None  # seconds
+    energy: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
+    scf_iterations: NonNegativeInt | None = None
+    scf_completed: bool | None = None
+    elapsed: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
 
-    homo_lumo_gap: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None  # eV
+    homo_lumo_gap: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
 
-    gradient: Annotated[Optional[Vector3DPerAtom], AfterValidator(round_optional_vector3d_per_atom(6))] = None  # Hartree/Å
-    stress: Annotated[Optional[Matrix3x3], AfterValidator(round_optional_matrix3x3(6))] = None  # Hartree/Å
+    gradient: Annotated[Vector3DPerAtom | None, AfterValidator(round_optional_vector3d_per_atom(6))] = None
+    stress: Annotated[Matrix3x3 | None, AfterValidator(round_optional_matrix3x3(6))] = None  # Hartree/Å
 
-    velocities: Annotated[Optional[Vector3DPerAtom], AfterValidator(round_optional_vector3d_per_atom(6))] = None  # Å/fs
+    velocities: Annotated[Vector3DPerAtom | None, AfterValidator(round_optional_vector3d_per_atom(6))] = None
 
     mulliken_charges: Annotated[FloatPerAtom | None, AfterValidator(round_optional_float_per_atom(6))] = None
     mulliken_spin_densities: Annotated[FloatPerAtom | None, AfterValidator(round_optional_float_per_atom(6))] = None
-    dipole: Annotated[Optional[Vector3D], AfterValidator(round_optional_vector3d(6))] = None  # Debye
+    dipole: Annotated[Vector3D | None, AfterValidator(round_optional_vector3d(6))] = None
 
-    vibrational_modes: Optional[list[VibrationalMode]] = None
+    vibrational_modes: list[VibrationalMode] | None = None
 
-    zero_point_energy: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
-    thermal_energy_corr: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
-    thermal_enthalpy_corr: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
-    thermal_free_energy_corr: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
+    zero_point_energy: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
+    thermal_energy_corr: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
+    thermal_enthalpy_corr: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
+    thermal_free_energy_corr: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
 
-    excitation_energies: Annotated[list[float] | None, AfterValidator(round_list(3))] = None  # Hartree
-    oscillator_strengths: Annotated[list[float] | None, AfterValidator(round_list(3))] = None  # dimensionless (length gauge where applicable)
+    excitation_energies: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
+    oscillator_strengths: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
 
-    smiles: Optional[str] = None
+    smiles: str | None = None
     calculation_index: int | None = None
 
     def __len__(self) -> int:
@@ -189,40 +188,40 @@ class Molecule(Base):
         return [a.atomic_number for a in self.atoms]
 
     @property
-    def sum_energy_zpe(self) -> Optional[float]:
+    def sum_energy_zpe(self) -> float | None:
         """Electronic energy plus zero-point energy, in Hartree."""
         if (self.energy is None) or (self.zero_point_energy is None):
             return None
         return self.energy + self.zero_point_energy
 
     @property
-    def sum_energy_thermal_corr(self) -> Optional[float]:
+    def sum_energy_thermal_corr(self) -> float | None:
         """Electronic energy plus thermal energy correction, in Hartree."""
         if (self.energy is None) or (self.thermal_energy_corr is None):
             return None
         return self.energy + self.thermal_energy_corr
 
     @property
-    def sum_energy_enthalpy(self) -> Optional[float]:
+    def sum_energy_enthalpy(self) -> float | None:
         """Electronic energy plus enthalpy correction, in Hartree."""
         if (self.energy is None) or (self.thermal_enthalpy_corr is None):
             return None
         return self.energy + self.thermal_enthalpy_corr
 
     @property
-    def enthalpy(self) -> Optional[float]:
+    def enthalpy(self) -> float | None:
         """Alias for sum_energy_enthalpy, in Hartree."""
         return self.sum_energy_enthalpy
 
     @property
-    def sum_energy_free_energy(self) -> Optional[float]:
+    def sum_energy_free_energy(self) -> float | None:
         """Electronic energy plus Gibbs free energy correction, in Hartree."""
         if (self.energy is None) or (self.thermal_free_energy_corr is None):
             return None
         return self.energy + self.thermal_free_energy_corr
 
     @property
-    def gibbs_free_energy(self) -> Optional[float]:
+    def gibbs_free_energy(self) -> float | None:
         """Alias for sum_energy_free_energy, in Hartree."""
         return self.sum_energy_free_energy
 

@@ -1,4 +1,4 @@
-from typing import Any, Optional, Self, TypeVar
+from typing import Any, Self, TypeVar
 
 from pydantic import PositiveFloat, computed_field, field_validator, model_validator
 
@@ -49,10 +49,10 @@ class Settings(Base):
     tasks: UniqueList[Task] = [Task.ENERGY, Task.CHARGE, Task.DIPOLE]
 
     method: Method = Method.HARTREE_FOCK
-    basis_set: Optional[BasisSet] = None
+    basis_set: BasisSet | None = None
     engine: Engine = None  # type: ignore [assignment]
     corrections: UniqueList[Correction] = []
-    solvent_settings: Optional[SolventSettings] = None
+    solvent_settings: SolventSettings | None = None
     omega: OmegaTuning | PositiveFloat | None = None
 
     excited_state_settings: ExcitedStateSettingsUnion | None = None

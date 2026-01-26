@@ -1,4 +1,4 @@
-from typing import Optional, Self
+from typing import Self
 
 from pydantic import PositiveFloat, PositiveInt, model_validator
 
@@ -25,7 +25,7 @@ class Constraint(Base):
 
     constraint_type: ConstraintType
     atoms: list[PositiveInt]  # 1-indexed
-    value: Optional[float] = None
+    value: float | None = None
 
     @model_validator(mode="after")
     def check_atom_list_length(self) -> Self:

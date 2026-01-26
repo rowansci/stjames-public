@@ -1,5 +1,5 @@
 from enum import Enum
-from typing import Annotated, Any, Callable, Hashable, Optional, TypeVar
+from typing import Annotated, Any, Callable, Hashable, TypeVar
 
 import numpy as np
 import pydantic
@@ -16,10 +16,10 @@ def round_float(round_to: int) -> Callable[[float], float]:
     return inner_round
 
 
-def round_optional_float(round_to: int) -> Callable[[Optional[float]], Optional[float]]:
+def round_optional_float(round_to: int) -> Callable[[float | None], float | None]:
     """Create a validator that rounds an optional float to a given number of decimal places."""
 
-    def rounder(value: Optional[float]) -> Optional[float]:
+    def rounder(value: float | None) -> float | None:
         if value is None:
             return None
         return round(value, round_to)

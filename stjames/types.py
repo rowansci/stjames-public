@@ -95,7 +95,7 @@ def round_matrix3x3(round_to: int = 6) -> Callable[[Matrix3x3], Matrix3x3]:
 
 
 def round_optional_matrix3x3(round_to: int = 3) -> Callable[[Matrix3x3 | None], Matrix3x3 | None]:
-    """Create a validator that rounds each vector in an Optional Matrix3x3 to a given number of decimal places."""
+    """Create a validator that rounds each vector in an optional Matrix3x3 to a given number of decimal places."""
 
     # Use the round_vector3d function to round each Vector3D in the Matrix3x3
     vector_rounder = round_vector3d(round_to)

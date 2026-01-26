@@ -1,6 +1,6 @@
 """pKa workflow."""
 
-from typing import Annotated, Optional, Self
+from typing import Annotated, Self
 
 from pydantic import AfterValidator, model_validator
 
@@ -72,9 +72,9 @@ class MacropKaWorkflow(SMILESWorkflow):
 
     microstates: list[MacropKaMicrostate] = []
     pKa_values: list[MacropKaValue] = []
-    isoelectric_point: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
-    solvation_energy: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
-    kpuu_probability: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
+    isoelectric_point: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    solvation_energy: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    kpuu_probability: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
 
     microstate_weights_by_pH: list[
         tuple[

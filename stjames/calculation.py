@@ -1,4 +1,4 @@
-from typing import Optional, Self
+from typing import Self
 
 from pydantic import model_validator
 
@@ -44,13 +44,13 @@ class Calculation(Base):
 
     status: Status = Status.QUEUED
 
-    name: Optional[str] = None
-    elapsed: Optional[float] = None
-    logfile: Optional[str] = None
+    name: str | None = None
+    elapsed: float | None = None
+    logfile: str | None = None
     messages: list[Message] = []
 
     # DEPRECATED - moving into settings
-    engine: Optional[str] = "peregrine"
+    engine: str | None = "peregrine"
 
     uuids: list[UUID | None] | None = None
 

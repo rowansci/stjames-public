@@ -1,4 +1,4 @@
-from typing import Optional, Self
+from typing import Self
 
 from pydantic import PositiveFloat, PositiveInt, model_validator
 
@@ -15,8 +15,8 @@ class BasisSetOverride(Base):
     """
 
     name: str
-    atomic_numbers: Optional[list[PositiveInt]] = None
-    atoms: Optional[list[PositiveInt]] = None  # 1-indexed
+    atomic_numbers: list[PositiveInt] | None = None
+    atoms: list[PositiveInt] | None = None
 
     @model_validator(mode="after")
     def check_override(self) -> Self:
@@ -37,7 +37,7 @@ class BasisSet(Base):
     name: str
 
     # do we want to override the default basis set for specific atoms or elements?
-    overrides: Optional[list[BasisSetOverride]] = []
+    overrides: list[BasisSetOverride] | None = []
 
     # value below which a basis function can be ignored
     # (for improving DFT grid calcs, as per Stratmann/Scuseria/Frisch CPL 1996)

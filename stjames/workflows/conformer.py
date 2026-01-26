@@ -1,6 +1,6 @@
 """Deprecated conformer search workflow, use ConformerSearchWorkflow instead."""
 
-from typing import Annotated, Any, Optional
+from typing import Annotated, Any
 
 from pydantic import AfterValidator
 
@@ -19,7 +19,7 @@ class ConformerSettings(Base):
 
     transition_state: bool = False
     final_method: Method = Method.AIMNET2_WB97MD3
-    solvent: Optional[Solvent] = Solvent.WATER
+    solvent: Solvent | None = Solvent.WATER
     max_energy: float = 5
 
     constraints: list[Constraint] = []
@@ -40,8 +40,7 @@ class Conformer(Base):
     energy: Annotated[float, AfterValidator(round_float(6))]
     weight: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
 
-    # uuid, optionally
-    uuid: Optional[str] = None
+    uuid: str | None = None
 
 
 class ConformerWorkflow(MoleculeWorkflow):
@@ -53,7 +52,7 @@ class ConformerWorkflow(MoleculeWorkflow):
         self.settings = csearch_settings_by_mode(self.mode, self.settings)
 
 
-def csearch_settings_by_mode(mode: Mode, old_settings: Optional[ConformerSettings] = None) -> ConformerSettings:
+def csearch_settings_by_mode(mode: Mode, old_settings: ConformerSettings | None = None) -> ConformerSettings:
     if mode == Mode.MANUAL:
         assert old_settings is not None
         return old_settings
