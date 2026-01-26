@@ -10,18 +10,19 @@ from .mmcif import add_secondary_structure_to_polymers
 
 
 def pdb_string_to_pdb_dict(filestring: str) -> dict[str, Any]:
-    """Takes a .pdb filestring and turns into a ``dict`` which represents its
+    """Takes a .pdb filestring and turns into a dict which represents its
     record structure. Only lines which aren't empty are used.
 
     The resultant dictionary has line types as the keys, which point to the
-    lines as its value. So ``{"TITLE": ["TITLE line 1", "TITLE line 2"]}`` etc.
+    lines as its value. So {"TITLE": ["TITLE line 1", "TITLE line 2"]} etc.
 
     The exceptions are the REMARK records, where there is a sub-dictionary with
     REMARK numbers as keys, and the structure records themselves which are just
     arranged into lists - one for each model.
 
-    :param str filestring: the .pdb filestring to process.
-    :rtype: ``dict``"""
+    :param filestring: .pdb filestring to process
+    :return: .pdb dictionary
+    """
 
     pdb_dict: dict[str, Any] = {}
     lines_1 = list(filter(lambda l: bool(l.strip()), filestring.split("\n")))
@@ -54,9 +55,10 @@ def update_dict(d: dict[str, Any], key: str, value: str) -> None:
 
     The dictionary is changed in place.
 
-    :param dict d: the dictionary to update.
-    :param str key: the location of the list.
-    :param str value: the value to add to the list."""
+    :param d: dictionary to update
+    :param key: location of list
+    :param value: value to add to list
+    """
 
     try:
         d[key].append(value)
@@ -68,8 +70,8 @@ def pdb_dict_to_data_dict(pdb_dict: dict[str, Any]) -> dict[str, Any]:
     """Converts an .pdb dictionary into an atomium data dictionary, with the
     same standard layout that the other file formats get converted into.
 
-    :param dict pdb_dict: the .pdb dictionary.
-    :rtype: ``dict``"""
+    :param pdb_dict: .pdb dictionary
+    """
 
     data_dict = {
         "description": {"code": None, "title": None, "deposition_date": None, "classification": None, "keywords": [], "authors": []},
@@ -90,8 +92,9 @@ def update_description_dict(pdb_dict: dict[str, Any], data_dict: dict[str, Any])
     """Creates the description component of a standard atomium data dictionary
     from a .pdb dictionary.
 
-    :param dict pdb_dict: The .pdb dictionary to read.
-    :param dict data_dict: The data dictionary to update."""
+    :param pdb_dict: .pdb dictionary to read
+    :param data_dict: data dictionary to update
+    """
 
     extract_header(pdb_dict, data_dict["description"])
     extract_title(pdb_dict, data_dict["description"])
@@ -103,8 +106,9 @@ def update_experiment_dict(pdb_dict: dict[str, Any], data_dict: dict[str, Any]) 
     """Creates the experiment component of a standard atomium data dictionary
     from a .pdb dictionary.
 
-    :param dict pdb_dict: The .pdb dictionary to read.
-    :param dict data_dict: The data dictionary to update."""
+    :param pdb_dict: .pdb dictionary to read
+    :param data_dict: data dictionary to update
+    """
 
     extract_technique(pdb_dict, data_dict["experiment"])
     extract_source(pdb_dict, data_dict["experiment"])
@@ -115,8 +119,9 @@ def update_quality_dict(pdb_dict: dict[str, Any], data_dict: dict[str, Any]) -> 
     """Creates the quality component of a standard atomium data dictionary
     from a .pdb dictionary.
 
-    :param dict pdb_dict: The .pdb dictionary to read.
-    :param dict data_dict: The data dictionary to update."""
+    :param pdb_dict: .pdb dictionary to read
+    :param data_dict: data dictionary to update
+    """
 
     extract_resolution_remark(pdb_dict, data_dict["quality"])
     extract_rvalue_remark(pdb_dict, data_dict["quality"])
@@ -126,8 +131,9 @@ def update_geometry_dict(pdb_dict: dict[str, Any], data_dict: dict[str, Any]) ->
     """Creates the geometry component of a standard atomium data dictionary
     from a .pdb dictionary.
 
-    :param dict pdb_dict: The .pdb dictionary to read.
-    :param dict data_dict: The data dictionary to update."""
+    :param pdb_dict: .pdb dictionary to read
+    :param data_dict: data dictionary to update
+    """
 
     extract_assembly_remark(pdb_dict, data_dict["geometry"])
     extract_crystallography(pdb_dict, data_dict["geometry"])
@@ -136,8 +142,9 @@ def update_geometry_dict(pdb_dict: dict[str, Any], data_dict: dict[str, Any]) ->
 def update_models_list(pdb_dict: dict[str, Any], data_dict: dict[str, Any]) -> None:
     """Creates model dictionaries in a data dictionary.
 
-    :param dict pdb_dict: The .pdb dictionary to read.
-    :param dict data_dict: The data dictionary to update."""
+    :param pdb_dict: .pdb dictionary to read
+    :param data_dict: data dictionary to update
+    """
 
     sequences = make_sequences(pdb_dict)
     secondary_structure = make_secondary_structure(pdb_dict)
@@ -165,8 +172,8 @@ def update_models_list(pdb_dict: dict[str, Any], data_dict: dict[str, Any]) -> N
 def parse_conect_records(pdb_dict: dict[str, Any]) -> list[list[int]]:
     """Parse CONECT records from PDB dictionary.
 
-    :param dict pdb_dict: The .pdb dictionary to read.
-    :return: List of connections, where each inner list is [atom1, atom2, ...]
+    :param pdb_dict: .pdb dictionary to read
+    :return: list of connections, where each inner list is [atom1, atom2, ...]
     """
     connections = []
     for line in pdb_dict.get("CONECT", []):
@@ -185,11 +192,12 @@ def parse_conect_records(pdb_dict: dict[str, Any]) -> list[list[int]]:
 
 
 def extract_header(pdb_dict: dict[str, Any], description_dict: dict[str, Any]) -> None:
-    """Takes a ``dict`` and adds header information to it by parsing the HEADER
+    """Takes a dict and adds header information to it by parsing the HEADER
     line.
 
-    :param dict pdb_dict: the ``dict`` to read.
-    :param dict description_dict: the ``dict`` to update."""
+    :param pdb_dict: dict to read
+    :param description_dict: dict to update
+    """
 
     if pdb_dict.get("HEADER"):
         line = pdb_dict["HEADER"][0]
@@ -202,22 +210,24 @@ def extract_header(pdb_dict: dict[str, Any], description_dict: dict[str, Any]) -
 
 
 def extract_title(pdb_dict: dict[str, Any], description_dict: dict[str, Any]) -> None:
-    """Takes a ``dict`` and adds header information to it by parsing the TITLE
+    """Takes a dict and adds header information to it by parsing the TITLE
     lines.
 
-    :param dict pdb_dict: the ``dict`` to read.
-    :param dict description_dict: the ``dict`` to update."""
+    :param pdb_dict: dict to read
+    :param description_dict: dict to update
+    """
 
     if pdb_dict.get("TITLE"):
         description_dict["title"] = merge_lines(pdb_dict["TITLE"], 10)
 
 
 def extract_keywords(pdb_dict: dict[str, Any], description_dict: dict[str, Any]) -> None:
-    """Takes a ``dict`` and adds header information to it by parsing the KEYWDS
+    """Takes a dict and adds header information to it by parsing the KEYWDS
     line.
 
-    :param dict pdb_dict: the ``dict`` to read.
-    :param dict description_dict: the ``dict`` to update."""
+    :param pdb_dict: dict to read
+    :param description_dict: dict to update
+    """
 
     if pdb_dict.get("KEYWDS"):
         text = merge_lines(pdb_dict["KEYWDS"], 10)
@@ -225,11 +235,12 @@ def extract_keywords(pdb_dict: dict[str, Any], description_dict: dict[str, Any])
 
 
 def extract_authors(pdb_dict: dict[str, Any], description_dict: dict[str, Any]) -> None:
-    """Takes a ``dict`` and adds header information to it by parsing the AUTHOR
+    """Takes a dict and adds header information to it by parsing the AUTHOR
     line.
 
-    :param dict pdb_dict: the ``dict`` to read.
-    :param dict description_dict: the ``dict`` to update."""
+    :param pdb_dict: dict to read
+    :param description_dict: dict to update
+    """
 
     if pdb_dict.get("AUTHOR"):
         text = merge_lines(pdb_dict["AUTHOR"], 10)
@@ -237,11 +248,12 @@ def extract_authors(pdb_dict: dict[str, Any], description_dict: dict[str, Any]) 
 
 
 def extract_technique(pdb_dict: dict[str, Any], experiment_dict: dict[str, Any]) -> None:
-    """Takes a ``dict`` and adds technique information to it by parsing EXPDTA
+    """Takes a dict and adds technique information to it by parsing EXPDTA
     lines.
 
-    :param dict pdb_dict: the ``dict`` to read.
-    :param dict experiment_dict: the ``dict`` to update."""
+    :param pdb_dict: dict to read
+    :param experiment_dict: dict to update
+    """
 
     if pdb_dict.get("EXPDTA"):
         if pdb_dict["EXPDTA"][0].strip():
@@ -249,11 +261,12 @@ def extract_technique(pdb_dict: dict[str, Any], experiment_dict: dict[str, Any])
 
 
 def extract_source(pdb_dict: dict[str, Any], experiment_dict: dict[str, Any]) -> None:
-    """Takes a ``dict`` and adds source information to it by parsing SOURCE
+    """Takes a dict and adds source information to it by parsing SOURCE
     lines.
 
-    :param dict pdb_dict: the ``dict`` to read.
-    :param dict experiment_dict: the ``dict`` to update."""
+    :param pdb_dict: dict to read
+    :param experiment_dict: dict to update
+    """
 
     if pdb_dict.get("SOURCE"):
         data = merge_lines(pdb_dict["SOURCE"], 10)
@@ -265,11 +278,12 @@ def extract_source(pdb_dict: dict[str, Any], experiment_dict: dict[str, Any]) ->
 
 
 def extract_missing_residues(pdb_dict: dict[str, Any], experiment_dict: dict[str, Any]) -> None:
-    """Takes a ``dict`` and adds missing residue information to it by parsing
+    """Takes a dict and adds missing residue information to it by parsing
     REMARK 465 lines.
 
-    :param dict pdb_dict: the ``dict`` to read.
-    :param dict experiment_dict: the ``dict`` to update."""
+    :param pdb_dict: dict to read
+    :param experiment_dict: dict to update
+    """
 
     for line in pdb_dict.get("REMARK", {}).get("465", []):
         chunks = line.strip().split()
@@ -278,11 +292,12 @@ def extract_missing_residues(pdb_dict: dict[str, Any], experiment_dict: dict[str
 
 
 def extract_resolution_remark(pdb_dict: dict[str, Any], quality_dict: dict[str, Any]) -> None:
-    """Takes a ``dict`` and adds resolution information to it by parsing REMARK
+    """Takes a dict and adds resolution information to it by parsing REMARK
     2 lines.
 
-    :param dict pdb_dict: the ``dict`` to read.
-    :param dict quality_dict: the ``dict`` to update."""
+    :param pdb_dict: dict to read
+    :param quality_dict: dict to update
+    """
 
     if pdb_dict.get("REMARK") and pdb_dict["REMARK"].get("2"):
         for remark in pdb_dict["REMARK"]["2"]:
@@ -294,11 +309,12 @@ def extract_resolution_remark(pdb_dict: dict[str, Any], quality_dict: dict[str, 
 
 
 def extract_rvalue_remark(pdb_dict: dict[str, Any], quality_dict: dict[str, Any]) -> None:
-    """Takes a ``dict`` and adds resolution information to it by parsing REMARK
+    """Takes a dict and adds resolution information to it by parsing REMARK
     3 lines.
 
-    :param dict pdb_dict: the ``dict`` to read.
-    :param dict quality_dict: the ``dict`` to update."""
+    :param pdb_dict: dict to read
+    :param quality_dict: dict to update
+    """
 
     if pdb_dict.get("REMARK") and pdb_dict["REMARK"].get("3"):
         patterns = {
@@ -317,11 +333,12 @@ def extract_rvalue_remark(pdb_dict: dict[str, Any], quality_dict: dict[str, Any]
 
 
 def extract_assembly_remark(pdb_dict: dict[str, Any], geometry_dict: dict[str, Any]) -> None:
-    """Takes a ``dict`` and adds assembly information to it by parsing REMARK
+    """Takes a dict and adds assembly information to it by parsing REMARK
     350 lines.
 
-    :param dict pdb_dict: the ``dict`` to read.
-    :param dict geometry_dict: the ``dict`` to update."""
+    :param pdb_dict: dict to read
+    :param geometry_dict: dict to update
+    """
     if pdb_dict.get("REMARK") and pdb_dict["REMARK"].get("350"):
         groups = [list(g) for k, g in groupby(pdb_dict["REMARK"]["350"], lambda x: "ECULE:" in x)][1:]
         assemblies = [list(chain(*a)) for a in zip(groups[::2], groups[1::2], strict=True)]
@@ -333,8 +350,8 @@ def assembly_lines_to_assembly_dict(lines: list[str]) -> dict[str, Any]:
     """Takes the lines representing a single biological assembly and turns
     them into an assembly dictionary.
 
-    :param list lines: The REMARK lines to read.
-    :rtype: ``dict``"""
+    :param lines: REMARK lines to read
+    """
 
     assembly: dict[str, Any] = {"transformations": [], "software": None, "buried_surface_area": None, "surface_area": None, "delta_energy": None, "id": 0}
     patterns: list[tuple[str, str, Callable[[str], Any]]] = [
@@ -369,11 +386,12 @@ def assembly_lines_to_assembly_dict(lines: list[str]) -> dict[str, Any]:
 
 
 def extract_crystallography(pdb_dict: dict[str, Any], geometry_dict: dict[str, Any]) -> None:
-    """Takes a ``dict`` and adds assembly information to it by parsing the
+    """Takes a dict and adds assembly information to it by parsing the
     CRYST1 record.
 
-    :param dict pdb_dict: the ``dict`` to read.
-    :param dict geometry_dict: the ``dict`` to update."""
+    :param pdb_dict: dict to read
+    :param geometry_dict: dict to update
+    """
 
     if pdb_dict.get("CRYST1"):
         line = pdb_dict["CRYST1"][0]
@@ -385,8 +403,8 @@ def extract_crystallography(pdb_dict: dict[str, Any], geometry_dict: dict[str, A
 def make_sequences(pdb_dict: dict[str, Any]) -> dict[str, str]:
     """Creates a mapping of chain IDs to sequences, by parsing SEQRES records.
 
-    :param dict pdb_dict: the .pdb dictionary to read.
-    :rtype: ``dict``"""
+    :param pdb_dict: .pdb dictionary to read
+    """
 
     seq: dict[str, Any] = {}
     if pdb_dict.get("SEQRES"):
@@ -399,9 +417,11 @@ def make_sequences(pdb_dict: dict[str, Any]) -> dict[str, str]:
 
 
 def inverse_make_sequences(seq: str, chain_id: str) -> list[str]:
-    """Converts a mapping of chain IDs to sequences back into SEQRES format.
+    """Convert sequence string back into SEQRES format.
 
-    :param dict seq_dict: A dictionary mapping chain IDs to sequences.
+    :param seq: sequence string
+    :param chain_id: chain identifier
+    :return: SEQRES formatted lines
     """
     # Reverse CODES dictionary
     REVERSE_CODES = {v: k for k, v in CODES.items()}
@@ -419,8 +439,8 @@ def make_secondary_structure(pdb_dict: dict[str, Any]) -> dict[str, Any]:
     """Creates a dictionary of helices and strands, with each having a list of
     start and end residues.
 
-    :param pdb_dict: the .pdb dict to read.
-    :rtype: ``dict``"""
+    :param pdb_dict: .pdb dict to read
+    """
 
     helices, strands = [], []
     for helix in pdb_dict.get("HELIX", []):
@@ -443,8 +463,8 @@ def make_secondary_structure(pdb_dict: dict[str, Any]) -> dict[str, Any]:
 def get_full_names(pdb_dict: dict[str, Any]) -> dict[str, Any]:
     """Creates a mapping of het names to full English names.
 
-    :param pdb_dict: the .pdb dict to read.
-    :rtype: ``dict``"""
+    :param pdb_dict: .pdb dict to read
+    """
 
     full_names: dict[str, Any] = {}
     for line in pdb_dict.get("HETNAM", []):
@@ -461,8 +481,8 @@ def make_aniso(model_lines: list[str]) -> dict[int, list[float | None]]:
 
     Preserves missing values as None for faithful round-trip.
 
-    :param model_lines: the lines to parse.
-    :rtype: ``dict``"""
+    :param model_lines: lines to parse
+    """
 
     result = {}
     for line in model_lines:
@@ -483,8 +503,9 @@ def get_last_ter_line(model_lines: list[str]) -> int:
     """Gets the index of the last TER record in a list of records. 0 will be
     returned if there are none.
 
-    :param list model_lines: the lines to search.
-    :rtype: ``int``"""
+    :param model_lines: lines to search
+    :return: index of last TER record
+    """
 
     last_ter = 0
     for index, line in enumerate(model_lines[::-1]):
@@ -497,8 +518,9 @@ def get_last_ter_line(model_lines: list[str]) -> int:
 def id_from_line(line: str) -> str:
     """Creates a residue ID from an atom line.
 
-    :param str line: the ATOM or HETATM line record.
-    :rtype: ``str``"""
+    :param line: ATOM or HETATM line record
+    :return: residue ID
+    """
 
     return "{}.{}{}".format(line[21], line[22:26].strip(), line[26].strip())
 
@@ -507,11 +529,12 @@ def add_atom_to_polymer(line: str, model: dict[Any, Any], chain_id: str, res_id:
     """Takes an .pdb ATOM or HETATM record, converts it, and adds it to a
     polymer dictionary.
 
-    :param dict line: the line to read.
-    :param dict model: the model to update.
-    :param str chain_id: the chain ID to add to.
-    :param str res_id: the molecule ID to add to.
-    :param dict aniso_dict: lookup dictionary for anisotropy information."""
+    :param line: line to read
+    :param model: model to update
+    :param chain_id: chain ID to add to
+    :param res_id: molecule ID to add to
+    :param aniso_dict: lookup dictionary for anisotropy information
+    """
 
     atom = atom_line_to_dict(line, aniso_dict)
 
@@ -546,10 +569,11 @@ def add_atom_to_non_polymer(line: str, model: dict[Any, Any], res_id: str, aniso
     """Takes an .pdb ATOM or HETATM record, converts it, and adds it to a
     non-polymer dictionary.
 
-    :param dict line: the line to read.
-    :param dict model: the model to update.
-    :param str res_id: the molecule ID to add to.
-    :param dict aniso_dict: lookup dictionary for anisotropy information."""
+    :param line: line to read
+    :param model: model to update
+    :param res_id: molecule ID to add to
+    :param aniso_dict: lookup dictionary for anisotropy information
+    """
     atom = atom_line_to_dict(line, aniso_dict)
 
     key = "water" if line[17:20] in ["HOH", "DOD"] else "non_polymer"
@@ -605,8 +629,8 @@ def atom_line_to_dict(line: str, aniso_dict: dict[Any, Any]) -> AtomDict:
     """
     Converts an ATOM or HETATM record to an atom dictionary.
 
-    :param str line: the record to convert.
-    :param dict aniso_dict: the anisotropy dictionary to use.
+    :param line: record to convert
+    :param aniso_dict: anisotropy dictionary to use
     :return: atom dictionary
     """
 
@@ -650,10 +674,10 @@ def atom_line_to_dict(line: str, aniso_dict: dict[Any, Any]) -> AtomDict:
 def merge_lines(lines: list[str], start: int, join: str = " ") -> str:
     """Gets a single continuous string from a sequence of lines.
 
-    :param list lines: The lines to merge.
-    :param int start: The start point in each record.
-    :param str join: The string to join on.
-    :rtype: ``str``"""
+    :param lines: lines to merge
+    :param start: start point in each record
+    :param join: string to join on
+    """
 
     string = join.join([line[start:].strip() for line in lines])
     return string

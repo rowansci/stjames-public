@@ -1,6 +1,6 @@
 """pKa workflow."""
 
-from typing import Annotated, Optional, Self
+from typing import Annotated, Self
 
 from pydantic import AfterValidator, model_validator
 
@@ -15,7 +15,7 @@ class MacropKaMicrostate(Base):
 
     :param smiles: SMILES string for this conformer
     :param energy: free energy of this conformer
-    :param charge: the total charge
+    :param charge: total charge
     """
 
     smiles: str
@@ -27,9 +27,9 @@ class MacropKaValue(Base):
     """
     Represents a change in pKa.
 
-    :param initial_charge: the charge of the initial state
-    :param final_charge: the charge of the final state
-    :param pKa: the pKa for the transition
+    :param initial_charge: charge of initial state
+    :param final_charge: charge of final state
+    :param pKa: pKa for the transition
     """
 
     initial_charge: int
@@ -55,12 +55,12 @@ class MacropKaWorkflow(SMILESWorkflow):
     Results:
     :param microstates: microstates
     :param pKa_values: macroscopic pKa values
-    :param isoelectric_point: the isoelectric point (in pH units)
-    :param solvation_energy: the solvation energy, in kcal/mol
-    :param microstate_weights_by_pH: the % of different microstates by pH
-    :param logD_by_pH: the distribution constant (water/octanol) by pH
-    :param aqueous_solubility_by_pH: the log(S)/L of the compound in water, by pH
-    :param kpuu_probability: the probability that Kpuu >= 0.3, the Schrodinger-determined threshold
+    :param isoelectric_point: isoelectric point (in pH units)
+    :param solvation_energy: solvation energy, in kcal/mol
+    :param microstate_weights_by_pH: % of different microstates by pH
+    :param logD_by_pH: distribution constant (water/octanol) by pH
+    :param aqueous_solubility_by_pH: solubility of compound in water, by pH, in log(S)/L
+    :param kpuu_probability: probability that Kpuu >= 0.3 (Schrödinger-determined threshold)
     """
 
     min_pH: Annotated[float, AfterValidator(round_float(3))] = 0.0
@@ -72,9 +72,9 @@ class MacropKaWorkflow(SMILESWorkflow):
 
     microstates: list[MacropKaMicrostate] = []
     pKa_values: list[MacropKaValue] = []
-    isoelectric_point: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
-    solvation_energy: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
-    kpuu_probability: Annotated[Optional[float], AfterValidator(round_optional_float(3))] = None
+    isoelectric_point: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    solvation_energy: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
+    kpuu_probability: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
 
     microstate_weights_by_pH: list[
         tuple[

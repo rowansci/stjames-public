@@ -34,7 +34,7 @@ class ContactConstraint(BaseModel):
 
     token_1: Token
     token_2: Token
-    max_distance: float  # Angstroms
+    max_distance: float  # Å
     force: bool = False  # Whether to use potentials to enforce the constraint
 
 
@@ -44,7 +44,7 @@ class PocketConstraint(BaseModel):
     input_type: Literal["ligand", "protein", "dna", "rna"]
     input_index: int
     contacts: list[Token]
-    max_distance: float  # Angstroms
+    max_distance: float  # Å
     force: bool = False  # Whether to use potentials to enforce the constraint
 
 
@@ -108,7 +108,7 @@ class ProteinCofoldingWorkflow(FASTAWorkflow):
     :param contact_constraints: Boltz contact constraints
     :param pocket_constraints: Boltz pocket constraints
     :param do_pose_refinement: whether to optimize non-rotatable bonds in output poses
-    :param compute_strain: whether to compute the strain of the pose (if `pose_refinement` is enabled)
+    :param compute_strain: whether to compute the strain of the pose (if pose_refinement is enabled)
     :param num_samples: number of samples generated for prediction
     :param model: which cofolding model to use
     :param cofolding_results: per diffusion sample outputs, grouped together

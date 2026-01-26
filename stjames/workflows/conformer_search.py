@@ -34,7 +34,7 @@ class ConformerSearchWorkflow(ConformerSearchMixin, SMILESWorkflow, MoleculeWork
     :param conformer_uuids: list of UUIDs of the Molecules generated
     :param energies: energies of the molecules
     :param conformer_properties: each conformer's properties
-    :param ensemble_properties: the overall ensemble's properties
+    :param ensemble_properties: overall ensemble's properties
     """
 
     initial_smiles: str = ""

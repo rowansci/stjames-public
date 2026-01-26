@@ -24,7 +24,7 @@ class BatchDockingWorkflow(BatchSMILESWorkflow, ProteinStructureWorkflow):
     :param docking_settings: how to run each docking calculation
 
     Results:
-    :param best_scores: the best score for each SMILES string
+    :param best_scores: best score for each SMILES string
     """
 
     model_config = ConfigDict(arbitrary_types_allowed=True)

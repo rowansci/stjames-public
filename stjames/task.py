@@ -2,6 +2,8 @@ from .base import LowercaseStrEnum
 
 
 class Task(LowercaseStrEnum):
+    """Calculation task type."""
+
     ENERGY = "energy"
     GRADIENT = "gradient"
     OPTIMIZE = "optimize"

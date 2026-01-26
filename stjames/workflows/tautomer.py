@@ -1,6 +1,6 @@
 """Tautomer prediction workflow."""
 
-from typing import Annotated, Optional
+from typing import Annotated
 
 from pydantic import AfterValidator
 
@@ -20,10 +20,9 @@ class Tautomer(Base):
     """
 
     energy: Annotated[float, AfterValidator(round_float(6))]
-    weight: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
-    predicted_relative_energy: Annotated[Optional[float], AfterValidator(round_optional_float(6))] = None
+    weight: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
+    predicted_relative_energy: Annotated[float | None, AfterValidator(round_optional_float(6))] = None
 
-    # UUIDs, optionally
     structures: list[DBCalculation] = []
 
 

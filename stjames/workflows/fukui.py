@@ -21,10 +21,10 @@ class FukuiIndexWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     Settings:
-    :param opt_settings: if given, the settings for optimization. if none, no optimization will be conducted.
-    :param opt_engine: the engine for optimization [uses opt_settings.method.default_engine if not set]
-    :param fukui_settings: the settings for Fukui index calculations.
-    :param fukui_engine: the engine for Fukui index calculations [uses fukui_settings.method.default_engine if not set]
+    :param opt_settings: settings for optimization; if none, no optimization conducted
+    :param opt_engine: engine for optimization [uses opt_settings.method.default_engine if not set]
+    :param fukui_settings: settings for Fukui index calculations
+    :param fukui_engine: engine for Fukui index calculations [uses fukui_settings.method.default_engine if not set]
 
     Results:
     :param optimization: UUID of optimization

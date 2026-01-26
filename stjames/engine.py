@@ -2,6 +2,8 @@ from .base import LowercaseStrEnum
 
 
 class Engine(LowercaseStrEnum):
+    """Computational chemistry engine."""
+
     AIMNET2 = "aimnet2"
     MACE = "mace"
     OMOL25 = "omol25"

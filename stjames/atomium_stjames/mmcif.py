@@ -12,9 +12,8 @@ from .data import CODES
 
 def mmcif_string_to_mmcif_dict(filestring: str) -> dict[str, Any]:
     """
-    Converts a .cif filestring and into a ``dict`` that represents its
-    table structure. Only lines which aren't empty and which don't begin with
-    ``#`` are used.
+    Converts a .cif filestring into a dict that represents its table structure.
+    Only lines which aren't empty and which don't begin with # are used.
 
     Multi-line strings are consolidated onto one line, and the whole thing is
     then split into the blocks that will become table lists. At the end, quote
@@ -40,12 +39,13 @@ def mmcif_string_to_mmcif_dict(filestring: str) -> dict[str, Any]:
 
 def consolidate_strings(lines: deque[str]) -> deque[str]:
     """
-    Generally, .cif files have a one file line to one table row
-    correspondence. Sometimes however, a string cell is given a line of its own,
-    breaking the row over several lines. This function takes the lines of a .cif
-    file and puts all table rows on a single line.
+    Generally, .cif files have a one file line to one table row correspondence.
+    Sometimes however, a string cell is given a line of its own, breaking the
+    row over several lines. This function takes the lines of a .cif file and
+    puts all table rows on a single line.
 
     :param lines: .cif file lines
+    :return: consolidated .cif file lines
     """
 
     new_lines: deque[str] = deque()
@@ -65,7 +65,7 @@ def consolidate_strings(lines: deque[str]) -> deque[str]:
 def mmcif_lines_to_mmcif_blocks(lines: deque[str]) -> list[dict[str, Any]]:
     """
     Takes a list of .cif file lines and splits them into table blocks. Each
-    block will be a ``dict`` containing a category name and a list of lines.
+    block will be a dict containing a category name and a list of lines.
 
     :param lines: .cif file lines
     """
@@ -97,10 +97,10 @@ def mmcif_lines_to_mmcif_blocks(lines: deque[str]) -> list[dict[str, Any]]:
 
 def non_loop_block_to_list(block: dict[str, Any]) -> list[dict[str, Any]]:
     """
-    Takes a simple block ``dict`` with no loop and turns it into a table
-    ``list``.
+    Takes a simple block dict with no loop and turns it into a table list.
 
     :param block: .cif block to process
+    :return: processed table list
     """
 
     d = {}
@@ -119,11 +119,12 @@ def non_loop_block_to_list(block: dict[str, Any]) -> list[dict[str, Any]]:
 
 def loop_block_to_list(block: dict[str, Any]) -> list[dict[str, Any]]:
     """
-    Takes a loop block ``dict`` where the initial lines are table headers and
-    turns it into a table ``list``. Sometimes a row is broken over several lines
-    so this function deals with that too.
+    Takes a loop block dict where the initial lines are table headers and turns
+    it into a table list. Sometimes a row is broken over several lines so this
+    function deals with that too.
 
     :param block: .cif block to process
+    :return: processed table list
     """
 
     names, lines, _ = [], [], True
@@ -155,6 +156,7 @@ def split_values(line: str) -> list[str]:
     be used to break the line. This function handles all of that.
 
     :param line: .cif line to split
+    :return: list of cell values
     """
 
     if not re.search("['\"]", line):
@@ -200,6 +202,7 @@ def mmcif_dict_to_data_dict(mmcif_dict: dict[str, Any]) -> dict[str, Any]:
     same standard layout that the other file formats get converted into.
 
     :param mmcif_dict: .mmcif dictionary
+    :return: atomium data dictionary
     """
 
     data_dict = {
@@ -355,7 +358,7 @@ def get_operation_id_groups(expression: str) -> list[list[str]]:
     For example, (1,2,3) becomes [[1, 2, 3]], (1-3)(8-11,17) becomes
         [[1, 2, 3], [8, 9, 10, 11, 17]], and so on.
 
-    :param str expression: expression to parse
+    :param expression: expression to parse
     :return: list of transformation ID groups
     """
     if expression[0] != "(":
@@ -451,11 +454,12 @@ def update_models_list(mmcif_dict: dict[str, Any], data_dict: dict[str, Any]) ->
         add_secondary_structure_to_polymers(model, secondary_structure)
 
 
-def make_aniso(mmcif_dict: dict[str, Any]) -> dict[int, Any]:
+def make_aniso(mmcif_dict: dict[str, Any]) -> dict[int, list[str]]:
     """
     Makes a mapping of atom IDs to anisotropy information.
 
     :param mmcif_dict: .mmcif dict to read
+    :return: anisotropy mapping
     """
     return {
         int(a["id"]): [float(a["U[{}][{}]".format(x, y)]) for x, y in ["11", "22", "33", "12", "13", "23"]]  # type: ignore [has-type, misc]

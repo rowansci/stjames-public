@@ -203,8 +203,8 @@ class BoltzGenScores(Base):
     :param num_filters_passed: number of QC/heuristic filters passed (↑)
     :param iptm: inter-chain pTM confidence, 0–1 (↑)
     :param design_ptm: design pTM confidence, 0–1 (↑)
-    :param min_interaction_pae: minimum interface PAE in Å (↓)
-    :param bb_rmsd: backbone RMSD in Å (↓)
+    :param min_interaction_pae: minimum interface PAE, in Å (↓)
+    :param bb_rmsd: backbone RMSD, in Å (↓)
     :param delta_sasa_refolded: ΔSASA of interface after refolding, Å² (↑ typically indicates better burial)
     :param plip_hbonds_refolded: count of hydrogen bonds at the interface (↑)
     :param plip_saltbridge_refolded: count of salt bridges at the interface (↑)
@@ -250,9 +250,9 @@ class ProteinBinderDesignResult(Base):
     """
     The output; a designed binder.
 
-    :param sequence: the sequence
-    :param bound_structure: the PDB of the structure bound to the target
-    :param scores: the scores for the generated structure
+    :param sequence: sequence
+    :param bound_structure: PDB of structure bound to target
+    :param scores: scores for generated structure
     """
 
     binder_sequence: str | None = None  # deprecated
@@ -278,7 +278,7 @@ class BoltzGenSettings(Base):
 
     :param num_designs: how many designs to generate
     :param protocol: which protocol to use
-    :param binding_residue: a dict mapping the chain ID to which residues should bind.
+    :param binding_residue: dict mapping chain ID to which residues should bind;
         the string follows the BoltzGen format of specifying ranges of residue indices (refer to their documentation).
         examples include "5..7,13" or "5..15,50..".
     """
@@ -294,9 +294,9 @@ class ProteinBinderDesignWorkflow(Workflow):
 
 
     New:
-    :param binder_design_input: the input to the protein binder design workflow
-    :param binder_design_settings: the settings for the protein generation method employed
-    :param generated_binders: the output structures
+    :param binder_design_input: input to protein binder design workflow
+    :param binder_design_settings: settings for protein generation method employed
+    :param generated_binders: output structures
     """
 
     binder_design_input: BoltzGenInput = BoltzGenInput()

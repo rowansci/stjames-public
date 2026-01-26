@@ -16,10 +16,10 @@ class SolventDependentConformer(Base):
     """
     Stores a single conformer scored in many different solvents.
 
-    :param calculation: the conformer (as a calculation)
-    :param free_energy_by_solvent: the free energy of the solvent in every solvent (in Hartree)
-    :param relative_free_energy_by_solvent: the relative free energy vs. the lowest-energy conformer in every solvent (in kcal/mol)
-    :param population_by_solvent: the population of the conformer in every solvent (as a number between 0 and 1)
+    :param calculation: conformer (as a calculation)
+    :param free_energy_by_solvent: free energy in every solvent, in Hartree
+    :param relative_free_energy_by_solvent: relative free energy vs. lowest-energy conformer in every solvent, in kcal/mol
+    :param population_by_solvent: population in every solvent (number between 0 and 1)
     """
 
     calculation: UUID
@@ -46,7 +46,7 @@ class SolventDependentConformersWorkflow(ConformerSearchMixin, MoleculeWorkflow)
     :param multistage_opt_settings: set by mode unless mode=MANUAL (ignores additional settings if set)
 
     New:
-    :param solvents: the solvents to study
+    :param solvents: solvents to study
     :param conformers: output conformers with per-solvent energies and weights
     :param per_solvent_properties: metrics for how overall distribution changes by solvent
     :param relative_free_energy_by_solvent: how free energy changes by solvent, for predicting ∆G_transfer

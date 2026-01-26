@@ -4,7 +4,16 @@ from .base import Base
 
 
 class ThermochemistrySettings(Base):
-    # Cramer/Truhlar cutoff freq (cm-1)
+    """
+    Thermochemistry calculation settings.
+
+    :param cutoff_frequency: Cramer/Truhlar quasi-harmonic cutoff, in cm^-1
+    :param temperature: temperature for thermochemistry, in K
+    :param scaling_factor: frequency scaling factor
+    :param concentration: concentration, in M (defaults to 1 atm)
+    """
+
+    # Cramer/Truhlar cutoff freq (cm^-1)
     cutoff_frequency: pydantic.NonNegativeFloat = 100
 
     # temp (K)

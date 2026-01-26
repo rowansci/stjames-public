@@ -114,7 +114,7 @@ class ProteinStructureWorkflow(Workflow):
     """
     Base class for Workflows that operate on protein sequences.
 
-    :param protein: the PDB structure of the protein in question, or the UUID of the PDB record in Rowan
+    :param protein: PDB structure of protein, or UUID of PDB record in Rowan
     """
 
     protein: PDB | UUID

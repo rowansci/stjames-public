@@ -1,4 +1,4 @@
-from typing import Any, Optional, Self, TypeVar
+from typing import Any, Self, TypeVar
 
 from pydantic import PositiveFloat, computed_field, field_validator, model_validator
 
@@ -49,10 +49,10 @@ class Settings(Base):
     tasks: UniqueList[Task] = [Task.ENERGY, Task.CHARGE, Task.DIPOLE]
 
     method: Method = Method.HARTREE_FOCK
-    basis_set: Optional[BasisSet] = None
+    basis_set: BasisSet | None = None
     engine: Engine = None  # type: ignore [assignment]
     corrections: UniqueList[Correction] = []
-    solvent_settings: Optional[SolventSettings] = None
+    solvent_settings: SolventSettings | None = None
     omega: OmegaTuning | PositiveFloat | None = None
 
     excited_state_settings: ExcitedStateSettingsUnion | None = None
@@ -140,7 +140,7 @@ class Settings(Base):
     @field_validator("basis_set", mode="before")
     @classmethod
     def parse_basis_set(cls, v: Any) -> BasisSet | dict[str, Any] | None:
-        """Turn a string into a ``BasisSet`` object. (This is a little crude.)"""
+        """Turn a string into a BasisSet object. (This is a little crude.)"""
         if isinstance(v, BasisSet):
             return None if v.name is None else v
         elif isinstance(v, dict):
@@ -153,7 +153,7 @@ class Settings(Base):
         elif v is None:
             return None
         else:
-            raise ValueError(f"invalid value ``{v}`` for ``basis_set``")
+            raise ValueError(f"invalid value {v} for basis_set")
 
     @field_validator("corrections", mode="before")
     @classmethod
@@ -194,6 +194,6 @@ def _assign_opt_settings_by_mode(mode: Mode, opt_settings: OptimizationSettings)
             opt_settings.max_gradient_threshold = 4e-6
             opt_settings.rms_gradient_threshold = 2e-6
         case _:
-            raise ValueError(f"Unknown mode ``{mode.value}``!")
+            raise ValueError(f"Unknown mode {mode.value}!")
 
     return opt_settings

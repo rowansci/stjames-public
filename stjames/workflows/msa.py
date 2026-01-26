@@ -18,7 +18,7 @@ class MSAWorkflow(ProteinSequenceWorkflow):
     :param initial_protein_sequences: protein sequences of interest
 
     New:
-    :param output_formats: the formats of the MSA return files
+    :param output_formats: formats of MSA return files
     """
 
     output_formats: list[MSAFormat] = [MSAFormat.COLABFOLD]

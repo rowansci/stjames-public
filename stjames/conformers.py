@@ -16,9 +16,9 @@ class ConformerProperties(BaseModel):
     """
     Descriptors of a conformer's properties.
 
-    :param solvent_accessible_surface_area: the average SASA, (Å²)
-    :param polar_solvent_accessible_surface_area: the average SASA for non-C/H elements (Å²)
-    :param radius_of_gyration: the radius of gyration (Å)
+    :param solvent_accessible_surface_area: average SASA (Å²)
+    :param polar_solvent_accessible_surface_area: average SASA for non-C/H elements (Å²)
+    :param radius_of_gyration: radius of gyration (Å)
     """
 
     solvent_accessible_surface_area: Annotated[PositiveFloat, AfterValidator(round_float(3))]
@@ -51,8 +51,8 @@ class ConformerClusteringSettings(BaseModel):
     Rowan uses k-means clustering to identify representative conformers.
     This loosely follows Wilcken and co-workers (10.1007/s10822-020-00337-7).
 
-    :param num_clusters: the number of clusters to include
-    :param conformers_per_cluster: the number of compounds to pick from each cluster
+    :param num_clusters: number of clusters to include
+    :param conformers_per_cluster: number of compounds to pick from each cluster
     """
 
     descriptors: list[ConformerClusteringDescriptor] = [
@@ -194,12 +194,12 @@ class iMTDSettings(ConformerGenSettings, ABC):
 
     New:
     :param mtd_method: method for the metadynamics
-    :param mtd_runtype: the algorithm used
+    :param mtd_runtype: algorithm used
     :param speed: speed of the calculations (CREST specific setting)
     :param reopt: re-optimize conformers (corrects for the lack of rotamer metadynamics and GC)
     :param free_energy_weights: calculate frequencies and re-weight based on free energies
-    :param energy_window: the energy window used, in kcal/mol (CREST specific setting). if set, overrides the default from the speed.
-    :param solvent_settings: the solvent to use, if any
+    :param energy_window: energy window used, in kcal/mol (CREST specific setting). if set, overrides default from speed
+    :param solvent_settings: solvent to use, if any
     """
 
     settings_type: Literal["imtd"] = "imtd"
@@ -342,9 +342,9 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
 
     New:
     :param num_monte_carlo_iterations: number of Monte Carlo iterations to run
-    :param rmsd_threshold: the threshold to determine if MCMM output structures are identical
+    :param rmsd_threshold: threshold to determine if MCMM output structures are identical
     :param energy_window: maximum energy window above the minimum-energy conformer above which to retain (kcal/mol)
-    :param monte_carlo_settings: the way the actual energy will be computed for the Monte-Carlo steps
+    :param monte_carlo_settings: energy computation method for Monte-Carlo steps
     """
 
     energy_settings: Settings = Settings(method=Method.AIMNET2_WB97MD3)

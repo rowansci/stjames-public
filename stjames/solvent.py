@@ -2,6 +2,8 @@ from .base import Base, LowercaseStrEnum
 
 
 class Solvent(LowercaseStrEnum):
+    """Implicit solvent."""
+
     WATER = "water"
     NITROMETHANE = "nitromethane"
     NITROBENZENE = "nitrobenzene"
@@ -34,6 +36,8 @@ class Solvent(LowercaseStrEnum):
 
 
 class SolventModel(LowercaseStrEnum):
+    """Implicit solvation model."""
+
     PCM = "pcm"
     CPCM = "cpcm"
     ALPB = "alpb"
@@ -44,5 +48,12 @@ class SolventModel(LowercaseStrEnum):
 
 
 class SolventSettings(Base):
+    """
+    Implicit solvation settings.
+
+    :param solvent: solvent to use
+    :param model: solvation model
+    """
+
     solvent: Solvent
     model: SolventModel
