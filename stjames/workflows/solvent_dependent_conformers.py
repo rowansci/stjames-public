@@ -4,6 +4,7 @@ from pydantic import AfterValidator
 
 from ..base import Base, round_float
 from ..conformers import ConformerClusteringSettings, ConformerGenSettingsUnion, ConformerProperties, ConformerSearchMixin, iMTDSettings
+from ..method import Method
 from ..mode import Mode
 from ..settings import Settings
 from ..solvent import Solvent, SolventModel, SolventSettings
@@ -65,6 +66,7 @@ class SolventDependentConformersWorkflow(ConformerSearchMixin, MoleculeWorkflow)
         speed="normal",
         solvent_settings=SolventSettings(solvent=Solvent.WATER, model=SolventModel.ALPB),
         reopt=False,
+        mtd_method=Method.GFN2_XTB,
     )
 
     conformer_clustering_settings: ConformerClusteringSettings | None = ConformerClusteringSettings()

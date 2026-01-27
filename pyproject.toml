@@ -1,6 +1,6 @@
 [project]
 name = "stjames"
-version = "0.0.154"
+version = "0.0.155"
 description = "structured JSON atom/molecule encoding scheme"
 readme = "README.md"
 keywords = []
