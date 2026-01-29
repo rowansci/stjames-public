@@ -9,7 +9,7 @@ from ..message import Message
 from ..method import Method
 from ..molecule import Molecule
 from ..pdb import PDB
-from ..types import UUID
+from ..types import UUID, round_list, round_list_of_lists
 from .workflow import ProteinStructureWorkflow, Workflow
 
 
@@ -83,6 +83,8 @@ class RBFEGraphEdge(Base):
     :param ddg: Combined cycle result derived from complex and solvent legs.
     :param ddg_err: Uncertainty on `ddg`.
     :param failed: Whether a required leg failed, making ddG impossible to compute.
+    :param lambdas: the final lambda values used for this transformation
+    :param overlap_matrix: the square matrix of lambda-to-lambda overlap values
     """
 
     ligand_a: str
@@ -99,6 +101,9 @@ class RBFEGraphEdge(Base):
     ddg: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
     ddg_err: Annotated[float | None, AfterValidator(round_optional_float(3))] = None
     failed: bool = False
+
+    lambdas: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
+    overlap_matrix: Annotated[list[list[float]], AfterValidator(round_list_of_lists(3))] | None = None
 
 
 class RBFEGraph(Base):
