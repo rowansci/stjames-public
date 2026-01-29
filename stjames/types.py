@@ -126,3 +126,14 @@ def round_float_per_atom(round_to: int = 6) -> Callable[[FloatPerAtom], FloatPer
         return [round(value, round_to) for value in values]
 
     return rounder
+
+
+def round_list_of_lists(round_to: int = 6) -> Callable[[list[list[float]]], list[list[float]]]:
+    """Create a validator that rounds each float in FloatPerAtom to a given number of decimal places, handling None."""
+
+    list_rounder = round_list(round_to)
+
+    def rounder(values: list[list[float]]) -> list[list[float]]:
+        return [list_rounder(value) for value in values]
+
+    return rounder
