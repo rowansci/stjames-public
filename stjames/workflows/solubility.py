@@ -43,7 +43,7 @@ class SolubilityWorkflow(SMILESWorkflow):
     :param initial_smiles: SMILES string of the molecule
     :param solubility_method: model used for solubility prediction
     :param solvents: list of solvent SMILES strings
-    :param temperatures: temperatures in K
+    :param temperatures: temperatures, in K
 
     Results:
     :param solubilities: {solvent: SolubilityResult}

@@ -24,10 +24,10 @@ def open(path: Path | str, file_dict: bool = False, data_dict: bool = False) -> 
 
     If the file extension is .gz, the file will be unzipped first.
 
-    :param str path: the location of the file.
-    :param bool file_dict: if ``True``, parsing will stop at the file ``dict``.
-    :param bool data_dict: if ``True``, parsing will stop at the data ``dict``.
-    :rtype: ``File``"""
+    :param path: location of file
+    :param file_dict: if True, parsing will stop at the file dict
+    :param data_dict: if True, parsing will stop at the data dict
+    """
     path = Path(path)
 
     if path.suffix == ".gz":
@@ -64,9 +64,9 @@ def fetch(code: str, file_dict: bool = False, data_dict: bool = False) -> dict[s
     This will get the .mmtf version of structure 1LOL, but only go as far as
     converting it to an atomium file dictionary.
 
-    :param code: the file to fetch.
-    :param file_dict: if ``True``, parsing will stop at the file ``dict``
-    :param data_dict: if ``True``, parsing will stop at the data ``dict``
+    :param code: file to fetch
+    :param file_dict: if True, parsing will stop at the file dict
+    :param data_dict: if True, parsing will stop at the data dict
     :raises ValueError: if no file is found
     """
 
@@ -97,8 +97,8 @@ def parse_string(filestring: Any, path: Path | str, file_dict: bool = False, dat
 
     :param filestring:  contents of some file
     :param path: filename of the file of origin
-    :param file_dict: if ``True``, parsing will stop at the file ``dict``
-    :param data_dict: if ``True``, parsing will stop at the data ``dict``
+    :param file_dict: if True, parsing will stop at the file dict
+    :param data_dict: if True, parsing will stop at the data dict
     :return: File
     """
 
@@ -118,8 +118,8 @@ def get_parse_functions(filestring: str, path: Path | str) -> tuple[Callable[[st
     (If this cannot be inferred from the path string, atomium will guess based
     on the filestring contents.)
 
-    :param filestring: the filestring to inspect
-    :param path: the path to inspect
+    :param filestring: filestring to inspect
+    :param path: path to inspect
     """
     path = Path(path)
 

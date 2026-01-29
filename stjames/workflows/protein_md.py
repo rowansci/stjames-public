@@ -11,8 +11,8 @@ class BindingPoseContact(Base):
     """
     A single protein–ligand contact from an MD trajectory.
 
-    :param protein_atom_index: the index of the protein atom
-    :param ligand_atom_index: the index of the ligand atom
+    :param protein_atom_index: index of protein atom
+    :param ligand_atom_index: index of ligand atom
     :occupancy: the probability of seeing this interaction in a frame, between 0 and 1
     """
 
@@ -25,7 +25,7 @@ class ProteinMDTrajectory(Base):
     """
     Represents a single protein MD trajectory.
 
-    :param uuid: the UUID of the trajectory
+    :param uuid: UUID of trajectory
     """
 
     uuid: UUID
@@ -36,11 +36,11 @@ class BindingPoseTrajectory(ProteinMDTrajectory):
     Represents a single trajectory looking at a binding pose.
 
     Inherited:
-    :param uuid: the UUID of the trajectory
+    :param uuid: UUID of trajectory
 
     New:
-    :param ligand_rmsd: the RMSD of the ligand vs. starting pose (aligning the protein)
-    :param contacts: the conserved binding-pose contacts
+    :param ligand_rmsd: RMSD of ligand vs. starting pose (aligning protein)
+    :param contacts: conserved binding-pose contacts
     """
 
     ligand_rmsd: Annotated[list[float], AfterValidator(round_list(3))] = []
@@ -51,16 +51,16 @@ class ProteinMDSettingsMixin(Base):
     """
     Mix-in for various settings used in running protein MD.
 
-    :param equilibration_time_ns: how long to equilibrate trajectories for, in nanoseconds
-    :param simulation_time_ns: how long to run trajectories for, in nanoseconds
-    :param temperature: the temperature, in K
-    :param pressure_atm: the pressure, in atm
-    :param langevin_timescale_ps: the timescale for the Langevin integrator, in inverse picoseconds
-    :param timestep_fs: the timestep, in femtoseconds
+    :param equilibration_time_ns: how long to equilibrate trajectories for, in ns
+    :param simulation_time_ns: how long to run trajectories for, in ns
+    :param temperature: temperature, in K
+    :param pressure_atm: pressure, in atm
+    :param langevin_timescale_ps: timescale for the Langevin integrator, in ps⁻¹
+    :param timestep_fs: timestep, in femtoseconds
     :param constrain_hydrogens: whether or not to use SHAKE to freeze bonds to hydrogen
-    :param nonbonded_cutoff: the nonbonded cutoff for particle-mesh Ewald, in Å
-    :param ionic_strength_M: the ionic strength of the solution, in M (molar)
-    :param water_buffer: the amount of water to add around the protein, in Å
+    :param nonbonded_cutoff: nonbonded cutoff for particle-mesh Ewald, in Å
+    :param ionic_strength_M: ionic strength of the solution, in M (molar)
+    :param water_buffer: amount of water to add around the protein, in Å
     """
 
     equilibration_time_ns: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 1
@@ -84,27 +84,27 @@ class ProteinMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStructureW
 
     Inherited:
     :param protein: PDB or UUID of the (holo) protein.
-    :param equilibration_time_ns: how long to equilibrate trajectories for, in nanoseconds
-    :param simulation_time_ns: how long to run trajectories for, in nanoseconds
-    :param temperature: the temperature, in K
-    :param pressure_atm: the pressure, in atm
-    :param langevin_timescale_ps: the timescale for the Langevin integrator, in inverse picoseconds
-    :param timestep_fs: the timestep, in femtoseconds
-    :param constrain_hydrogens: whether or not to use SHAKE to freeze bonds to hydrogen
-    :param nonbonded_cutoff: the nonbonded cutoff for particle-mesh Ewald, in Å
-    :param protein_restraint_cutoff: the cutoff past which alpha-carbons will be constrained, in Å
-    :param protein_restraint_constant: the force constant for backbone restraints, in kcal/mol/Å**2
-    :param ionic_strength_M: the ionic strength of the solution, in M (molar)
-    :param water_buffer: the amount of water to add around the protein, in Å
+    :param equilibration_time_ns: how long to equilibrate trajectories for, in ns
+    :param simulation_time_ns: how long to run trajectories for, in ns
+    :param temperature: temperature, in K
+    :param pressure_atm: pressure, in atm
+    :param langevin_timescale_ps: timescale for Langevin integrator, in ps⁻¹
+    :param timestep_fs: timestep, in femtoseconds
+    :param constrain_hydrogens: whether to use SHAKE to freeze bonds to hydrogen
+    :param nonbonded_cutoff: nonbonded cutoff for particle-mesh Ewald, in Å
+    :param protein_restraint_cutoff: cutoff past which alpha-carbons constrained, in Å
+    :param protein_restraint_constant: force constant for backbone restraints, in kcal/mol/Å²
+    :param ionic_strength_M: ionic strength of solution, in M (molar)
+    :param water_buffer: amount of water to add around protein, in Å
 
     New:
-    :param num_trajectories: the number of trajectories to run
+    :param num_trajectories: number of trajectories to run
     :param save_solvent: whether solvent should be saved
 
     Results:
     :param minimized_protein_uuid: UUID of final system PDB
     :param bonds: which atoms are bonded to which other atoms
-    :param trajectories: the UUID for each trajectory
+    :param trajectories: UUID for each trajectory
     """
 
     num_trajectories: PositiveInt = 1
@@ -122,24 +122,24 @@ class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStruc
     Inherited:
     :param initial_smiles: ligand's SMILES
     :param protein: PDB or UUID of the (holo) protein.
-    :param equilibration_time_ns: how long to equilibrate trajectories for, in nanoseconds
-    :param simulation_time_ns: how long to run trajectories for, in nanoseconds
-    :param temperature: the temperature, in K
-    :param pressure_atm: the pressure, in atm
-    :param langevin_timescale_ps: the timescale for the Langevin integrator, in inverse picoseconds
-    :param timestep_fs: the timestep, in femtoseconds
+    :param equilibration_time_ns: how long to equilibrate trajectories for, in ns
+    :param simulation_time_ns: how long to run trajectories for, in ns
+    :param temperature: temperature, in K
+    :param pressure_atm: pressure, in atm
+    :param langevin_timescale_ps: timescale for the Langevin integrator, in ps⁻¹
+    :param timestep_fs: timestep, in femtoseconds
     :param constrain_hydrogens: whether or not to use SHAKE to freeze bonds to hydrogen
-    :param nonbonded_cutoff: the nonbonded cutoff for particle-mesh Ewald, in Å
-    :param ionic_strength_M: the ionic strength of the solution, in M (molar)
-    :param water_buffer: the amount of water to add around the protein, in Å
+    :param nonbonded_cutoff: nonbonded cutoff for particle-mesh Ewald, in Å
+    :param ionic_strength_M: ionic strength of the solution, in M (molar)
+    :param water_buffer: amount of water to add around the protein, in Å
 
     New:
     :param protein_uuid: UUID of the (holo) protein. DEPRECATED.
     :param ligand_residue_name: ligand's residue name
-    :param num_trajectories: the number of trajectories to run
+    :param num_trajectories: number of trajectories to run
     :param save_solvent: whether solvent should be saved
-    :param protein_restraint_cutoff: the cutoff past which alpha-carbons will be constrained, in Å
-    :param protein_restraint_constant: the force constant for backbone restraints, in kcal/mol/Å**2
+    :param protein_restraint_cutoff: cutoff past which alpha-carbons will be constrained, in Å
+    :param protein_restraint_constant: force constant for backbone restraints, in kcal/mol/Å²
 
     Results:
     :param minimized_protein_uuid: UUID of final system PDB

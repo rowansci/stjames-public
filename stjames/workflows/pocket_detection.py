@@ -11,13 +11,13 @@ class Pocket(Base):
     """
     Represents a pocket.
 
-    :param sphere_centers: the centers of the detected spheres
-    :param sphere_radii: the radii of the detected spheres
-    :param volume: the volume, in Å**3
-    :param score: the druggability / quality score, larger scores are better
-    :param pocket_center: the center of the bounding box
-    :param pocket_sides: the side lengths of the bounding box
-    :param residue_numbers: the indices of the residues on the pocket
+    :param sphere_centers: centers of detected spheres
+    :param sphere_radii: radii of detected spheres
+    :param volume: volume, in Å³
+    :param score: druggability/quality score; larger scores are better
+    :param pocket_center: center of bounding box
+    :param pocket_sides: side lengths of bounding box
+    :param residue_numbers: indices of residues on pocket
     """
 
     sphere_centers: list[Vector3D]
@@ -37,13 +37,13 @@ class PocketDetectionWorkflow(ProteinStructureWorkflow):
     Uses Pocketeer to detect potential binding sites on a protein.
 
     Inherited:
-    :param protein: the protein
+    :param protein: protein
 
     New:
     :param merge_distance: distance for merging pocket spheres, in Å
 
     Results:
-    :param pockets: the located pockets
+    :param pockets: located pockets
     """
 
     merge_distance: Annotated[float, AfterValidator(round_float(3))] = 1.75

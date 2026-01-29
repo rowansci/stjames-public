@@ -12,29 +12,13 @@ from .solvent import SolventModel, SolventSettings
 from .workflows.multistage_opt import MultiStageOptMixin
 
 
-class ScreeningSettings(BaseModel):
-    """
-    Settings for determining unique and useful conformers.
-
-    :param energy_threshold: maximum relative energy for screening (kcal/mol)
-    :param rotational_constants_threshold: maximum difference in rotational constants for screening
-    :param rmsd: Cartesian RMSD for screening
-    :param max_confs: maximum number of conformers to keep
-    """
-
-    energy_threshold: float | None = None
-    rotational_constants_threshold: float | None = 0.02
-    rmsd: float | None = 0.25
-    max_confs: int | None = None
-
-
 class ConformerProperties(BaseModel):
     """
     Descriptors of a conformer's properties.
 
-    :param solvent_accessible_surface_area: the average SASA, (Å²)
-    :param polar_solvent_accessible_surface_area: the average SASA for non-C/H elements (Å²)
-    :param radius_of_gyration: the radius of gyration (Å)
+    :param solvent_accessible_surface_area: average SASA (Å²)
+    :param polar_solvent_accessible_surface_area: average SASA for non-C/H elements (Å²)
+    :param radius_of_gyration: radius of gyration (Å)
     """
 
     solvent_accessible_surface_area: Annotated[PositiveFloat, AfterValidator(round_float(3))]
@@ -67,8 +51,8 @@ class ConformerClusteringSettings(BaseModel):
     Rowan uses k-means clustering to identify representative conformers.
     This loosely follows Wilcken and co-workers (10.1007/s10822-020-00337-7).
 
-    :param num_clusters: the number of clusters to include
-    :param conformers_per_cluster: the number of compounds to pick from each cluster
+    :param num_clusters: number of clusters to include
+    :param conformers_per_cluster: number of compounds to pick from each cluster
     """
 
     descriptors: list[ConformerClusteringDescriptor] = [
@@ -90,15 +74,12 @@ class ConformerGenSettings(BaseModel):
 
     Conformers are generated and an initial screening is performed to remove duplicates and high-energy conformers.
 
-    :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings
     :param constraints: constraints for conformer generation
     :param nci: add a constraining potential for non-covalent interactions
     :param max_confs: maximum number of conformers to keep
     """
 
-    conf_opt_method: XTBMethod = Method.GFN_FF
-    screening: ScreeningSettings | None = None
     constraints: Sequence[Constraint] = ()
     nci: bool = False
     max_confs: PositiveInt | None = None
@@ -117,7 +98,7 @@ class ConformerGenSettings(BaseModel):
         if self.max_confs:
             extra += f" max_confs={self.max_confs}"
 
-        return f"<{type(self).__name__} {self.conf_opt_method}{extra}>"
+        return f"<{type(self).__name__} {extra}>"
 
 
 class ETKDGSettings(ConformerGenSettings):
@@ -125,7 +106,6 @@ class ETKDGSettings(ConformerGenSettings):
     Settings for ETKDG conformer generation.
 
     Inherited:
-    :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings
     :param constraints: constraints for conformer generation
     :param nci: add a constraining potential for non-covalent interactions (not supported in ETKDG)
@@ -169,7 +149,6 @@ class ETKDGSettings(ConformerGenSettings):
                 max_mmff_energy = 30
                 max_confs = 20
                 max_mmff_energy = 20
-                conf_opt_method = Method.GFN0_XTB
             case Mode.RAPID:
                 num_initial_confs = 300
                 num_confs_considered = 100
@@ -177,7 +156,6 @@ class ETKDGSettings(ConformerGenSettings):
                 max_mmff_energy = 30
                 max_confs = 50
                 max_mmff_energy = 30
-                conf_opt_method = Method.GFN0_XTB
             case _:
                 raise NotImplementedError(f"Unsupported mode: {mode}")
 
@@ -187,7 +165,6 @@ class ETKDGSettings(ConformerGenSettings):
             max_mmff_iterations=max_mmff_iterations,
             max_mmff_energy=max_mmff_energy,
             max_confs=max_confs,
-            conf_opt_method=conf_opt_method,
         )
 
 
@@ -210,7 +187,6 @@ class iMTDSettings(ConformerGenSettings, ABC):
     See build_imtd_setings(mode) for sensible defaults.
 
     Inherited:
-    :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings (not used)
     :param constraints: constraints to add
     :param nci: add an ellipsoide potential around the input structure
@@ -218,12 +194,12 @@ class iMTDSettings(ConformerGenSettings, ABC):
 
     New:
     :param mtd_method: method for the metadynamics
-    :param mtd_runtype: the algorithm used
+    :param mtd_runtype: algorithm used
     :param speed: speed of the calculations (CREST specific setting)
     :param reopt: re-optimize conformers (corrects for the lack of rotamer metadynamics and GC)
     :param free_energy_weights: calculate frequencies and re-weight based on free energies
-    :param energy_window: the energy window used, in kcal/mol (CREST specific setting). if set, overrides the default from the speed.
-    :param solvent_settings: the solvent to use, if any
+    :param energy_window: energy window used, in kcal/mol (CREST specific setting). if set, overrides default from speed
+    :param solvent_settings: solvent to use, if any
     """
 
     settings_type: Literal["imtd"] = "imtd"
@@ -284,25 +260,21 @@ class iMTDSettings(ConformerGenSettings, ABC):
         match mode:
             case Mode.RECKLESS:  # GFN-FF//MTD(GFN-FF)
                 mtd_method = Method.GFN_FF
-                conf_opt_method = Method.GFN0_XTB
                 speed = iMTDSpeeds.MEGAQUICK
                 reopt = True
                 max_confs: int | None = 20
             case Mode.RAPID:  # GFN0//MTD(GFN-FF)
                 mtd_method = Method.GFN_FF
-                conf_opt_method = Method.GFN0_XTB
                 speed = iMTDSpeeds.SUPERQUICK
                 reopt = True
                 max_confs = 50
             case Mode.CAREFUL:  # GFN2//MTD(GFN-FF)
                 mtd_method = Method.GFN_FF
-                conf_opt_method = Method.GFN2_XTB
                 speed = iMTDSpeeds.QUICK
                 reopt = False
                 max_confs = None
             case Mode.METICULOUS:  # GFN2//MTD(GFN2)
                 mtd_method = Method.GFN2_XTB
-                conf_opt_method = Method.GFN2_XTB
                 speed = iMTDSpeeds.NORMAL
                 reopt = False
                 max_confs = None
@@ -311,7 +283,6 @@ class iMTDSettings(ConformerGenSettings, ABC):
 
         return cls(
             mtd_method=mtd_method,
-            conf_opt_method=conf_opt_method,
             speed=speed,
             reopt=reopt,
             max_confs=max_confs,
@@ -331,7 +302,6 @@ class LyrebirdSettings(ConformerGenSettings):
     Settings for Lyrebird-based conformer generation.
 
     Inherited:
-    :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings
     :param constraints: constraints for conformer generation (not supported)
     :param nci: add a constraining potential for non-covalent interactions (not supported)
@@ -365,7 +335,6 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
     Default values recommended by Nick Casetti.
 
     Inherited:
-    :param conf_opt_method: method for the optimization
     :param screening: post-generation screening settings
     :param constraints: constraints for conformer generation (not supported)
     :param nci: add a constraining potential for non-covalent interactions (not supported)
@@ -373,9 +342,9 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
 
     New:
     :param num_monte_carlo_iterations: number of Monte Carlo iterations to run
-    :param rmsd_threshold: the threshold to determine if MCMM output structures are identical
+    :param rmsd_threshold: threshold to determine if MCMM output structures are identical
     :param energy_window: maximum energy window above the minimum-energy conformer above which to retain (kcal/mol)
-    :param monte_carlo_settings: the way the actual energy will be computed for the Monte-Carlo steps
+    :param monte_carlo_settings: energy computation method for Monte-Carlo steps
     """
 
     energy_settings: Settings = Settings(method=Method.AIMNET2_WB97MD3)

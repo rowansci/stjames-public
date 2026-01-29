@@ -4,7 +4,6 @@ from pydantic import AfterValidator
 
 from ..base import round_float, round_optional_float
 from ..conformers import ConformerGenSettingsUnion, ETKDGSettings
-from ..method import Method
 from ..mode import Mode
 from ..settings import Settings
 from ..types import UUID
@@ -21,18 +20,18 @@ class StrainWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (currently unused)
 
     New:
-    :param conf_gen_settings : the conformer-search settings.
-    :param multistage_opt_settings: the optimization settings.
-    :param harmonic_constraint_spring_constant: the spring constant for the constraints in kcal/mol/Å
+    :param conf_gen_settings: conformer-search settings
+    :param multistage_opt_settings: optimization settings
+    :param harmonic_constraint_spring_constant: spring constant for constraints, in kcal/mol/Å
     :param constrain_hydrogens: whether or not to constrain hydrogens
 
     Results:
     :param conformers: list of conformer UUIDs
-    :param constrained_optimization: the UUID of the optimized strained structure
-    :param strain: the actual strain in kcal/mol
+    :param constrained_optimization: UUID of optimized strained structure
+    :param strain: actual strain, in kcal/mol
     """
 
-    conf_gen_settings: ConformerGenSettingsUnion = ETKDGSettings(max_confs=50, conf_opt_method=Method.GFN0_XTB)
+    conf_gen_settings: ConformerGenSettingsUnion = ETKDGSettings(max_confs=50)
     multistage_opt_settings: MultiStageOptSettings = MultiStageOptSettings(
         mode=Mode.MANUAL,
         optimization_settings=[Settings(method="aimnet2_wb97md3", tasks=["optimize"])],
