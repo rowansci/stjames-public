@@ -55,6 +55,8 @@ class SymmetryAdaptedPerturbationTheoryWorkflow(MoleculeWorkflow):
 
     Inherited:
     :param initial_molecule: Molecule in question
+
+    New:
     :param fragment1_indices: which atoms go to fragment #1 (fragment #2 takes the rest)
     :param sapt_settings: settings for SAPT calculations
 
