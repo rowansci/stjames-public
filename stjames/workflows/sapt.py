@@ -8,7 +8,7 @@ from .workflow import MoleculeWorkflow
 
 
 class SAPTMethod(LowercaseStrEnum):
-    SAPT0 = "sapt_0"
+    SAPT0 = "sapt0"
 
 
 class SAPTSettings(Base):
