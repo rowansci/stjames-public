@@ -158,7 +158,7 @@ def update_models_list(pdb_dict: dict[str, Any], data_dict: dict[str, Any]) -> N
             if line[:6] in ["ATOM  ", "HETATM"]:
                 chain_id = line[21] if index < last_ter else id_from_line(line)
                 res_id = id_from_line(line)
-                if index < last_ter:
+                if index < last_ter and line[17:20] not in ["HOH", "DOD"]:
                     add_atom_to_polymer(line, model, chain_id, res_id, aniso, full_names)
                 else:
                     add_atom_to_non_polymer(line, model, res_id, aniso, full_names)

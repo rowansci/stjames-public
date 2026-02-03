@@ -783,7 +783,7 @@ wheels = [
 
 [[package]]
 name = "stjames"
-version = "0.0.155"
+version = "0.0.156"
 source = { editable = "." }
 dependencies = [
     { name = "more-itertools" },
