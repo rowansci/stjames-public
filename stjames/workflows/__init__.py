@@ -32,6 +32,7 @@ from .relative_binding_free_energy_perturbation import (
     RBFEGraphWorkflow,
     RelativeBindingFreeEnergyPerturbationWorkflow,
 )
+from .sapt import SAPT0Result, SAPTMethod, SAPTSettings, SymmetryAdaptedPerturbationTheoryWorkflow
 from .scan import *
 from .solubility import *
 from .solvent_dependent_conformers import *
@@ -71,6 +72,7 @@ WORKFLOW_NAME = Literal[
     "protein_md",
     "rbfe_graph",
     "redox_potential",
+    "sapt",
     "scan",
     "solubility",
     "solvent_dependent_conformers",
@@ -110,6 +112,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "rbfe_graph": RBFEGraphWorkflow,  # type: ignore [dict-item]
     "redox_potential": RedoxPotentialWorkflow,  # type: ignore [dict-item]
     "relative_binding_free_energy_perturbation": RelativeBindingFreeEnergyPerturbationWorkflow,  # type: ignore [dict-item]
+    "sapt": SymmetryAdaptedPerturbationTheoryWorkflow,  # type: ignore [dict-item]
     "scan": ScanWorkflow,  # type: ignore [dict-item]
     "solubility": SolubilityWorkflow,  # type: ignore [dict-item]
     "solvent_dependent_conformers": SolventDependentConformersWorkflow,  # type: ignore [dict-item]
