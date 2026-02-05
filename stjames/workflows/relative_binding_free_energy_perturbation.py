@@ -9,7 +9,7 @@ from ..message import Message
 from ..method import Method
 from ..molecule import Molecule
 from ..pdb import PDB
-from ..types import ProteinMDTrajectory, UUID, round_list, round_list_of_lists
+from ..types import UUID, ProteinMDTrajectory, round_list, round_list_of_lists
 from .workflow import ProteinStructureWorkflow, Workflow
 
 
