@@ -1,6 +1,23 @@
 from typing import Callable, Iterable, Protocol, TypeAlias, overload
 
+from .base import Base
+
 UUID: TypeAlias = str
+
+
+class ProteinMDTrajectory(Base):
+    """
+    Reference to a molecular dynamics trajectory stored in S3.
+
+    The trajectory is stored as a DCD file containing atomic coordinates
+    across multiple frames. The corresponding topology (atom names, residues,
+    connectivity) comes from the protein PDB associated with the workflow.
+
+    :param uuid: UUID of the DCD trajectory file in S3 storage.
+    """
+
+    uuid: UUID
+
 
 Vector3D: TypeAlias = tuple[float, float, float]
 Vector3DPerAtom: TypeAlias = list[Vector3D]

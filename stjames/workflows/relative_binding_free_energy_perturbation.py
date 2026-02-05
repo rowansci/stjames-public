@@ -9,7 +9,7 @@ from ..message import Message
 from ..method import Method
 from ..molecule import Molecule
 from ..pdb import PDB
-from ..types import UUID, round_list, round_list_of_lists
+from ..types import ProteinMDTrajectory, UUID, round_list, round_list_of_lists
 from .workflow import ProteinStructureWorkflow, Workflow
 
 
@@ -35,6 +35,8 @@ class TMDRBFESettings(Base):
     :param local_md_radius: Sphere radius in nanometers for the local MD region.
     :param local_md_free_reference: Whether to free the reference frame during local MD.
     :param legs: Which thermodynamic cycle legs to run (default: solvent and complex).
+    :param save_trajectories: Whether to save DCD trajectories.
+    :param trajectory_frame_interval: Save every Nth frame when saving trajectories.
     """
 
     forcefield: Method = Method.SMIRNOFF_2_0_0_AMBER_AM1BCC
@@ -52,6 +54,8 @@ class TMDRBFESettings(Base):
     local_md_radius: float = 1.2
     local_md_free_reference: bool = False
     legs: list[Literal["vacuum", "solvent", "complex"]] = ["solvent", "complex"]
+    save_trajectories: bool = True
+    trajectory_frame_interval: PositiveInt = 1000
 
 
 class RBFEResult(Base):
@@ -85,6 +89,7 @@ class RBFEGraphEdge(Base):
     :param failed: Whether a required leg failed, making ddG impossible to compute.
     :param complex_lambda_values: the final lambda values used for the complex leg
     :param complex_overlap_matrix: the square matrix of lambda-to-lambda overlap values from the complex leg
+    :param complex_trajectories: mapping of lambda values to saved DCD trajectory UUIDs
     """
 
     ligand_a: str
@@ -104,6 +109,7 @@ class RBFEGraphEdge(Base):
 
     complex_lambda_values: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
     complex_overlap_matrix: Annotated[list[list[float]], AfterValidator(round_list_of_lists(3))] | None = None
+    complex_trajectories: dict[float, ProteinMDTrajectory] | None = None
 
 
 class RBFEGraph(Base):

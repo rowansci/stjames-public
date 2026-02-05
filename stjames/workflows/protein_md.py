@@ -3,7 +3,7 @@ from typing import Annotated, Any
 from pydantic import AfterValidator, PositiveFloat, PositiveInt, model_validator
 
 from ..base import Base, round_float
-from ..types import UUID, round_list
+from ..types import ProteinMDTrajectory, UUID, round_list
 from .workflow import ProteinStructureWorkflow, SMILESWorkflow
 
 
@@ -19,16 +19,6 @@ class BindingPoseContact(Base):
     protein_atom_index: int
     ligand_atom_index: int
     occupancy: Annotated[float, AfterValidator(round_float(3))]
-
-
-class ProteinMDTrajectory(Base):
-    """
-    Represents a single protein MD trajectory.
-
-    :param uuid: UUID of trajectory
-    """
-
-    uuid: UUID
 
 
 class BindingPoseTrajectory(ProteinMDTrajectory):
