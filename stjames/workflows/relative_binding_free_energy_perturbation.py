@@ -36,7 +36,7 @@ class TMDRBFESettings(Base):
     :param local_md_free_reference: Whether to free the reference frame during local MD.
     :param legs: Which thermodynamic cycle legs to run (default: solvent and complex).
     :param save_trajectories: Whether to save DCD trajectories.
-    :param trajectory_frame_interval: Save every Nth frame when saving trajectories.
+    :param trajectory_save_interval: Save every Nth frame when saving trajectories.
     """
 
     forcefield: Method = Method.SMIRNOFF_2_0_0_AMBER_AM1BCC
@@ -55,7 +55,7 @@ class TMDRBFESettings(Base):
     local_md_free_reference: bool = False
     legs: list[Literal["vacuum", "solvent", "complex"]] = ["solvent", "complex"]
     save_trajectories: bool = True
-    trajectory_frame_interval: PositiveInt = 1000
+    trajectory_save_interval: PositiveInt = 1000
 
 
 class RBFEResult(Base):
