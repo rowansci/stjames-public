@@ -14,6 +14,12 @@ from .double_ended_ts_search import DoubleEndedTSSearchWorkflow
 from .electronic_properties import *
 from .fukui import *
 from .hydrogen_bond_basicity import *
+from .interaction_energy_decomposition import (
+    EnergyDecompositionMethod, 
+    EnergyDecompositionSettings, 
+    InteractionEnergyDecompositionWorkflow,
+    SAPT0Result,
+)
 from .ion_mobility import *
 from .irc import *
 from .macropka import *
@@ -32,7 +38,6 @@ from .relative_binding_free_energy_perturbation import (
     RBFEGraphWorkflow,
     RelativeBindingFreeEnergyPerturbationWorkflow,
 )
-from .sapt import SAPT0Result, SAPTMethod, SAPTSettings, SymmetryAdaptedPerturbationTheoryWorkflow
 from .scan import *
 from .solubility import *
 from .solvent_dependent_conformers import *
@@ -57,6 +62,7 @@ WORKFLOW_NAME = Literal[
     "relative_binding_free_energy_perturbation",
     "fukui",
     "hydrogen_bond_basicity",
+    "interaction_energy_decomposition",
     "ion_mobility",
     "irc",
     "macropka",
@@ -72,7 +78,6 @@ WORKFLOW_NAME = Literal[
     "protein_md",
     "rbfe_graph",
     "redox_potential",
-    "sapt",
     "scan",
     "solubility",
     "solvent_dependent_conformers",
@@ -96,6 +101,7 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "electronic_properties": ElectronicPropertiesWorkflow,  # type: ignore [dict-item]
     "fukui": FukuiIndexWorkflow,  # type: ignore [dict-item]
     "hydrogen_bond_basicity": HydrogenBondBasicityWorkflow,  # type: ignore [dict-item]
+    "interaction_energy_decomposition": InteractionEnergyDecompositionWorkflow,  # type: ignore [dict-item]
     "ion_mobility": IonMobilityWorkflow,  # type: ignore [dict-item]
     "irc": IRCWorkflow,  # type: ignore [dict-item]
     "macropka": MacropKaWorkflow,  # type: ignore [dict-item]
@@ -112,7 +118,6 @@ WORKFLOW_MAPPING: dict[WORKFLOW_NAME, Workflow] = {
     "rbfe_graph": RBFEGraphWorkflow,  # type: ignore [dict-item]
     "redox_potential": RedoxPotentialWorkflow,  # type: ignore [dict-item]
     "relative_binding_free_energy_perturbation": RelativeBindingFreeEnergyPerturbationWorkflow,  # type: ignore [dict-item]
-    "sapt": SymmetryAdaptedPerturbationTheoryWorkflow,  # type: ignore [dict-item]
     "scan": ScanWorkflow,  # type: ignore [dict-item]
     "solubility": SolubilityWorkflow,  # type: ignore [dict-item]
     "solvent_dependent_conformers": SolventDependentConformersWorkflow,  # type: ignore [dict-item]
