@@ -54,7 +54,7 @@ class TMDRBFESettings(Base):
     local_md_radius: float = 1.2
     local_md_free_reference: bool = False
     legs: list[Literal["vacuum", "solvent", "complex"]] = ["solvent", "complex"]
-    save_trajectories: bool = True
+    save_trajectories: bool = False
     trajectory_save_interval: PositiveInt = 1000
 
 
@@ -89,7 +89,7 @@ class RBFEGraphEdge(Base):
     :param failed: Whether a required leg failed, making ddG impossible to compute.
     :param complex_lambda_values: the final lambda values used for the complex leg
     :param complex_overlap_matrix: the square matrix of lambda-to-lambda overlap values from the complex leg
-    :param complex_trajectories: mapping of lambda values to saved DCD trajectory UUIDs
+    :param complex_trajectories: mapping of lambda values to ProteinMDTrajectory objects
     """
 
     ligand_a: str
