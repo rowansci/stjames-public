@@ -19,7 +19,7 @@ class EnergyDecompositionSettings(Base):
     :param basis_set: which basis set to employ
     """
 
-    method: EnergyDecompositionMethod = SAPTMethod.SAPT0
+    method: EnergyDecompositionMethod = EnergyDecompositionMethod.SAPT0
     basis_set: BasisSet = BasisSet(name="jun-cc-pVDZ")
 
     def __str__(self) -> str:
