@@ -15,8 +15,8 @@ from .electronic_properties import *
 from .fukui import *
 from .hydrogen_bond_basicity import *
 from .interaction_energy_decomposition import (
-    EnergyDecompositionMethod, 
-    EnergyDecompositionSettings, 
+    EnergyDecompositionMethod,
+    EnergyDecompositionSettings,
     InteractionEnergyDecompositionWorkflow,
     SAPT0Result,
 )

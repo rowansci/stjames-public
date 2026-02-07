@@ -1,6 +1,6 @@
 from pytest import raises
 
-from stjames import Constraint, Method, Mode, OmegaTuning, OptimizationSettings, Settings, TDDFTSettings
+from stjames import Constraint, Method, Mode, OmegaTuning, OptimizationSettings, Settings, SolventSettings, TDDFTSettings
 
 
 def test_set_mode_auto() -> None:
@@ -106,3 +106,13 @@ def test_settings_roundtrip() -> None:
     assert stjames_settings.engine == settings.engine
     assert isinstance(stjames_settings.excited_state_settings, TDDFTSettings)
     assert stjames_settings.excited_state_settings == settings.excited_state_settings
+
+
+def test_gpu4pyscf_solvent() -> None:
+    with raises(ValueError, match="GPU4PySCF does not support the COSMO solvent model"):
+        Settings(
+            method=Method.B3LYP,
+            basis_set="sto-3g",
+            solvent_settings=SolventSettings(model="COSMO", solvent="hexane"),
+            engine="gpu4pyscf",
+        )
