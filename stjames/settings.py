@@ -12,7 +12,7 @@ from .method import CORRECTABLE_NNP_METHODS, DFT_FUNCTIONALS, METHODS_WITH_CORRE
 from .mode import Mode
 from .opt_settings import OptimizationSettings
 from .scf_settings import SCFSettings
-from .solvent import SolventSettings
+from .solvent import SolventModel, SolventSettings
 from .task import Task
 from .thermochem_settings import ThermochemistrySettings
 
@@ -117,6 +117,10 @@ class Settings(Base):
             if self.method not in DFT_FUNCTIONALS:
                 functionals = "\n    ".join(DFT_FUNCTIONALS)
                 raise ValueError(f"Excited-state calculations may only be performed with DFT:\n    {functionals}.")
+
+        if self.solvent_settings:
+            if self.solvent_settings.model == SolventModel.COSMO and self.engine == Engine.GPU4PYSCF:
+                raise ValueError("GPU4PySCF does not support the COSMO solvent model")
 
         return self
 
