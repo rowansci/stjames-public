@@ -2,7 +2,7 @@
 
 from typing import Annotated, Any, Literal, Self, TypeAlias
 
-from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
+from pydantic import AfterValidator, ConfigDict, PositiveInt, field_validator, model_validator
 
 from ..base import Base, round_float
 from ..conformers import ConformerGenSettingsUnion, ETKDGSettings
@@ -179,6 +179,7 @@ class AnalogueDockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
 
     New:
     :param analogues: SMILES for analogues of `initial_molecule`
+    :param num_conformers_per_analogue: the number of conformers to generate per analogue
     :param docking_settings: how docking should be run
 
     Results:
@@ -186,6 +187,7 @@ class AnalogueDockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
     """
 
     analogues: list[str]
+    num_conformers_per_analogue: PositiveInt = 1000
     docking_settings: VinaSettings = VinaSettings()
 
     analogue_scores: dict[str, list[Score]] = {}

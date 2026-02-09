@@ -66,7 +66,8 @@ class SolventDependentConformersWorkflow(ConformerSearchMixin, MoleculeWorkflow)
         speed="normal",
         solvent_settings=SolventSettings(solvent=Solvent.WATER, model=SolventModel.ALPB),
         reopt=False,
-        mtd_method=Method.GFN2_XTB,
+        mtd_method=Method.GFN_FF,
+        energy_window=30,
     )
 
     conformer_clustering_settings: ConformerClusteringSettings | None = ConformerClusteringSettings()
