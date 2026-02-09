@@ -47,7 +47,7 @@ class TMDRBFESettings(Base):
     :param trajectory_save_interval: Save every Nth frame when saving trajectories.
     """
 
-    forcefield: Method = Method.SMIRNOFF_2_0_0_PRECOMPUTED
+    forcefield: Method = Method.OFF_SAGE_2_0_0
     charge_method: ChargeMethod = ChargeMethod.AMBER_AM1BCC
     n_eq_steps: PositiveInt = 200_000
     n_frames: PositiveInt = 2_000
