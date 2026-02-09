@@ -35,6 +35,7 @@ from .protein_cofolding import *
 from .protein_md import *
 from .redox_potential import *
 from .relative_binding_free_energy_perturbation import (
+    ChargeMethod,
     RBFEGraphWorkflow,
     RelativeBindingFreeEnergyPerturbationWorkflow,
 )
