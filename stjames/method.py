@@ -80,9 +80,8 @@ class Method(LowercaseStrEnum):
     OFF_SAGE_2_2_1 = "off_sage_2_2_1"
 
     # Deprecated force fields
-    SMIRNOFF_2_0_0_AMBER_AM1BCC = "smirnoff_2_0_0_amber_am1bcc" # Deprecated: use OFF_SAGE_2_0_0
-    SMIRNOFF_2_0_0_PRECOMPUTED = "smirnoff_2_0_0_precomputed" # Deprecated: use OFF_SAGE_2_0_0
-    SMIRNOFF_2_2_1_AMBER_AM1BCC = "smirnoff_2_2_1_amber_am1bcc" # Deprecated: use OFF_SAGE_2_2_1
+    SMIRNOFF_2_0_0_AMBER_AM1BCC = "smirnoff_2_0_0_amber_am1bcc"  # Deprecated: use OFF_SAGE_2_0_0
+    SMIRNOFF_2_2_1_AMBER_AM1BCC = "smirnoff_2_2_1_amber_am1bcc"  # Deprecated: use OFF_SAGE_2_2_1
 
     def default_engine(self, *, is_periodic: bool = False) -> Engine:
         """
@@ -112,7 +111,7 @@ class Method(LowercaseStrEnum):
                 return Engine.ORB
             case method if method in XTB_METHODS:
                 return Engine.TBLITE if is_periodic else Engine.XTB
-            case Method.OFF_SAGE_2_0_0 | Method.OFF_SAGE_2_2_1 | Method.SMIRNOFF_2_0_0_AMBER_AM1BCC | Method.SMIRNOFF_2_0_0_PRECOMPUTED | Method.SMIRNOFF_2_2_1_AMBER_AM1BCC:
+            case Method.OFF_SAGE_2_0_0 | Method.OFF_SAGE_2_2_1 | Method.SMIRNOFF_2_0_0_AMBER_AM1BCC | Method.SMIRNOFF_2_2_1_AMBER_AM1BCC:
                 return Engine.OPENFF
             case Method.EGRET_1 | Method.EGRET_1E | Method.EGRET_1T:
                 return Engine.EGRET
