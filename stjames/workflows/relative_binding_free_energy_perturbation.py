@@ -4,13 +4,20 @@ from typing import Annotated, Any, Literal, Self
 
 from pydantic import AfterValidator, PositiveInt, model_validator
 
-from ..base import Base, round_float, round_optional_float
+from ..base import Base, LowercaseStrEnum, round_float, round_optional_float
 from ..message import Message
 from ..method import Method
 from ..molecule import Molecule
 from ..pdb import PDB
 from ..types import UUID, ProteinMDTrajectory, round_list, round_list_of_lists
 from .workflow import ProteinStructureWorkflow, Workflow
+
+
+class ChargeMethod(LowercaseStrEnum):
+    """Method for computing partial charges for force field simulations."""
+
+    AMBER_AM1BCC = "amber_am1bcc"
+    NAGL = "nagl"
 
 
 class TMDRBFESettings(Base):
@@ -21,6 +28,7 @@ class TMDRBFESettings(Base):
     their own settings model if their controls differ.
 
     :param forcefield: Registered St. James method corresponding to a force field.
+    :param charge_method: method for computing partial charges (AMBER_AM1BCC or NAGL).
     :param n_eq_steps: Equilibration steps per lambda window.
     :param n_frames: Production frames saved per lambda window.
     :param steps_per_frame: MD integration steps per saved frame.
@@ -39,7 +47,8 @@ class TMDRBFESettings(Base):
     :param trajectory_save_interval: Save every Nth frame when saving trajectories.
     """
 
-    forcefield: Method = Method.SMIRNOFF_2_0_0_AMBER_AM1BCC
+    forcefield: Method = Method.OFF_SAGE_2_0_0
+    charge_method: ChargeMethod = ChargeMethod.AMBER_AM1BCC
     n_eq_steps: PositiveInt = 200_000
     n_frames: PositiveInt = 2_000
     steps_per_frame: PositiveInt = 400
