@@ -24,7 +24,7 @@ def process_line(line: str, fmt: Callable[[str], _T] = str) -> _T:  # type: igno
     >>> process_line("Atomic Number = 1", int)
     1
     """
-    return fmt(line.split("=")[-1].strip())
+    return fmt(line.rsplit("=", maxsplit=1)[-1].strip())
 
 
 def fmt_float(val: str) -> float:
