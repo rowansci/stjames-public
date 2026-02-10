@@ -115,7 +115,7 @@ class RBFEGraphEdge(Base):
     :param complex_lambda_values: the final lambda values used for the complex leg
     :param complex_overlap_matrix: the square matrix of lambda-to-lambda overlap values from the complex leg
     :param complex_trajectories: mapping of lambda values to ProteinMDTrajectory objects
-    :param complex_topology: UUID of solvated system PDB for trajectory topology
+    :param complex_protein_uuid: UUID of solvated system PDB for trajectory topology
     :param complex_ligand_atom_indices: ligand atom indices for visualization filtering
     """
 
@@ -137,7 +137,7 @@ class RBFEGraphEdge(Base):
     complex_lambda_values: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
     complex_overlap_matrix: Annotated[list[list[float]], AfterValidator(round_list_of_lists(3))] | None = None
     complex_trajectories: dict[float, ProteinMDTrajectory] | None = None
-    complex_topology: ProteinUUID | None = None
+    complex_protein_uuid: ProteinUUID | None = None
     complex_ligand_atom_indices: RBFELigandAtomIndices | None = None
 
 
