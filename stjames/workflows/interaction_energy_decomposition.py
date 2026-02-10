@@ -59,7 +59,7 @@ class InteractionEnergyDecompositionWorkflow(MoleculeWorkflow):
     :param initial_molecule: Molecule in question
 
     New:
-    :param fragment1_indices: which atoms go to fragment #1 (fragment #2 takes the rest)
+    :param fragment1_indices: which atoms go to fragment #1, fragment #2 takes the rest (1-indexed)
     :param energy_decomposition_settings: settings for SAPT calculations
 
     Results:
