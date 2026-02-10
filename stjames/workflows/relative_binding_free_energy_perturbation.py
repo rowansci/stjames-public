@@ -2,14 +2,14 @@
 
 from typing import Annotated, Any, Literal, Self
 
-from pydantic import AfterValidator, PositiveInt, model_validator
+from pydantic import AfterValidator, NonNegativeInt, PositiveInt, model_validator
 
 from ..base import Base, LowercaseStrEnum, round_float, round_optional_float
 from ..message import Message
 from ..method import Method
 from ..molecule import Molecule
 from ..pdb import PDB
-from ..types import UUID, ProteinMDTrajectory, round_list, round_list_of_lists
+from ..types import UUID, ProteinMDTrajectory, ProteinUUID, round_list, round_list_of_lists
 from .workflow import ProteinStructureWorkflow, Workflow
 
 
@@ -87,12 +87,12 @@ class RBFELigandAtomIndices(Base):
     ligand A vs ligand B. Protein and solvent atoms can be identified from
     residue names in the topology PDB.
 
-    :param ligand_a: indices of ligand A atoms (visible at lambda=0)
-    :param ligand_b: indices of ligand B atoms (visible at lambda=1)
+    :param ligand_a: 0-indexed atom indices for ligand A (visible at lambda=0)
+    :param ligand_b: 0-indexed atom indices for ligand B (visible at lambda=1)
     """
 
-    ligand_a: list[int]
-    ligand_b: list[int]
+    ligand_a: list[NonNegativeInt]
+    ligand_b: list[NonNegativeInt]
 
 
 class RBFEGraphEdge(Base):
@@ -115,9 +115,8 @@ class RBFEGraphEdge(Base):
     :param complex_lambda_values: the final lambda values used for the complex leg
     :param complex_overlap_matrix: the square matrix of lambda-to-lambda overlap values from the complex leg
     :param complex_trajectories: mapping of lambda values to ProteinMDTrajectory objects
-    :param complex_topology: solvated system PDB or UUID for trajectory topology
+    :param complex_topology: UUID of solvated system PDB for trajectory topology
     :param complex_ligand_atom_indices: ligand atom indices for visualization filtering
-    :param complex_bonds: bond pairs in the solvated system for visualization
     """
 
     ligand_a: str
@@ -138,9 +137,8 @@ class RBFEGraphEdge(Base):
     complex_lambda_values: Annotated[list[float] | None, AfterValidator(round_list(3))] = None
     complex_overlap_matrix: Annotated[list[list[float]], AfterValidator(round_list_of_lists(3))] | None = None
     complex_trajectories: dict[float, ProteinMDTrajectory] | None = None
-    complex_topology: PDB | UUID | None = None
+    complex_topology: ProteinUUID | None = None
     complex_ligand_atom_indices: RBFELigandAtomIndices | None = None
-    complex_bonds: list[tuple[int, int]] | None = None
 
 
 class RBFEGraph(Base):

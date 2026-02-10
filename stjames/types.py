@@ -3,6 +3,7 @@ from typing import Callable, Iterable, Protocol, TypeAlias, overload
 from .base import Base
 
 UUID: TypeAlias = str
+ProteinUUID: TypeAlias = UUID
 
 
 class ProteinMDTrajectory(Base):

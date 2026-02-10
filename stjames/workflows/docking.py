@@ -7,10 +7,9 @@ from pydantic import AfterValidator, ConfigDict, PositiveInt, field_validator, m
 from ..base import Base, round_float
 from ..conformers import ConformerGenSettingsUnion, ETKDGSettings
 from ..pdb import PDB
-from ..types import UUID, Vector3D
+from ..types import UUID, ProteinUUID, Vector3D
 from .workflow import MoleculeWorkflow, ProteinStructureWorkflow
 
-ProteinUUID: TypeAlias = UUID
 CalculationUUID: TypeAlias = UUID
 
 

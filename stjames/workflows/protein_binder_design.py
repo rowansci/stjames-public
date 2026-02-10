@@ -1,16 +1,14 @@
 """Protein-binder-design workflow."""
 
 from enum import Enum
-from typing import Annotated, TypeAlias
+from typing import Annotated
 
 from pydantic import AfterValidator
 
 from ..base import Base, LowercaseStrEnum, round_optional_float
 from ..protein import ProteinSequence
-from ..types import UUID
+from ..types import ProteinUUID
 from .workflow import Workflow
-
-ProteinUUID: TypeAlias = UUID
 
 
 class BoltzGenSecondaryStructure(Base):

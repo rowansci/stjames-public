@@ -5,10 +5,9 @@ from typing import Annotated, Literal, TypeAlias
 from pydantic import AfterValidator, BaseModel, ConfigDict
 
 from ..base import Base, LowercaseStrEnum, round_float, round_optional_float
-from ..types import UUID, round_list
+from ..types import UUID, ProteinUUID, round_list
 from .workflow import FASTAWorkflow
 
-ProteinUUID: TypeAlias = UUID
 CalculationUUID: TypeAlias = UUID
 
 
