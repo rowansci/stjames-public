@@ -1,13 +1,11 @@
 import logging
 import re
 from pathlib import Path
-from typing import Annotated, Any, Iterable, Self, Sequence, TypeAlias, TypedDict, TypeVar
+from typing import TYPE_CHECKING, Annotated, Any, Iterable, Self, Sequence, TypeAlias, TypedDict, TypeVar
 
 import numpy as np
 import pydantic
 from pydantic import AfterValidator, NonNegativeInt, PositiveInt, ValidationError
-from rdkit import Chem
-from rdkit.Chem import AllChem
 
 from .atom import Atom
 from .base import Base, round_float, round_optional_float
@@ -26,9 +24,14 @@ from .types import (
     round_vector3d_per_atom,
 )
 
-RdkitMol: TypeAlias = Chem.rdchem.Mol | Chem.rdchem.RWMol
-
 logger = logging.getLogger(__name__)
+
+if TYPE_CHECKING:
+    from rdkit import Chem  # noqa: TC004
+
+    RdkitMol: TypeAlias = Chem.rdchem.Mol | Chem.rdchem.RWMol
+else:
+    RdkitMol = Any
 
 
 class MoleculeReadError(RuntimeError):
@@ -510,6 +513,8 @@ class Molecule(Base):
 
     @classmethod
     def from_rdkit(cls: type[Self], rdkm: RdkitMol, cid: int = 0, multiplicity: int = 1) -> Self:
+        from rdkit import Chem  # noqa: PLC0415
+
         if len(rdkm.GetConformers()) == 0:
             rdkm = _embed_rdkit_mol(rdkm)
 
@@ -531,6 +536,8 @@ class Molecule(Base):
 
 
 def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
+    from rdkit.Chem import AllChem  # noqa: PLC0415
+
     try:
         AllChem.SanitizeMol(rdkm)  # type: ignore [attr-defined, unused-ignore]
     except Exception as e:
