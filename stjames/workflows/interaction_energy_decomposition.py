@@ -1,6 +1,6 @@
 from typing import Annotated, Literal
 
-from pydantic import AfterValidator
+from pydantic import AfterValidator, PositiveInt
 
 from ..base import Base, LowercaseStrEnum, round_float
 from ..basis_set import BasisSet
@@ -59,14 +59,14 @@ class InteractionEnergyDecompositionWorkflow(MoleculeWorkflow):
     :param initial_molecule: Molecule in question
 
     New:
-    :param fragment1_indices: which atoms go to fragment #1 (fragment #2 takes the rest)
+    :param fragment1_indices: which atoms go to fragment #1, fragment #2 takes the rest (1-indexed)
     :param energy_decomposition_settings: settings for SAPT calculations
 
     Results:
     :param energy_decomposition_result: results from the energy decomposition
     """
 
-    fragment1_indices: list[int]
+    fragment1_indices: list[PositiveInt]
 
     energy_decomposition_settings: EnergyDecompositionSettings = EnergyDecompositionSettings()
 
