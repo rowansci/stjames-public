@@ -1,6 +1,6 @@
 [project]
 name = "stjames"
-version = "0.0.160"
+version = "0.0.161"
 description = "structured JSON atom/molecule encoding scheme"
 readme = "README.md"
 keywords = []
@@ -9,7 +9,6 @@ dependencies = [
     "pydantic>=2.4",
     "numpy",
     "requests",
-    "rdkit",
     "more-itertools",
 ]
 
@@ -22,6 +21,12 @@ dev = [
     "mypy",
     "rdkit-stubs",
 ]
+
+[project.optional-dependencies]
+rdkit = [
+    "rdkit",
+]
+
 [build-system]
 # maybe will want to move away from setuptools eventually
 requires = ["setuptools>=61.0"]
