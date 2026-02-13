@@ -27,7 +27,7 @@ from .types import (
 logger = logging.getLogger(__name__)
 
 if TYPE_CHECKING:
-    from rdkit import Chem  # noqa: TC004
+    from rdkit import Chem
 
     RdkitMol: TypeAlias = Chem.rdchem.Mol | Chem.rdchem.RWMol
 else:
@@ -530,6 +530,8 @@ class Molecule(Base):
 
     @classmethod
     def from_smiles(cls: type[Self], smiles: str) -> Self:
+        from rdkit import Chem  # noqa: PLC0415
+
         rdkm = Chem.MolFromSmiles(smiles)
         assert rdkm is not None
         return cls.from_rdkit(rdkm)

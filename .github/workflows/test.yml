@@ -26,6 +26,9 @@ jobs:
       - name: Install Python
         run: uv python install ${{ matrix.python-version }}
 
+      - name: Install packages
+        run: uv sync --frozen --dev --extra rdkit
+
       - run: uv run ruff format .
       - run: uv run ruff check .
       - run: uv run mypy .

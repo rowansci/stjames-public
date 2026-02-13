@@ -88,3 +88,10 @@ H        0.000000     0.757000     0.587000
     assert mol.cell is None
     assert mol.smiles == "O"
     assert getattr(mol.cell, "is_periodic", None) is None
+
+
+# Only works if rdkit installed
+def test_from_smiles() -> None:
+    mol = Molecule.from_smiles("CCO")
+
+    assert len(mol.atoms) == 9
