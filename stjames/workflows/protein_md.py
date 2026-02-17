@@ -130,8 +130,8 @@ class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStruc
     :param protein_uuid: UUID of the (holo) protein. DEPRECATED.
     :param ligand_residue_name: ligand's residue name
     :param num_trajectories: number of trajectories to run
-    :param save_solvent: whether solvent should be saved
-    :param max_num_solvent: if set, only this many solvent molecules will be saved about the ligand
+    :param save_solvent: whether any solvent should be saved
+    :param max_num_solvent: saves this many solvent molecules, or all solvent molecules if None
     :param protein_restraint_cutoff: cutoff past which alpha-carbons will be constrained, in Å
     :param protein_restraint_constant: force constant for backbone restraints, in kcal/mol/Å²
 
@@ -146,7 +146,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStruc
 
     num_trajectories: PositiveInt = 1
     save_solvent: bool = False
-    num_solvent_to_save: PositiveInt | None = 100
+    num_solvent_to_save: PositiveInt | None = None
 
     protein_restraint_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] | None = None
     protein_restraint_constant: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 100

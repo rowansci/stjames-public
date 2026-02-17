@@ -83,7 +83,7 @@ class SolventDependentConformersWorkflow(ConformerSearchMixin, MoleculeWorkflow)
                 tasks=["optimize"],
             )
         ],
-        sp_settings=Settings(method="g_xtb", tasks=["energy"]),
+        singlepoint_settings=Settings(method="g_xtb", tasks=["energy"]),
         mode=Mode.MANUAL,
     )
 
