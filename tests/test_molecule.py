@@ -1,7 +1,7 @@
 from functools import partial
 
 from pydantic import ValidationError
-from pytest import raises
+from pytest import importorskip, raises
 
 from stjames import Atom, Molecule
 
@@ -92,6 +92,7 @@ H        0.000000     0.757000     0.587000
 
 # Only works if rdkit installed
 def test_from_smiles() -> None:
+    importorskip("rdkit")
     mol = Molecule.from_smiles("CCO")
 
     assert len(mol.atoms) == 9
