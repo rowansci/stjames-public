@@ -51,6 +51,7 @@ class ProteinMDSettingsMixin(Base):
     :param nonbonded_cutoff: nonbonded cutoff for particle-mesh Ewald, in Å
     :param ionic_strength_M: ionic strength of the solution, in M (molar)
     :param water_buffer: amount of water to add around the protein, in Å
+    :param num_clusters: the number of clusters to use for trajectory post-processing
     """
 
     equilibration_time_ns: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 1
@@ -66,6 +67,8 @@ class ProteinMDSettingsMixin(Base):
 
     ionic_strength_M: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 0.10
     water_buffer: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 6.0
+
+    num_clusters: PositiveInt = 10
 
 
 class ProteinMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStructureWorkflow):
