@@ -51,6 +51,7 @@ class ProteinMDSettingsMixin(Base):
     :param nonbonded_cutoff: nonbonded cutoff for particle-mesh Ewald, in Å
     :param ionic_strength_M: ionic strength of the solution, in M (molar)
     :param water_buffer: amount of water to add around the protein, in Å
+    :param num_clusters: the number of clusters to use for trajectory post-processing
     """
 
     equilibration_time_ns: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 1
@@ -66,6 +67,8 @@ class ProteinMDSettingsMixin(Base):
 
     ionic_strength_M: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 0.10
     water_buffer: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 6.0
+
+    num_clusters: PositiveInt = 10
 
 
 class ProteinMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStructureWorkflow):
@@ -127,7 +130,8 @@ class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStruc
     :param protein_uuid: UUID of the (holo) protein. DEPRECATED.
     :param ligand_residue_name: ligand's residue name
     :param num_trajectories: number of trajectories to run
-    :param save_solvent: whether solvent should be saved
+    :param save_solvent: whether any solvent should be saved
+    :param max_num_solvent: saves this many solvent molecules, or all solvent molecules if None
     :param protein_restraint_cutoff: cutoff past which alpha-carbons will be constrained, in Å
     :param protein_restraint_constant: force constant for backbone restraints, in kcal/mol/Å²
 
@@ -142,6 +146,7 @@ class PoseAnalysisMolecularDynamicsWorkflow(ProteinMDSettingsMixin, ProteinStruc
 
     num_trajectories: PositiveInt = 1
     save_solvent: bool = False
+    num_solvent_to_save: PositiveInt | None = None
 
     protein_restraint_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] | None = None
     protein_restraint_constant: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 100

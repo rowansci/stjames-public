@@ -15,9 +15,13 @@ class ProteinMDTrajectory(Base):
     connectivity) comes from the protein PDB associated with the workflow.
 
     :param uuid: UUID of the DCD trajectory file in S3 storage.
+    :param cluster_centroid_indices: the indices of frames corresponding to cluster centroids
+    :param cluster_indices_by_frame: the cluster that each frame belongs to
     """
 
     uuid: UUID
+    cluster_centroid_indices: list[int] = []
+    cluster_indices_by_frame: list[int] = []
 
 
 Vector3D: TypeAlias = tuple[float, float, float]
