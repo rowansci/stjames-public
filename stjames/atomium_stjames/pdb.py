@@ -341,7 +341,7 @@ def extract_assembly_remark(pdb_dict: dict[str, Any], geometry_dict: dict[str, A
     """
     if pdb_dict.get("REMARK") and pdb_dict["REMARK"].get("350"):
         groups = [list(g) for k, g in groupby(pdb_dict["REMARK"]["350"], lambda x: "ECULE:" in x)][1:]
-        assemblies = [list(chain(*a)) for a in zip(groups[::2], groups[1::2], strict=True)]
+        assemblies = [list(chain(*a)) for a in zip(groups[::2], groups[1::2], strict=False)]
         for a in assemblies:
             geometry_dict["assemblies"].append(assembly_lines_to_assembly_dict(a))
 
