@@ -179,6 +179,8 @@ class AnalogueDockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
     New:
     :param analogues: SMILES for analogues of `initial_molecule`
     :param num_conformers_per_analogue: the number of conformers to generate per analogue
+    :param require_posebusters: filter conformers based on PoseBusters validity
+    :param run_local_optimization: whether to run a local optimization in the docking pocket or just to score
     :param docking_settings: how docking should be run
 
     Results:
@@ -187,6 +189,8 @@ class AnalogueDockingWorkflow(MoleculeWorkflow, ProteinStructureWorkflow):
 
     analogues: list[str]
     num_conformers_per_analogue: PositiveInt = 1000
+    require_posebusters: bool = True
+    run_local_optimization: bool = True
     docking_settings: VinaSettings = VinaSettings()
 
     analogue_scores: dict[str, list[Score]] = {}
