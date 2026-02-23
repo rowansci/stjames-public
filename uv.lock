@@ -800,7 +800,7 @@ wheels = [
 
 [[package]]
 name = "stjames"
-version = "0.0.164"
+version = "0.0.166"
 source = { editable = "." }
 dependencies = [
     { name = "more-itertools" },

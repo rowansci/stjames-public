@@ -23,6 +23,7 @@ class OmegaTuning(LowercaseStrEnum):
     """Options for omega (range-separation parameter) tuning"""
 
     KOOPMANS = "koopmans"  # Baer et al. doi.org/10.1146/annurev.physchem.012809.103321
+    HALF = "half"  # Cut the default omega in half
 
 
 class Settings(Base):
