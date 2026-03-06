@@ -2,7 +2,7 @@ from typing import Annotated, Self
 
 import numpy as np
 from numpy.typing import NDArray
-from pydantic import AfterValidator, field_validator, model_validator
+from pydantic import AfterValidator, ConfigDict, field_validator, model_validator
 
 from ..base import Base, round_optional_float
 from ..engine import Engine
@@ -50,8 +50,7 @@ class ScanSettings(Base):
     def vals(self) -> NDArray[np.float64]:
         return np.linspace(self.start, self.stop, self.num)  # type: ignore [return-value, unused-ignore]
 
-    class Config:
-        from_attributes = True
+    model_config = ConfigDict(from_attributes=True)
 
 
 class ScanWorkflow(MoleculeWorkflow):

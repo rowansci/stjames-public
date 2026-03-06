@@ -428,6 +428,5 @@ def multi_stage_opt_settings_from_workflow(msow: MultiStageOptWorkflow) -> Multi
     >>> msos.xtb_preopt
     False
     """
-    data = dict(msow)
-    del data["calculations"]
-    return MultiStageOptSettings.construct(**data)
+    data = {k: getattr(msow, k) for k in MultiStageOptSettings.model_fields}
+    return MultiStageOptSettings.model_construct(**data)
