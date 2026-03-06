@@ -53,10 +53,13 @@ class Method(LowercaseStrEnum):
 
     ## UMA
     UMA_S_OMOL = "uma_s_omol"
+    UMA_S_1_2_OMOL = "uma_s_1_2_omol"
     UMA_M_OMOL = "uma_m_omol"
     UMA_S_OMAT = "uma_s_omat"
+    UMA_S_1_2_OMAT = "uma_s_1_2_omat"
     UMA_M_OMAT = "uma_m_omat"
     UMA_S_OMC = "uma_s_omc"
+    UMA_S_1_2_OMC = "uma_s_1_2_omc"
     UMA_M_OMC = "uma_m_omc"
 
     ## Orb
@@ -104,7 +107,16 @@ class Method(LowercaseStrEnum):
             case Method.MACE_MP_0B2_L:
                 return Engine.MACE
             case (
-                Method.OMOL25_CONSERVING_S | Method.UMA_S_OMOL | Method.UMA_M_OMOL | Method.UMA_S_OMAT | Method.UMA_M_OMAT | Method.UMA_S_OMC | Method.UMA_M_OMC
+                Method.OMOL25_CONSERVING_S
+                | Method.UMA_S_OMOL
+                | Method.UMA_S_1_2_OMOL
+                | Method.UMA_M_OMOL
+                | Method.UMA_S_OMAT
+                | Method.UMA_S_1_2_OMAT
+                | Method.UMA_M_OMAT
+                | Method.UMA_S_OMC
+                | Method.UMA_S_1_2_OMC
+                | Method.UMA_M_OMC
             ):
                 return Engine.OMOL25
             case Method.ORB_V3_CONSERVATIVE_INF_OMAT | Method.ORB_V3_CONSERVATIVE_OMOL:
@@ -126,10 +138,13 @@ PrepackagedNNPMethod = Literal[
     Method.AIMNET2_WB97MD3,
     Method.OMOL25_CONSERVING_S,
     Method.UMA_S_OMOL,
+    Method.UMA_S_1_2_OMOL,
     Method.UMA_M_OMOL,
     Method.UMA_S_OMAT,
+    Method.UMA_S_1_2_OMAT,
     Method.UMA_M_OMAT,
     Method.UMA_S_OMC,
+    Method.UMA_S_1_2_OMC,
     Method.UMA_M_OMC,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
     Method.ORB_V3_CONSERVATIVE_OMOL,
@@ -142,10 +157,13 @@ PREPACKAGED_NNP_METHODS = {
     Method.AIMNET2_WB97MD3,
     Method.OMOL25_CONSERVING_S,
     Method.UMA_S_OMOL,
+    Method.UMA_S_1_2_OMOL,
     Method.UMA_M_OMOL,
     Method.UMA_S_OMAT,
+    Method.UMA_S_1_2_OMAT,
     Method.UMA_M_OMAT,
     Method.UMA_S_OMC,
+    Method.UMA_S_1_2_OMC,
     Method.UMA_M_OMC,
     Method.ORB_V3_CONSERVATIVE_INF_OMAT,
     Method.ORB_V3_CONSERVATIVE_OMOL,
