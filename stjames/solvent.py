@@ -45,7 +45,7 @@ class SolventModel(LowercaseStrEnum):
     COSMO = "cosmo"
     GBSA = "gbsa"
     CPCMX = "cpcmx"
-    SMD = "SMD"
+    SMD = "smd"
 
 
 class SolventSettings(Base):
