@@ -45,9 +45,9 @@ class Method(LowercaseStrEnum):
     # NNPs
     AIMNET2_WB97MD3 = "aimnet2_wb97md3"
 
-    ## MACE
-    MACE_MP_0 = "mace_mp_0"
-    MACE_MP_0B2_L = "mace_mp_0b2_l"
+    ## MACE (Deprecated)
+    MACE_MP_0 = "mace_mp_0"  # Deprecated
+    MACE_MP_0B2_L = "mace_mp_0b2_l"  # Deprecated
 
     OMOL25_CONSERVING_S = "omol25_conserving_s"
 
@@ -93,10 +93,8 @@ class Method(LowercaseStrEnum):
 
         :param is_periodic: if True and method is in XTB family, return
             "tblite" (periodic-capable backend) instead of "xtb"
-        :return: lower-case engine identifier (e.g. "psi4", "mace")
+        :return: lower-case engine identifier (e.g. "psi4", "xtb")
 
-        >>> Method.MACE_MP_0B2_L.default_engine().value
-        'mace'
         >>> Method.GFN2_XTB.default_engine().value
         'xtb'
         >>> Method.GFN2_XTB.default_engine(is_periodic=True).value
@@ -175,8 +173,8 @@ PREPACKAGED_NNP_METHODS = {
     Method.EGRET_1T,
 }
 
-CorrectableNNPMethod = Literal[Method.MACE_MP_0, Method.MACE_MP_0B2_L]
-CORRECTABLE_NNP_METHODS = {Method.MACE_MP_0, Method.MACE_MP_0B2_L}
+CorrectableNNPMethod = Literal[Method.MACE_MP_0, Method.MACE_MP_0B2_L]  # Deprecated
+CORRECTABLE_NNP_METHODS = {Method.MACE_MP_0, Method.MACE_MP_0B2_L}  # Deprecated
 
 NNPMethod = PrepackagedNNPMethod | CorrectableNNPMethod
 NNP_METHODS = PREPACKAGED_NNP_METHODS | CORRECTABLE_NNP_METHODS

@@ -5,7 +5,7 @@ class Engine(LowercaseStrEnum):
     """Computational chemistry engine."""
 
     AIMNET2 = "aimnet2"
-    MACE = "mace"
+    MACE = "mace"  # Deprecated
     OMOL25 = "omol25"
     ORB = "orb"
     TBLITE = "tblite"
