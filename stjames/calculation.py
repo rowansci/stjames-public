@@ -37,7 +37,7 @@ class Calculation(Base):
     :param json_format: stjames version identifier
     """
 
-    molecules: list[Molecule]
+    molecules: list[Molecule] = []
 
     tasks: UniqueList[Task] = []
     settings: Settings = Settings()
