@@ -5,12 +5,11 @@ from typing import Annotated
 from pydantic import AfterValidator
 
 from ..base import Base, round_float, round_optional_float
-from ..mode import Mode
-from .workflow import DBCalculation, MoleculeWorkflow
-
 from ..conformers import ConformerGenSettingsUnion, ETKDGSettings
+from ..mode import Mode
 from ..settings import Settings
 from .multistage_opt import MultiStageOptSettings
+from .workflow import DBCalculation, MoleculeWorkflow
 
 
 class Tautomer(Base):
