@@ -261,14 +261,19 @@ class Molecule(Base):
         if not format:
             format = filename.suffix[1:]
 
-        with open(filename) as f:
-            match format:
-                case "xyz":
+        match format:
+            case "xyz":
+                with open(filename) as f:
                     return cls.from_xyz_lines(f.readlines(), charge=charge, multiplicity=multiplicity)
-                case "extxyz":
+            case "extxyz":
+                with open(filename) as f:
                     return cls.from_extxyz_lines(f.readlines(), charge=charge, multiplicity=multiplicity)
-                case _:
-                    raise ValueError(f"Unsupported {format=}")
+            case "sdf" | "mol":
+                return cls.molecules_from_sdf(filename)[0]
+            case "mol2":
+                return cls.molecules_from_mol2(filename)[0]
+            case _:
+                raise ValueError(f"Unsupported {format=}")
 
     @classmethod
     def from_xyz(cls: type[Self], xyz: str, charge: int | None = None, multiplicity: PositiveInt | None = None) -> Self:
@@ -535,6 +540,53 @@ class Molecule(Base):
         rdkm = Chem.MolFromSmiles(smiles)
         assert rdkm is not None
         return cls.from_rdkit(rdkm)
+
+    @classmethod
+    def molecules_from_sdf(cls: type[Self], path: Path | str) -> list[Self]:
+        """
+        Read multiple molecules from an SDF file.
+
+        :param path: Path to the SDF file.
+        :returns: List of Molecule instances, one per record.
+        :raises ValueError: If no valid molecules are found in the file.
+
+        Example::
+
+            mols = Molecule.molecules_from_sdf("ligands.sdf")
+        """
+        from rdkit import Chem  # noqa: PLC0415
+
+        supplier = Chem.SDMolSupplier(str(path), removeHs=False)
+        mols = [cls.from_rdkit(rdkm) for rdkm in supplier if rdkm is not None]
+        if not mols:
+            raise ValueError(f"No valid molecules found in {path}")
+        return mols
+
+    @classmethod
+    def molecules_from_mol2(cls: type[Self], path: Path | str) -> list[Self]:
+        """
+        Read multiple molecules from a MOL2 file.
+
+        :param path: Path to the MOL2 file.
+        :returns: List of Molecule instances, one per record.
+        :raises ValueError: If no valid molecules are found in the file.
+
+        Example::
+
+            mols = Molecule.molecules_from_mol2("ligands.mol2")
+        """
+        from rdkit import Chem  # noqa: PLC0415
+
+        text = Path(path).read_text()
+        blocks = [b for b in text.split("@<TRIPOS>MOLECULE") if b.strip()]
+        mols = []
+        for block in blocks:
+            rdkm = Chem.MolFromMol2Block("@<TRIPOS>MOLECULE" + block, removeHs=False)
+            if rdkm is not None:
+                mols.append(cls.from_rdkit(rdkm))
+        if not mols:
+            raise ValueError(f"No valid molecules found in {path}")
+        return mols
 
 
 def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
