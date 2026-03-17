@@ -26,9 +26,14 @@ from .types import (
 
 logger = logging.getLogger(__name__)
 
-if TYPE_CHECKING:
+try:
     from rdkit import Chem
+    from rdkit.Chem import AllChem
+except ImportError:
+    Chem = None  # type: ignore[assignment]
+    AllChem = None  # type: ignore[assignment]
 
+if TYPE_CHECKING:
     RdkitMol: TypeAlias = Chem.rdchem.Mol | Chem.rdchem.RWMol
 else:
     RdkitMol = Any
@@ -518,8 +523,6 @@ class Molecule(Base):
 
     @classmethod
     def from_rdkit(cls: type[Self], rdkm: RdkitMol, cid: int = 0, multiplicity: int = 1) -> Self:
-        from rdkit import Chem  # noqa: PLC0415
-
         if len(rdkm.GetConformers()) == 0:
             rdkm = _embed_rdkit_mol(rdkm)
 
@@ -535,8 +538,6 @@ class Molecule(Base):
 
     @classmethod
     def from_smiles(cls: type[Self], smiles: str) -> Self:
-        from rdkit import Chem  # noqa: PLC0415
-
         rdkm = Chem.MolFromSmiles(smiles)
         assert rdkm is not None
         return cls.from_rdkit(rdkm)
@@ -554,8 +555,6 @@ class Molecule(Base):
 
             mols = Molecule.molecules_from_sdf("ligands.sdf")
         """
-        from rdkit import Chem  # noqa: PLC0415
-
         supplier = Chem.SDMolSupplier(str(path), removeHs=False)
         mols = [cls.from_rdkit(rdkm) for rdkm in supplier if rdkm is not None]
         if not mols:
@@ -575,8 +574,6 @@ class Molecule(Base):
 
             mols = Molecule.molecules_from_mol2("ligands.mol2")
         """
-        from rdkit import Chem  # noqa: PLC0415
-
         text = Path(path).read_text()
         blocks = [b for b in text.split("@<TRIPOS>MOLECULE") if b.strip()]
         mols = []
@@ -590,8 +587,6 @@ class Molecule(Base):
 
 
 def _embed_rdkit_mol(rdkm: RdkitMol) -> RdkitMol:
-    from rdkit.Chem import AllChem  # noqa: PLC0415
-
     try:
         AllChem.SanitizeMol(rdkm)  # type: ignore [attr-defined, unused-ignore]
     except Exception as e:
