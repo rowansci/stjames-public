@@ -29,7 +29,7 @@ class Score(Base):
     complex_pdb: ProteinUUID | None
     score: Annotated[float, AfterValidator(round_float(3))]
     posebusters_valid: bool
-    strain: float | None
+    strain: float | None = None
     rmsd: Annotated[float, AfterValidator(round_float(3))] | None = None
 
 
