@@ -8,6 +8,10 @@ from ..base import Base, round_float, round_optional_float
 from ..mode import Mode
 from .workflow import DBCalculation, MoleculeWorkflow
 
+from ..conformers import ConformerGenSettingsUnion, ETKDGSettings
+from ..settings import Settings
+from .multistage_opt import MultiStageOptSettings
+
 
 class Tautomer(Base):
     """
@@ -32,11 +36,27 @@ class TautomerWorkflow(MoleculeWorkflow):
 
     Inherited:
     :param initial_molecule: Molecule of interest
-    :param mode: Mode for workflow
+    :param mode: Mode for workflow (deprecated)
+
+    New:
+    :param conf_gen_settings: conformer-search settings, defaults to old "careful"
+    :param multistage_opt_settings: optimization settings
 
     Results:
     :param tautomers: resulting Tautomers
     """
 
-    mode: Mode = Mode.CAREFUL
+    conf_gen_settings: ConformerGenSettingsUnion = ETKDGSettings(
+        num_initial_confs=250,
+        max_confs=20,
+        max_mmff_energy=15,
+    )
+
+    multistage_opt_settings: MultiStageOptSettings = MultiStageOptSettings(
+        mode=Mode.MANUAL,
+        optimization_settings=[Settings(method="aimnet2_wb97md3", tasks=["optimize"])],
+        singlepoint_settings=Settings(method="aimnet2_wb97md3", tasks=["energy"], solvent_settings={"solvent": "water", "model": "cpcmx"}),
+    )
+
+    mode: Mode = Mode.CAREFUL  # deprecated
     tautomers: list[Tautomer] = []
