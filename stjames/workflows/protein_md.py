@@ -65,8 +65,8 @@ class ProteinMDSettingsMixin(Base):
     constrain_hydrogens: bool = True
     nonbonded_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 8.0
 
-    ionic_strength_M: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 0.10
-    water_buffer: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 6.0
+    ionic_strength_M: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 0.0
+    water_buffer: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 10.0
 
     num_clusters: PositiveInt = 10
 
