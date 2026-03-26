@@ -7,7 +7,7 @@ from .basis_set import BasisSet
 from .compute_settings import ComputeSettings
 from .correction import Correction
 from .engine import Engine
-from .engine_compatibility import ENGINE_METHODS, get_supported_corrections
+from .engine_compatibility import ENGINE_METHODS, METHOD_ENGINES, get_supported_corrections
 from .excited_state_settings import ExcitedStateSettingsUnion
 from .method import CORRECTABLE_NNP_METHODS, DFT_FUNCTIONALS, METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, RANGE_SEPARATED_FUNCTIONALS, Method
 from .mode import Mode
@@ -108,13 +108,13 @@ class Settings(Base):
 
         self.opt_settings = _assign_opt_settings_by_mode(self.mode, self.opt_settings)
 
-        if self.engine in ENGINE_METHODS and self.method not in ENGINE_METHODS[self.engine]:
-            supported = ", ".join(sorted(m.value for m in ENGINE_METHODS[self.engine]))
-            raise ValueError(f"Method '{self.method.value}' is not supported by engine '{self.engine.value}'. Supported methods: {supported}")
+        if self.method not in ENGINE_METHODS.get(self.engine, frozenset()):
+            valid_engines = ", ".join(sorted(e.value for e in METHOD_ENGINES.get(self.method, [])))
+            msg = f"'{self.method.value}' is not supported by engine '{self.engine.value}'. Supported engines: {valid_engines or 'none'}"
+            raise ValueError(msg)
 
         allowed_corrections = get_supported_corrections(self.method, self.engine)
-        invalid_corrections = [c for c in self.corrections if c not in allowed_corrections]
-        if invalid_corrections:
+        if invalid_corrections := sorted(set(self.corrections) - allowed_corrections):
             invalid_str = ", ".join(c.value for c in invalid_corrections)
             allowed_str = ", ".join(sorted(c.value for c in allowed_corrections)) or "none"
             raise ValueError(f"{self.method.value}/{self.engine.value} does not support correction(s): {invalid_str}. Supported: {allowed_str}")

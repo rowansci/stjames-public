@@ -1,7 +1,6 @@
 """Engine/method/correction/task compatibility tables.
 
-Matches the rules enforced in tinbergen's ``engines.tsx``. Used by
-``Settings`` validators to catch invalid combinations at construction time.
+Used by ``Settings`` validators to catch invalid combinations at construction time.
 """
 
 from .correction import Correction
@@ -53,6 +52,7 @@ ENGINE_METHODS: dict[Engine, frozenset[Method]] = {
     ),
     Engine.TBLITE: frozenset(
         {
+            Method.GFN1_XTB,
             Method.GFN2_XTB,
         }
     ),
@@ -128,6 +128,11 @@ ENGINE_METHODS: dict[Engine, frozenset[Method]] = {
             Method.SKALA,
         }
     ),
+}
+
+METHOD_ENGINES: dict[Method, frozenset[Engine]] = {
+    method: frozenset(engine for engine, methods in ENGINE_METHODS.items() if method in methods)
+    for method in {m for methods in ENGINE_METHODS.values() for m in methods}
 }
 
 # Engine-level defaults; use get_supported_corrections() for method-specific overrides.
