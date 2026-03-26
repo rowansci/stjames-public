@@ -130,8 +130,26 @@ class Method(LowercaseStrEnum):
                 return Engine.EGRET
             case Method.SKALA:
                 return Engine.PYSCF
+            case (
+                Method.HARTREE_FOCK
+                | Method.PBE
+                | Method.R2SCAN
+                | Method.TPSS
+                | Method.M06L
+                | Method.PBE0
+                | Method.B3LYP
+                | Method.TPSSH
+                | Method.M06
+                | Method.M062X
+                | Method.CAMB3LYP
+                | Method.WB97XV
+                | Method.WB97MV
+                | Method.WB97MD3BJ
+            ):
+                # gpu4pyscf supports D4 on all methods including mGGA
+                return Engine.GPU4PYSCF
             case _:
-                # All remaining methods (HF, DFT, composite, etc.) fall back to Psi4
+                # psi4-only: composite methods, wb97x_d3, dsd_blyp_d3bj, b97_d3bj
                 return Engine.PSI4
 
 
