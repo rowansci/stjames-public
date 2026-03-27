@@ -136,11 +136,9 @@ class Settings(Base):
                 functionals = "\n    ".join(DFT_FUNCTIONALS)
                 raise ValueError(f"Excited-state calculations may only be performed with DFT:\n    {functionals}.")
 
-        if self.solvent_settings:
-            supported = ENGINE_SOLVENT_MODELS.get(self.engine, frozenset())
-            if supported and self.solvent_settings.model not in supported:
-                allowed = ", ".join(sorted(m.value for m in supported)) or "none"
-                raise ValueError(f"{self.engine.value} does not support the {self.solvent_settings.model.value.upper()} solvent model. Supported: {allowed}")
+        if self.solvent_settings and (supported := ENGINE_SOLVENT_MODELS.get(self.engine)) and self.solvent_settings.model not in supported:
+            allowed = ", ".join(sorted(m.value for m in supported))
+            raise ValueError(f"{self.engine.value} does not support the {self.solvent_settings.model.value.upper()} solvent model. Supported: {allowed}")
 
         return self
 

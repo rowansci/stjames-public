@@ -3,6 +3,8 @@
 Used by ``Settings`` validators to catch invalid combinations at construction time.
 """
 
+from itertools import product
+
 from .correction import Correction
 from .engine import Engine
 from .method import Method
@@ -170,8 +172,10 @@ _METHOD_ENGINE_CORRECTION_OVERRIDES: dict[tuple[Method, Engine], frozenset[Corre
     # Dispersion baked in — no additional corrections allowed
     **{
         (method, engine): frozenset()
-        for method in (Method.WB97XD3, Method.WB97X3C, Method.WB97MD3BJ, Method.WB97XV, Method.WB97MV, Method.DSDBLYPD3BJ, Method.B97D3BJ)
-        for engine in (Engine.PSI4, Engine.PYSCF, Engine.GPU4PYSCF)
+        for method, engine in product(
+            (Method.WB97XD3, Method.WB97X3C, Method.WB97MD3BJ, Method.WB97XV, Method.WB97MV, Method.DSDBLYPD3BJ, Method.B97D3BJ),
+            (Engine.PSI4, Engine.PYSCF, Engine.GPU4PYSCF),
+        )
     },
 }
 
@@ -214,6 +218,10 @@ ENGINE_SOLVENT_MODELS: dict[Engine, frozenset[SolventModel]] = {
     Engine.PYSCF: frozenset({SolventModel.COSMO, SolventModel.CPCM, SolventModel.PCM}),
     Engine.GPU4PYSCF: frozenset({SolventModel.CPCM, SolventModel.PCM}),
     Engine.XTB: frozenset({SolventModel.ALPB, SolventModel.GBSA, SolventModel.CPCMX}),
+    Engine.AIMNET2: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
+    Engine.OMOL25: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
+    Engine.ORB: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
+    Engine.EGRET: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
 }
 
 
