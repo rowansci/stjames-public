@@ -280,8 +280,8 @@ def mso_settings_from_method_string(
     """
     Helper function to construct multi-stage opt settings objects from a method string.
 
-    >>> mso_settings_from_method_string("r2SCAN-3c/CPCM(Water)//B3LYP-D3/6-31G(d)/ALPB(Water)//GFN2-xTB/CPCM(Water)//GFN0-xTB").level_of_theory
-    'r2scan_3c/cpcm(water)//b3lyp-d3/6-31g(d)/alpb(water)//gfn2_xtb/cpcm(water)//gfn0_xtb'
+    >>> mso_settings_from_method_string("r2SCAN-3c/CPCM(Water)//B3LYP-D3/6-31G(d)/CPCM(Water)//GFN2-xTB/ALPB(Water)//GFN0-xTB").level_of_theory
+    'r2scan_3c/cpcm(water)//b3lyp-d3/6-31g(d)/cpcm(water)//gfn2_xtb/alpb(water)//gfn0_xtb'
     """
     solvent_models = "|".join(model.name for model in SolventModel)
 

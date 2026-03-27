@@ -7,13 +7,13 @@ from .basis_set import BasisSet
 from .compute_settings import ComputeSettings
 from .correction import Correction
 from .engine import Engine
-from .engine_compatibility import ENGINE_METHODS, METHOD_ENGINES, get_supported_corrections
+from .engine_compatibility import ENGINE_METHODS, ENGINE_SOLVENT_MODELS, METHOD_ENGINES, get_supported_corrections
 from .excited_state_settings import ExcitedStateSettingsUnion
 from .method import CORRECTABLE_NNP_METHODS, DFT_FUNCTIONALS, METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, RANGE_SEPARATED_FUNCTIONALS, Method
 from .mode import Mode
 from .opt_settings import OptimizationSettings
 from .scf_settings import SCFSettings
-from .solvent import SolventModel, SolventSettings
+from .solvent import SolventSettings
 from .task import Task
 from .thermochem_settings import ThermochemistrySettings
 
@@ -68,7 +68,12 @@ class Settings(Base):
     @model_validator(mode="after")
     def set_engine(self) -> Self:
         """Set the calculation engine."""
-        self.engine = self.engine or self.method.default_engine()
+        if not self.engine:
+            engine = self.method.default_engine()
+            # Fall back to PySCF if the auto-selected engine has a solvent allowlist that excludes the requested model
+            if self.solvent_settings and engine in ENGINE_SOLVENT_MODELS and self.solvent_settings.model not in ENGINE_SOLVENT_MODELS[engine]:
+                engine = Engine.PYSCF
+            self.engine = engine
         return self
 
     # mypy has this dead wrong (https://docs.pydantic.dev/2.0/usage/computed_fields/)
@@ -132,8 +137,10 @@ class Settings(Base):
                 raise ValueError(f"Excited-state calculations may only be performed with DFT:\n    {functionals}.")
 
         if self.solvent_settings:
-            if self.solvent_settings.model == SolventModel.COSMO and self.engine == Engine.GPU4PYSCF:
-                raise ValueError("GPU4PySCF does not support the COSMO solvent model")
+            supported = ENGINE_SOLVENT_MODELS.get(self.engine, frozenset())
+            if supported and self.solvent_settings.model not in supported:
+                allowed = ", ".join(sorted(m.value for m in supported)) or "none"
+                raise ValueError(f"{self.engine.value} does not support the {self.solvent_settings.model.value.upper()} solvent model. Supported: {allowed}")
 
         return self
 
