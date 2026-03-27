@@ -109,10 +109,28 @@ def test_settings_roundtrip() -> None:
 
 
 def test_gpu4pyscf_solvent() -> None:
-    with raises(ValueError, match="GPU4PySCF does not support the COSMO solvent model"):
+    with raises(ValueError, match="gpu4pyscf does not support the COSMO solvent model"):
         Settings(
             method=Method.B3LYP,
             basis_set="sto-3g",
             solvent_settings=SolventSettings(model="COSMO", solvent="hexane"),
             engine="gpu4pyscf",
+        )
+
+
+def test_unsupported_solvent_model() -> None:
+    """Engines reject solvent models they don't support."""
+    with raises(ValueError, match="psi4 does not support the ALPB solvent model"):
+        Settings(
+            method=Method.B3LYP,
+            basis_set="sto-3g",
+            solvent_settings=SolventSettings(model="ALPB", solvent="water"),
+            engine="psi4",
+        )
+
+    with raises(ValueError, match="xtb does not support the COSMO solvent model"):
+        Settings(
+            method=Method.GFN2_XTB,
+            solvent_settings=SolventSettings(model="COSMO", solvent="water"),
+            engine="xtb",
         )

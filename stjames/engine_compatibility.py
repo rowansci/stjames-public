@@ -3,9 +3,12 @@
 Used by ``Settings`` validators to catch invalid combinations at construction time.
 """
 
+from itertools import product
+
 from .correction import Correction
 from .engine import Engine
 from .method import Method
+from .solvent import SolventModel
 from .task import Task
 
 ENGINE_METHODS: dict[Engine, frozenset[Method]] = {
@@ -93,6 +96,7 @@ ENGINE_METHODS: dict[Engine, frozenset[Method]] = {
     Engine.PYSCF: frozenset(
         {
             Method.HARTREE_FOCK,
+            Method.BP86,
             Method.PBE,
             Method.R2SCAN,
             Method.TPSS,
@@ -104,14 +108,17 @@ ENGINE_METHODS: dict[Engine, frozenset[Method]] = {
             Method.M062X,
             Method.CAMB3LYP,
             Method.WB97XV,
+            Method.WB97XD3,
             Method.WB97MV,
             Method.WB97MD3BJ,
+            Method.WB97X3C,
             Method.SKALA,
         }
     ),
     Engine.GPU4PYSCF: frozenset(
         {
             Method.HARTREE_FOCK,
+            Method.BP86,
             Method.PBE,
             Method.R2SCAN,
             Method.TPSS,
@@ -123,8 +130,10 @@ ENGINE_METHODS: dict[Engine, frozenset[Method]] = {
             Method.M062X,
             Method.CAMB3LYP,
             Method.WB97XV,
+            Method.WB97XD3,
             Method.WB97MV,
             Method.WB97MD3BJ,
+            Method.WB97X3C,
             Method.SKALA,
         }
     ),
@@ -151,6 +160,7 @@ ENGINE_CORRECTIONS: dict[Engine, frozenset[Correction]] = {
 
 # Per-(method, engine) overrides on top of ENGINE_CORRECTIONS.
 # r2scan+psi4 and b3lyp allow D4; M06 family on psi4 only allows D3.
+# Methods with dispersion baked in (WB97X-D3, WB97X-3C, WB97M-D3BJ, etc.) disallow further corrections.
 _METHOD_ENGINE_CORRECTION_OVERRIDES: dict[tuple[Method, Engine], frozenset[Correction]] = {
     (Method.R2SCAN, Engine.PSI4): frozenset({Correction.D3BJ, Correction.D4}),
     (Method.B3LYP, Engine.PSI4): frozenset({Correction.D3BJ, Correction.D4}),
@@ -159,6 +169,14 @@ _METHOD_ENGINE_CORRECTION_OVERRIDES: dict[tuple[Method, Engine], frozenset[Corre
     (Method.M06, Engine.PSI4): frozenset({Correction.D3}),
     (Method.M06L, Engine.PSI4): frozenset({Correction.D3}),
     (Method.M062X, Engine.PSI4): frozenset({Correction.D3}),
+    # Dispersion baked in — no additional corrections allowed
+    **{
+        (method, engine): frozenset()
+        for method, engine in product(
+            (Method.WB97XD3, Method.WB97X3C, Method.WB97MD3BJ, Method.WB97XV, Method.WB97MV, Method.DSDBLYPD3BJ, Method.B97D3BJ),
+            (Engine.PSI4, Engine.PYSCF, Engine.GPU4PYSCF),
+        )
+    },
 }
 
 # Tasks unavailable per engine (periodic mode may disable additional tasks).
@@ -192,6 +210,19 @@ ENGINE_SUPPORTS_BASIS_SET: frozenset[Engine] = frozenset(
         Engine.GPU4PYSCF,
     }
 )
+
+
+# Solvent models supported per engine. Engines not listed do not support solvent models.
+ENGINE_SOLVENT_MODELS: dict[Engine, frozenset[SolventModel]] = {
+    Engine.PSI4: frozenset({SolventModel.COSMO, SolventModel.CPCM, SolventModel.PCM}),
+    Engine.PYSCF: frozenset({SolventModel.COSMO, SolventModel.CPCM, SolventModel.PCM}),
+    Engine.GPU4PYSCF: frozenset({SolventModel.CPCM, SolventModel.PCM}),
+    Engine.XTB: frozenset({SolventModel.ALPB, SolventModel.GBSA, SolventModel.CPCMX}),
+    Engine.AIMNET2: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
+    Engine.OMOL25: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
+    Engine.ORB: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
+    Engine.EGRET: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
+}
 
 
 def get_supported_corrections(method: Method, engine: Engine) -> frozenset[Correction]:

@@ -132,6 +132,7 @@ class Method(LowercaseStrEnum):
                 return Engine.PYSCF
             case (
                 Method.HARTREE_FOCK
+                | Method.BP86
                 | Method.PBE
                 | Method.R2SCAN
                 | Method.TPSS
