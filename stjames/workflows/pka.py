@@ -24,6 +24,7 @@ CHEMPROP_NEVOLIANIS2025_ALLOWED_SOLVENTS = {
 
 class MicroscopicpKaMethod(LowercaseStrEnum):
     AIMNET2_WAGEN2024 = "aimnet2_wagen2024"
+    GXTB_WAGEN2026 = "gxtb_wagen2026"
     CHEMPROP_NEVOLIANIS2025 = "chemprop_nevolianis2025"
     STARLING = "starling"
 

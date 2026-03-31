@@ -2,7 +2,7 @@
 
 from typing import Annotated, Self
 
-from pydantic import AfterValidator, PositiveFloat, model_validator
+from pydantic import AfterValidator, NonNegativeFloat, model_validator
 
 from ..molecule import Molecule
 from ..optimization.freezing_string_method import FSMSettings
@@ -40,8 +40,8 @@ class DoubleEndedTSSearchWorkflow(Workflow):
     optimize_ts: bool = True
 
     # Results
-    forward_string_distances: Annotated[list[PositiveFloat], AfterValidator(round_list(5))] = []
-    backward_string_distances: Annotated[list[PositiveFloat], AfterValidator(round_list(5))] = []
+    forward_string_distances: Annotated[list[NonNegativeFloat], AfterValidator(round_list(5))] = []
+    backward_string_distances: Annotated[list[NonNegativeFloat], AfterValidator(round_list(5))] = []
 
     forward_calculation_uuids: list[UUID | None] = []
     backward_calculation_uuids: list[UUID | None] = []

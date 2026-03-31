@@ -23,7 +23,7 @@ class SolventDependentConformer(Base):
     :param population_by_solvent: population in every solvent (number between 0 and 1)
     """
 
-    calculation: UUID
+    calculation: UUID | None = None
     free_energy_by_solvent: dict[Solvent, Annotated[float, AfterValidator(round_float(3))]]
     relative_free_energy_by_solvent: dict[Solvent, Annotated[float, AfterValidator(round_float(3))]]
     population_by_solvent: dict[Solvent, Annotated[float, AfterValidator(round_float(3))]]
