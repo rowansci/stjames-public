@@ -78,6 +78,12 @@ class Method(LowercaseStrEnum):
     GFN2_XTB = "gfn2_xtb"
     G_XTB = "g_xtb"
 
+    ## MOPAC semiempirical methods
+    PM6 = "pm6"
+    PM6_D3H4X = "pm6_d3h4x"
+    PM6_ORG = "pm6_org"
+    PM7 = "pm7"
+
     # Force fields
     OFF_SAGE_2_0_0 = "off_sage_2_0_0"
     OFF_SAGE_2_2_1 = "off_sage_2_2_1"
@@ -122,6 +128,8 @@ class Method(LowercaseStrEnum):
                 return Engine.ORB
             case method if method in XTB_METHODS:
                 return Engine.TBLITE if is_periodic else Engine.XTB
+            case method if method in MOPAC_METHODS:
+                return Engine.MOPAC
             case (
                 Method.OFF_SAGE_2_0_0 | Method.OFF_SAGE_2_2_1 | Method.OFF_SAGE_2_3_0 | Method.SMIRNOFF_2_0_0_AMBER_AM1BCC | Method.SMIRNOFF_2_2_1_AMBER_AM1BCC
             ):
@@ -201,14 +209,17 @@ NNP_METHODS = PREPACKAGED_NNP_METHODS | CORRECTABLE_NNP_METHODS
 XTBMethod = Literal[Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB, Method.G_XTB]
 XTB_METHODS = {Method.GFN_FF, Method.GFN0_XTB, Method.GFN1_XTB, Method.GFN2_XTB, Method.G_XTB}
 
+MOPACMethod = Literal[Method.PM6, Method.PM6_D3H4X, Method.PM6_ORG, Method.PM7]
+MOPAC_METHODS = {Method.PM6, Method.PM6_D3H4X, Method.PM6_ORG, Method.PM7}
+
 CompositeMethod = Literal[Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C]
 COMPOSITE_METHODS = {Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C}
 
 FFMethod = Literal[Method.OFF_SAGE_2_0_0, Method.OFF_SAGE_2_2_1, Method.OFF_SAGE_2_3_0]
 FF_METHODS = {Method.OFF_SAGE_2_0_0, Method.OFF_SAGE_2_2_1, Method.OFF_SAGE_2_3_0}
 
-PrepackagedMethod = XTBMethod | CompositeMethod | PrepackagedNNPMethod | FFMethod
-PREPACKAGED_METHODS = XTB_METHODS | COMPOSITE_METHODS | PREPACKAGED_NNP_METHODS | FF_METHODS
+PrepackagedMethod = XTBMethod | MOPACMethod | CompositeMethod | PrepackagedNNPMethod | FFMethod
+PREPACKAGED_METHODS = XTB_METHODS | MOPAC_METHODS | COMPOSITE_METHODS | PREPACKAGED_NNP_METHODS | FF_METHODS
 
 MethodWithCorrection = Literal[Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ]
 METHODS_WITH_CORRECTION = {Method.WB97XD3, Method.WB97XV, Method.WB97MV, Method.WB97MD3BJ, Method.DSDBLYPD3BJ, Method.B97D3BJ}

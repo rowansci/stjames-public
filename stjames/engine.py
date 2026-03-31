@@ -16,3 +16,4 @@ class Engine(LowercaseStrEnum):
     PSI4 = "psi4"
     OPENFF = "openff"
     EGRET = "egret"
+    MOPAC = "mopac"
