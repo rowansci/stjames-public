@@ -59,6 +59,14 @@ ENGINE_METHODS: dict[Engine, frozenset[Method]] = {
             Method.GFN2_XTB,
         }
     ),
+    Engine.MOPAC: frozenset(
+        {
+            Method.PM6,
+            Method.PM6_D3H4X,
+            Method.PM6_ORG,
+            Method.PM7,
+        }
+    ),
     Engine.OPENFF: frozenset(
         {
             Method.OFF_SAGE_2_0_0,
@@ -148,6 +156,7 @@ METHOD_ENGINES: dict[Method, frozenset[Engine]] = {
 ENGINE_CORRECTIONS: dict[Engine, frozenset[Correction]] = {
     Engine.AIMNET2: frozenset(),
     Engine.EGRET: frozenset(),
+    Engine.MOPAC: frozenset(),
     Engine.OMOL25: frozenset(),
     Engine.ORB: frozenset({Correction.D3}),
     Engine.XTB: frozenset(),
@@ -183,10 +192,11 @@ _METHOD_ENGINE_CORRECTION_OVERRIDES: dict[tuple[Method, Engine], frozenset[Corre
 ENGINE_DISABLED_TASKS: dict[Engine, frozenset[Task]] = {
     Engine.AIMNET2: frozenset({Task.DIPOLE, Task.SPIN_DENSITY}),
     Engine.EGRET: frozenset({Task.CHARGE, Task.DIPOLE, Task.SPIN_DENSITY}),
+    Engine.MOPAC: frozenset({Task.DIPOLE, Task.SPIN_DENSITY}),
     Engine.OMOL25: frozenset({Task.CHARGE, Task.DIPOLE, Task.SPIN_DENSITY}),
     Engine.ORB: frozenset({Task.CHARGE, Task.DIPOLE, Task.SPIN_DENSITY}),
     Engine.XTB: frozenset({Task.SPIN_DENSITY}),
-    Engine.TBLITE: frozenset({Task.SPIN_DENSITY, Task.FREQUENCIES, Task.OPTIMIZE_TS}),
+    Engine.TBLITE: frozenset({Task.SPIN_DENSITY}),
     Engine.OPENFF: frozenset(),
     Engine.PSI4: frozenset(),
     Engine.PYSCF: frozenset(),
@@ -214,14 +224,15 @@ ENGINE_SUPPORTS_BASIS_SET: frozenset[Engine] = frozenset(
 
 # Solvent models supported per engine. Engines not listed do not support solvent models.
 ENGINE_SOLVENT_MODELS: dict[Engine, frozenset[SolventModel]] = {
-    Engine.PSI4: frozenset({SolventModel.COSMO, SolventModel.CPCM, SolventModel.PCM}),
-    Engine.PYSCF: frozenset({SolventModel.COSMO, SolventModel.CPCM, SolventModel.PCM}),
-    Engine.GPU4PYSCF: frozenset({SolventModel.CPCM, SolventModel.PCM}),
-    Engine.XTB: frozenset({SolventModel.ALPB, SolventModel.GBSA, SolventModel.CPCMX}),
     Engine.AIMNET2: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
+    Engine.EGRET: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
+    Engine.GPU4PYSCF: frozenset({SolventModel.CPCM, SolventModel.PCM}),
+    Engine.MOPAC: frozenset({SolventModel.COSMO}),
     Engine.OMOL25: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
     Engine.ORB: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
-    Engine.EGRET: frozenset({SolventModel.ALPB, SolventModel.CPCMX}),
+    Engine.PSI4: frozenset({SolventModel.COSMO, SolventModel.CPCM, SolventModel.PCM}),
+    Engine.PYSCF: frozenset({SolventModel.COSMO, SolventModel.CPCM, SolventModel.PCM}),
+    Engine.XTB: frozenset({SolventModel.ALPB, SolventModel.GBSA, SolventModel.CPCMX}),
 }
 
 
