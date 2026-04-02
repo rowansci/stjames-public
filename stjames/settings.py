@@ -12,6 +12,7 @@ from .excited_state_settings import ExcitedStateSettingsUnion
 from .method import CORRECTABLE_NNP_METHODS, DFT_FUNCTIONALS, METHODS_WITH_CORRECTION, PREPACKAGED_METHODS, RANGE_SEPARATED_FUNCTIONALS, Method
 from .mode import Mode
 from .opt_settings import OptimizationSettings
+from .pbc_dft_settings import PBCDFTSettings
 from .scf_settings import SCFSettings
 from .solvent import SolventSettings
 from .task import Task
@@ -39,6 +40,8 @@ class Settings(Base):
     :param corrections: list of corrections to apply (e.g. D3BJ, D4)
     :param solvent_settings: solvent model settings (if any)
     :param omega: range-separation parameter (Bohr⁻¹) or method to tune it (optional)
+    :param excited_state_settings: settings for excited-state calculations (if any)
+    :param pbc_dft_settings: settings specific to DFT calculations on periodic systems
     :param scf_settings: SCF settings
     :param opt_settings: geometry optimization settings
     :param thermochem_settings: thermochemistry settings
@@ -59,6 +62,7 @@ class Settings(Base):
 
     excited_state_settings: ExcitedStateSettingsUnion | None = None
 
+    pbc_dft_settings: PBCDFTSettings | None = None
     # scf/opt settings will be set automatically based on mode, but can be overridden manually
     scf_settings: SCFSettings = SCFSettings()
     opt_settings: OptimizationSettings = OptimizationSettings()
