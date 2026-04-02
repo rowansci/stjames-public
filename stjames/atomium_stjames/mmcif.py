@@ -462,7 +462,7 @@ def make_aniso(mmcif_dict: dict[str, Any]) -> dict[int, list[str]]:
     :return: anisotropy mapping
     """
     return {
-        int(a["id"]): [float(a["U[{}][{}]".format(x, y)]) for x, y in ["11", "22", "33", "12", "13", "23"]]  # type: ignore [has-type, misc]
+        int(a["id"]): [float(a["U[{}][{}]".format(x, y)]) for x, y in ["11", "22", "33", "12", "13", "23"]]  # type: ignore [str-unpack, misc]
         for a in mmcif_dict.get("atom_site_anisotrop", [])
     }
 
