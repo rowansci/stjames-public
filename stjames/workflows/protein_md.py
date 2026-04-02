@@ -1,6 +1,6 @@
 from typing import Annotated, Any
 
-from pydantic import AfterValidator, PositiveFloat, PositiveInt, model_validator
+from pydantic import AfterValidator, NonNegativeFloat, PositiveFloat, PositiveInt, model_validator
 
 from ..base import Base, round_float
 from ..types import UUID, ProteinMDTrajectory, round_list
@@ -65,7 +65,7 @@ class ProteinMDSettingsMixin(Base):
     constrain_hydrogens: bool = True
     nonbonded_cutoff: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 8.0
 
-    ionic_strength_M: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 0.0
+    ionic_strength_M: Annotated[NonNegativeFloat, AfterValidator(round_float(3))] = 0.0
     water_buffer: Annotated[PositiveFloat, AfterValidator(round_float(3))] = 10.0
 
     num_clusters: PositiveInt = 10
