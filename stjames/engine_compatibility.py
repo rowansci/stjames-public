@@ -24,6 +24,36 @@ ENGINE_METHODS: dict[Engine, frozenset[Method]] = {
             Method.EGRET_1T,
         }
     ),
+    Engine.GPU4PYSCF: frozenset(
+        {
+            Method.HARTREE_FOCK,
+            Method.BP86,
+            Method.PBE,
+            Method.R2SCAN,
+            Method.TPSS,
+            Method.M06L,
+            Method.PBE0,
+            Method.B3LYP,
+            Method.TPSSH,
+            Method.M06,
+            Method.M062X,
+            Method.CAMB3LYP,
+            Method.WB97XV,
+            Method.WB97XD3,
+            Method.WB97MV,
+            Method.WB97MD3BJ,
+            Method.WB97X3C,
+            Method.SKALA,
+        }
+    ),
+    Engine.MOPAC: frozenset(
+        {
+            Method.PM6,
+            Method.PM6_D3H4X,
+            Method.PM6_ORG,
+            Method.PM7,
+        }
+    ),
     Engine.OMOL25: frozenset(
         {
             Method.OMOL25_CONSERVING_S,
@@ -42,29 +72,6 @@ ENGINE_METHODS: dict[Engine, frozenset[Method]] = {
         {
             Method.ORB_V3_CONSERVATIVE_INF_OMAT,
             Method.ORB_V3_CONSERVATIVE_OMOL,
-        }
-    ),
-    Engine.XTB: frozenset(
-        {
-            Method.GFN_FF,
-            Method.GFN0_XTB,
-            Method.GFN1_XTB,
-            Method.GFN2_XTB,
-            Method.G_XTB,
-        }
-    ),
-    Engine.TBLITE: frozenset(
-        {
-            Method.GFN1_XTB,
-            Method.GFN2_XTB,
-        }
-    ),
-    Engine.MOPAC: frozenset(
-        {
-            Method.PM6,
-            Method.PM6_D3H4X,
-            Method.PM6_ORG,
-            Method.PM7,
         }
     ),
     Engine.OPENFF: frozenset(
@@ -123,26 +130,37 @@ ENGINE_METHODS: dict[Engine, frozenset[Method]] = {
             Method.SKALA,
         }
     ),
-    Engine.GPU4PYSCF: frozenset(
+    Engine.QUANTUM_ESPRESSO: frozenset(
         {
             Method.HARTREE_FOCK,
-            Method.BP86,
             Method.PBE,
+            Method.BP86,
             Method.R2SCAN,
             Method.TPSS,
             Method.M06L,
+            Method.B97D3BJ,
             Method.PBE0,
             Method.B3LYP,
             Method.TPSSH,
             Method.M06,
             Method.M062X,
             Method.CAMB3LYP,
-            Method.WB97XV,
             Method.WB97XD3,
-            Method.WB97MV,
-            Method.WB97MD3BJ,
-            Method.WB97X3C,
-            Method.SKALA,
+        }
+    ),
+    Engine.TBLITE: frozenset(
+        {
+            Method.GFN1_XTB,
+            Method.GFN2_XTB,
+        }
+    ),
+    Engine.XTB: frozenset(
+        {
+            Method.GFN_FF,
+            Method.GFN0_XTB,
+            Method.GFN1_XTB,
+            Method.GFN2_XTB,
+            Method.G_XTB,
         }
     ),
 }
