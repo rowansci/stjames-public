@@ -12,13 +12,17 @@ class DescriptorsWorkflow(MoleculeWorkflow):
 
     Inherited:
     :param initial_molecule: Molecule of interest
-    :param mode: Mode for workflow
+    :param mode: Mode for workflow (not used)
 
     New:
+    :param optimize: whether to optimize with GFN2-xTB before calculating descriptors
+    :param solvent: solvent to use for optimization and descriptor calculation
     :param optimization: UUID of optimization
     :param descriptors: calculated descriptors
     """
 
-    optimization: UUID | None = None
+    optimize: bool = False
+    solvent: str | None = None
 
+    optimization: UUID | None = None
     descriptors: Descriptors | None = None
