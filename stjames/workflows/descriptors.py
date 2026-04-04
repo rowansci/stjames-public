@@ -1,5 +1,6 @@
 """Molecular descriptors workflow."""
 
+from ..solvent import Solvent
 from ..types import UUID
 from .workflow import MoleculeWorkflow
 
@@ -15,14 +16,14 @@ class DescriptorsWorkflow(MoleculeWorkflow):
     :param mode: Mode for workflow (not used)
 
     New:
-    :param optimize: whether to optimize with GFN2-xTB before calculating descriptors
+    :param do_optimization: whether to optimize with GFN2-xTB before calculating descriptors
     :param solvent: solvent to use for optimization and descriptor calculation
     :param optimization: UUID of optimization
     :param descriptors: calculated descriptors
     """
 
-    optimize: bool = False
-    solvent: str | None = None
+    do_optimization: bool = True
+    solvent: Solvent | None = None
 
     optimization: UUID | None = None
     descriptors: Descriptors | None = None
