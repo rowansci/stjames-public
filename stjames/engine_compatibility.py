@@ -174,15 +174,16 @@ METHOD_ENGINES: dict[Method, frozenset[Engine]] = {
 ENGINE_CORRECTIONS: dict[Engine, frozenset[Correction]] = {
     Engine.AIMNET2: frozenset(),
     Engine.EGRET: frozenset(),
+    Engine.GPU4PYSCF: frozenset({Correction.D3, Correction.D3BJ, Correction.D4}),
     Engine.MOPAC: frozenset(),
     Engine.OMOL25: frozenset(),
-    Engine.ORB: frozenset({Correction.D3}),
-    Engine.XTB: frozenset(),
-    Engine.TBLITE: frozenset(),
     Engine.OPENFF: frozenset(),
+    Engine.ORB: frozenset({Correction.D3}),
     Engine.PSI4: frozenset({Correction.D3BJ}),
     Engine.PYSCF: frozenset({Correction.D3, Correction.D3BJ, Correction.D4}),
-    Engine.GPU4PYSCF: frozenset({Correction.D3, Correction.D3BJ, Correction.D4}),
+    Engine.QUANTUM_ESPRESSO: frozenset({Correction.D3, Correction.D3BJ}),
+    Engine.TBLITE: frozenset(),
+    Engine.XTB: frozenset(),
 }
 
 # Per-(method, engine) overrides on top of ENGINE_CORRECTIONS.
@@ -210,15 +211,16 @@ _METHOD_ENGINE_CORRECTION_OVERRIDES: dict[tuple[Method, Engine], frozenset[Corre
 ENGINE_DISABLED_TASKS: dict[Engine, frozenset[Task]] = {
     Engine.AIMNET2: frozenset({Task.DIPOLE, Task.SPIN_DENSITY}),
     Engine.EGRET: frozenset({Task.CHARGE, Task.DIPOLE, Task.SPIN_DENSITY}),
+    Engine.GPU4PYSCF: frozenset(),
     Engine.MOPAC: frozenset({Task.DIPOLE, Task.SPIN_DENSITY}),
     Engine.OMOL25: frozenset({Task.CHARGE, Task.DIPOLE, Task.SPIN_DENSITY}),
     Engine.ORB: frozenset({Task.CHARGE, Task.DIPOLE, Task.SPIN_DENSITY}),
-    Engine.XTB: frozenset({Task.SPIN_DENSITY}),
-    Engine.TBLITE: frozenset({Task.SPIN_DENSITY}),
     Engine.OPENFF: frozenset(),
     Engine.PSI4: frozenset(),
     Engine.PYSCF: frozenset(),
-    Engine.GPU4PYSCF: frozenset(),
+    Engine.QUANTUM_ESPRESSO: frozenset({Task.DIPOLE, Task.SPIN_DENSITY, Task.HESSIAN, Task.FREQUENCIES}),
+    Engine.TBLITE: frozenset({Task.SPIN_DENSITY}),
+    Engine.XTB: frozenset({Task.SPIN_DENSITY}),
 }
 
 # Engines that do not support open-shell (multiplicity > 1) calculations.
@@ -233,9 +235,10 @@ ENGINE_NO_OPEN_SHELL: frozenset[Engine] = frozenset(
 # Engines that accept an explicit basis set.
 ENGINE_SUPPORTS_BASIS_SET: frozenset[Engine] = frozenset(
     {
+        Engine.GPU4PYSCF,
         Engine.PSI4,
         Engine.PYSCF,
-        Engine.GPU4PYSCF,
+        Engine.QUANTUM_ESPRESSO,
     }
 )
 
