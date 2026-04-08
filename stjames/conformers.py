@@ -4,7 +4,7 @@ from typing import Annotated, Literal, Self, Sequence
 from pydantic import AfterValidator, BaseModel, Field, NonNegativeFloat, PositiveFloat, PositiveInt, field_validator, model_validator
 
 from .base import LowercaseStrEnum, round_float
-from .constraint import Constraint
+from .constraint import Constraint, ConstraintType
 from .method import Method, XTBMethod
 from .mode import Mode
 from .settings import Settings
@@ -370,7 +370,57 @@ class MonteCarloMultipleMinimumSettings(ConformerGenSettings):
         return nci
 
 
-ConformerGenSettingsUnion = Annotated[ETKDGSettings | iMTDSettings | LyrebirdSettings | MonteCarloMultipleMinimumSettings, Field(discriminator="settings_type")]
+class OpenConfSettings(ConformerGenSettings):
+    """
+    Settings for OpenConf-based conformer generation.
+
+    OpenConf uses a hybrid ETKDG seeding + MCMM torsion-walk exploration
+    strategy with PRISM deduplication.
+
+    Inherited:
+    :param constraints: FREEZE_ATOMS constraints only; pins specified atoms via MMFF
+        position restraints and excludes their rotors from the move set
+    :param nci: not supported
+    :param max_confs: maximum number of conformers to return
+
+    New:
+    :param n_steps: number of MCMM exploration steps (primary quality/speed lever)
+    :param energy_window_kcal: energy window for keeping conformers (kcal/mol)
+    :param parent_strategy: how to select parent conformers for mutation
+        - "softmax": energy-biased; favors low-energy basins (good for NMR/property prediction)
+        - "uniform": random; maximizes diversity (good for docking)
+        - "best": always mutate the lowest-energy conformer; fastest but least diverse
+    :param final_select: how the final conformer set is selected
+        - "diverse": k-means clustering on 3D shape descriptors; one conformer per cluster
+        - "energy": lowest-energy conformers only (best for Boltzmann-weighted applications)
+    :param do_final_refine: run full MMFF minimization on final set (slower but more accurate geometries)
+    """
+
+    n_steps: PositiveInt = 200
+    energy_window_kcal: PositiveFloat = 10.0
+    parent_strategy: Literal["softmax", "uniform", "best"] = "softmax"
+    final_select: Literal["energy", "diverse"] = "diverse"
+    do_final_refine: bool = True
+
+    settings_type: Literal["openconf"] = "openconf"
+
+    @field_validator("constraints")
+    def check_constraints(cls, constraints: Sequence[Constraint]) -> Sequence[Constraint]:
+        for c in constraints:
+            if c.constraint_type != ConstraintType.FREEZE_ATOMS:
+                raise ValueError(f"OpenConf only supports FREEZE_ATOMS constraints, not {c.constraint_type}")
+        return tuple(constraints)
+
+    @field_validator("nci")
+    def check_nci(cls, nci: bool) -> Literal[False]:
+        if nci:
+            raise ValueError("OpenConf does not support NCI potentials")
+        return nci
+
+
+ConformerGenSettingsUnion = Annotated[
+    ETKDGSettings | iMTDSettings | LyrebirdSettings | MonteCarloMultipleMinimumSettings | OpenConfSettings, Field(discriminator="settings_type")
+]
 
 
 class ConformerGenMixin(BaseModel):
