@@ -101,7 +101,7 @@ class pKaWorkflow(SMILESWorkflow, MoleculeWorkflow):
     def check_method_settings(self) -> Self:
         """Check that models with limited domain of applicability are predicting within correct domain."""
         match self.microscopic_pka_method:
-            case MicroscopicpKaMethod.AIMNET2_WAGEN2024:
+            case MicroscopicpKaMethod.AIMNET2_WAGEN2024 | MicroscopicpKaMethod.GXTB_WAGEN2026:
                 if self.solvent is not Solvent.WATER:
                     raise ValueError(f"{self.microscopic_pka_method} only supports water")
             case MicroscopicpKaMethod.CHEMPROP_NEVOLIANIS2025:
