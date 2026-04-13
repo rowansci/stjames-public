@@ -1,6 +1,6 @@
 [project]
 name = "stjames"
-version = "0.0.180"
+version = "0.0.181"
 description = "structured JSON atom/molecule encoding scheme"
 readme = "README.md"
 keywords = []
@@ -14,10 +14,10 @@ dependencies = [
 
 [dependency-groups]
 dev = [
-    "prek>=0.2",
+    "prek>=0.3.8",
     "pytest>=8.4",
     "pytest-cov>=7.0",
-    "ruff>=0.14",
+    "ruff>=0.15",
     "mypy",
     "rdkit-stubs",
 ]
