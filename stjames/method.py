@@ -97,7 +97,8 @@ class Method(LowercaseStrEnum):
         """
         Return the canonical Engine for this quantum-chemistry method.
 
-        :param is_periodic: if True and method is in XTB family, return
+        :param is_periodic: if True and method supports periodic DFT, return
+            "quantum_espresso"; if True and method is in XTB family, return
             "tblite" (periodic-capable backend) instead of "xtb"
         :return: lower-case engine identifier (e.g. "psi4", "xtb")
 
@@ -105,8 +106,14 @@ class Method(LowercaseStrEnum):
         'xtb'
         >>> Method.GFN2_XTB.default_engine(is_periodic=True).value
         'tblite'
+        >>> Method.PBE.default_engine(is_periodic=True).value
+        'quantum_espresso'
+        >>> Method.PBE.default_engine().value
+        'gpu4pyscf'
         """
         match self:
+            case method if is_periodic and method in QUANTUM_ESPRESSO_METHODS:
+                return Engine.QUANTUM_ESPRESSO
             case Method.AIMNET2_WB97MD3:
                 return Engine.AIMNET2
             case Method.MACE_MP_0B2_L:
@@ -217,6 +224,26 @@ COMPOSITE_METHODS = {Method.HF3C, Method.B973C, Method.R2SCAN3C, Method.WB97X3C}
 
 FFMethod = Literal[Method.OFF_SAGE_2_0_0, Method.OFF_SAGE_2_2_1, Method.OFF_SAGE_2_3_0]
 FF_METHODS = {Method.OFF_SAGE_2_0_0, Method.OFF_SAGE_2_2_1, Method.OFF_SAGE_2_3_0}
+
+# Methods supported by the Quantum ESPRESSO periodic DFT engine
+QUANTUM_ESPRESSO_METHODS: frozenset[Method] = frozenset(
+    {
+        Method.HARTREE_FOCK,
+        Method.PBE,
+        Method.BP86,
+        Method.R2SCAN,
+        Method.TPSS,
+        Method.M06L,
+        Method.B97D3BJ,
+        Method.PBE0,
+        Method.B3LYP,
+        Method.TPSSH,
+        Method.M06,
+        Method.M062X,
+        Method.CAMB3LYP,
+        Method.WB97XD3,
+    }
+)
 
 PrepackagedMethod = XTBMethod | MOPACMethod | CompositeMethod | PrepackagedNNPMethod | FFMethod
 PREPACKAGED_METHODS = XTB_METHODS | MOPAC_METHODS | COMPOSITE_METHODS | PREPACKAGED_NNP_METHODS | FF_METHODS

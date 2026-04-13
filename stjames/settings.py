@@ -73,7 +73,7 @@ class Settings(Base):
     def set_engine(self) -> Self:
         """Set the calculation engine."""
         if not self.engine:
-            engine = self.method.default_engine()
+            engine = self.method.default_engine(is_periodic=self.pbc_dft_settings is not None)
             # Fall back to PySCF if the auto-selected engine has a solvent allowlist that excludes the requested model
             if self.solvent_settings and engine in ENGINE_SOLVENT_MODELS and self.solvent_settings.model not in ENGINE_SOLVENT_MODELS[engine]:
                 engine = Engine.PYSCF
