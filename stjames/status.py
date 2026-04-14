@@ -24,3 +24,6 @@ class Status(int, Enum):
 
     # Job is not yet submitted
     DRAFT = 6
+
+    # Job has been preempted or otherwise stopped unexpectedly
+    PREEMPTED = 7
